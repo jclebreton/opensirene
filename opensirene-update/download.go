@@ -1,135 +1,100 @@
 package main
 
 import (
-	"archive/zip"
-	"errors"
 	"fmt"
 	"io"
-	"log"
+	"math"
 	"net/http"
 	"os"
-	"path/filepath"
-	"strings"
 	"time"
 )
 
-//getIncrementalFiles returns a list of Incremental files to download
-func getIncrementalFiles() []string {
-	year, month, _ := time.Now().Date()
-	firstDayOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
-	firstDayOfYear := time.Date(year, time.January, 1, 0, 0, 0, 0, time.Local)
-	startNumber := int(firstDayOfMonth.Local().Sub(firstDayOfYear).Hours()/24) + 1
-	n := int(time.Now().Sub(firstDayOfMonth).Hours() / 24)
+//getFiles returns a list of files to download
+func getZipList(url, dest string) (files []zipFile) {
+	currentYear, currentMonth, _ := time.Now().Date()
 
-	var files []string
-	for i := 2; i <= n; i++ {
-		day := time.Date(year, month, i, 0, 0, 0, 0, time.Local).Format("Monday")
-		if day != "Saturday" && day != "Sunday" {
-			files = append(files, fmt.Sprintf("sirene_%d%d_E_Q", year, startNumber+i))
+	//Stock file
+	pattern := "sirene_%d%d_L_M"
+	if currentMonth-1 < 10 {
+		pattern = "sirene_%d0%d_L_M"
+	}
+	file := zipFile{
+		updateType: "complete",
+		name:       fmt.Sprintf(pattern, currentYear, currentMonth-1),
+	}
+	file.filename = file.name + ".zip"
+	file.url = fmt.Sprintf("%s/%s", url, file.filename)
+	file.path = fmt.Sprintf("%s/%s", dest, file.filename)
+	files = append(files, file)
+
+	//Incremental files
+	firstDayOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, time.Local)
+	firstDayOfYear := time.Date(currentYear, time.January, 1, 0, 0, 0, 0, time.Local)
+	startNumber := int(math.Ceil(firstDayOfMonth.Local().Sub(firstDayOfYear).Hours()/24)) + 1
+	n := int(math.Ceil(time.Now().Sub(firstDayOfMonth).Hours() / 24))
+	for i := 2; i <= n-1; i++ {
+		day := time.Date(currentYear, currentMonth, i, 0, 0, 0, 0, time.Local)
+		if day.Format("Monday") != "Saturday" && day.Format("Monday") != "Sunday" {
+			file = zipFile{
+				updateType: "incremental",
+				name:       fmt.Sprintf("sirene_%d%d_E_Q", currentYear, startNumber+i-1),
+			}
+			file.filename = file.name + ".zip"
+			file.url = fmt.Sprintf("%s/%s", url, file.filename)
+			file.path = fmt.Sprintf("%s/%s", dest, file.filename)
+			files = append(files, file)
 		}
 	}
 
 	return files
 }
 
-//getLastStockFile returns the name of the last stock file to download
-func getLastStockFile() string {
-	year, month, _ := time.Now().Date()
-	month -= 1
-	pattern := "sirene_%d%d_L_M"
-	if month < 10 {
-		pattern = "sirene_%d0%d_L_M"
-	}
-
-	return fmt.Sprintf(pattern, year, month)
+// PassThru code originally from
+// http://stackoverflow.com/a/22422650/613575
+type PassThru struct {
+	io.Reader
+	curr     int64
+	total    float64
+	filename string
+	progress chan map[string]float64
 }
 
-//downloadFile will download a file
-func downloadFile(file, prefix, dest string) (err error) {
-	url := fmt.Sprintf("%s/%s", prefix, file)
+//Override native Read
+func (pt *PassThru) Read(p []byte) (int, error) {
+	n, err := pt.Reader.Read(p)
+	pt.curr += int64(n)
 
-	// Get the data
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
+	// last read will have EOF err
+	if err == nil || (err == io.EOF && n > 0) {
+		pt.progress <- map[string]float64{pt.filename: (float64(pt.curr) / pt.total) * 100}
 	}
 
-	// Stop if file does not exist
-	if resp.StatusCode != 200 {
-		return errors.New(fmt.Sprintf("%s not found!\n", file))
-	}
+	return n, err
+}
 
-	// Create the file
-	out, err := os.Create(fmt.Sprintf("%s/%s", dest, file))
-	defer out.Close()
-	if err != nil {
-		return err
-	}
-
-	// Writer the body to file
+//downloadZipFile will download a file
+func downloadZipFile(file zipFile, progress chan map[string]float64) (err error) {
+	resp, _ := http.Get(file.url)
 	defer resp.Body.Close()
-	_, err = io.Copy(out, resp.Body)
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("Remote file not found: %s", file.filename)
+	}
+
+	out, _ := os.Create(file.path)
+	defer out.Close()
+
+	src := &PassThru{
+		Reader:   resp.Body,
+		total:    float64(resp.ContentLength),
+		filename: file.filename,
+		progress: progress,
+	}
+
+	_, err = io.Copy(out, src)
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-//unzipFile will un-compress a zip archive
-func unzipFile(src, dest string) ([]string, error) {
-
-	var filenames []string
-
-	r, err := zip.OpenReader(src)
-	if err != nil {
-		return filenames, err
-	}
-	defer r.Close()
-
-	for _, f := range r.File {
-
-		rc, err := f.Open()
-		if err != nil {
-			return filenames, err
-		}
-		defer rc.Close()
-
-		// Store filename/path for returning and using later on
-		fpath := filepath.Join(dest, f.Name)
-		filenames = append(filenames, fpath)
-
-		if f.FileInfo().IsDir() {
-
-			// Make Folder
-			os.MkdirAll(fpath, os.ModePerm)
-
-		} else {
-
-			// Make File
-			var fdir string
-			if lastIndex := strings.LastIndex(fpath, string(os.PathSeparator)); lastIndex > -1 {
-				fdir = fpath[:lastIndex]
-			}
-
-			err = os.MkdirAll(fdir, os.ModePerm)
-			if err != nil {
-				log.Fatal(err)
-				return filenames, err
-			}
-			f, err := os.OpenFile(
-				fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-			if err != nil {
-				return filenames, err
-			}
-			defer f.Close()
-
-			_, err = io.Copy(f, rc)
-			if err != nil {
-				return filenames, err
-			}
-
-		}
-	}
-	return filenames, nil
 }
