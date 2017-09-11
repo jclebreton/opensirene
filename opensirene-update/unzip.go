@@ -18,10 +18,9 @@ func unzipFile(zipFile zipFile, dest string, progress chan map[string]float64) (
 	}
 	defer r.Close()
 
-	totalFiles := len(r.File)
 	var result []csvFile
 
-	for k, f := range r.File {
+	for _, f := range r.File {
 		rc, err := f.Open()
 		if err != nil {
 			return nil, err
@@ -30,6 +29,7 @@ func unzipFile(zipFile zipFile, dest string, progress chan map[string]float64) (
 
 		fpath := filepath.Join(dest, f.Name)
 
+		file := f
 		if f.FileInfo().IsDir() {
 			os.MkdirAll(fpath, os.ModePerm)
 		} else {
@@ -50,7 +50,14 @@ func unzipFile(zipFile zipFile, dest string, progress chan map[string]float64) (
 			}
 			defer f.Close()
 
-			_, err = io.Copy(f, rc)
+			src := &PassThru{
+				Reader:   rc,
+				total:    float64(file.FileInfo().Size()),
+				filename: zipFile.filename,
+				progress: progress,
+			}
+
+			_, err = io.Copy(f, src)
 			if err != nil {
 				return nil, err
 			}
@@ -60,8 +67,6 @@ func unzipFile(zipFile zipFile, dest string, progress chan map[string]float64) (
 				path:     fpath,
 			})
 		}
-
-		progress <- map[string]float64{zipFile.filename: float64(((k + 1) / totalFiles) * 100)}
 	}
 
 	return result, nil
