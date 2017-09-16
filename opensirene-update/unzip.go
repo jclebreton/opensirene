@@ -10,7 +10,9 @@ import (
 )
 
 //unzipFile will un-compress a zip archive
-func unzipFile(zipFile zipFile, dest string, progress chan map[string]float64) ([]csvFile, error) {
+func unzipFile(zipFile zipFile, progress chan map[string]float64) ([]csvFile, error) {
+
+	dest := filepath.Dir(zipFile.path)
 
 	r, err := zip.OpenReader(zipFile.path)
 	if err != nil {
@@ -63,8 +65,8 @@ func unzipFile(zipFile zipFile, dest string, progress chan map[string]float64) (
 			}
 
 			result = append(result, csvFile{
-				filename: f.Name(),
-				path:     fpath,
+				filename: fpath,
+				path:     f.Name(),
 			})
 		}
 	}

@@ -1,13 +1,8 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-)
+import "fmt"
 
-func progress(wg *sync.WaitGroup, downloadProgress chan map[string]float64, unzipProgress chan map[string]float64) {
-	defer wg.Done()
-
+func progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipProgress <-chan map[string]float64) {
 	downloadResults := map[string]float64{}
 	unzipResults := map[string]float64{}
 
@@ -29,14 +24,14 @@ func progress(wg *sync.WaitGroup, downloadProgress chan map[string]float64, unzi
 		for _, v := range downloadResults {
 			totalDownloadProgress += v
 		}
-		totalDownloadProgress = totalDownloadProgress / float64(len(downloadResults))
+		totalDownloadProgress = totalDownloadProgress / float64(nbZipFiles)
 
 		//Unzip progress
 		var totalUnzipProgress float64
 		for _, v := range unzipResults {
 			totalUnzipProgress += v
 		}
-		totalUnzipProgress = totalUnzipProgress / float64(len(downloadResults))
+		totalUnzipProgress = totalUnzipProgress / float64(nbZipFiles)
 
 		fmt.Printf("\rDownload progress: %.1f%% - Unzip progress: %.1f%%", totalDownloadProgress, totalUnzipProgress)
 
