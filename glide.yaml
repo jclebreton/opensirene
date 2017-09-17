@@ -1,0 +1,3 @@
+package: github.com/jclebreton/opensirene
+import:
+- package: github.com/docopt/docopt-go
