@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 )
 
@@ -46,19 +46,19 @@ func startWorker(id int, workerChan <-chan zipFile, resultChan chan<- []csvFile,
 	for zipFile := range workerChan {
 		err := downloadZipFile(zipFile, downloadProgressChan)
 		if err != nil {
-			fmt.Printf("Error: %s\n", err)
+			log.Fatal(err)
 			return
 		}
 
 		zipFile.csvFiles, err = unzipFile(zipFile, unzipProgressChan)
 		if err != nil {
-			fmt.Printf("Error: %s\n", err)
+			log.Fatal(err)
 			return
 		}
 
 		err = os.Remove(zipFile.path)
 		if err != nil {
-			fmt.Printf("Error: %s\n", err)
+			log.Fatal(err)
 			return
 		}
 
