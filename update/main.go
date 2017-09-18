@@ -7,6 +7,9 @@ import (
 
 	"strconv"
 
+	"log"
+	"os"
+
 	"github.com/docopt/docopt-go"
 )
 
@@ -40,6 +43,12 @@ Options:
 		}
 		wd = temp
 	}
+	err := os.MkdirAll(wd, os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
 	fmt.Printf("Working directory: %s\n", wd)
 
 	//Max workers
