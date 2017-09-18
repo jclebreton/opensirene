@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/docopt/docopt-go"
+	"golang.org/x/sys/unix"
 )
 
 var url = "http://files.data.gouv.fr/sirene"
@@ -48,7 +49,9 @@ Options:
 		log.Fatal(err)
 		return
 	}
-
+	if unix.Access(wd, unix.W_OK) != nil {
+		log.Fatal("Workng directory is not writable")
+	}
 	fmt.Printf("Working directory: %s\n", wd)
 
 	//Max workers
