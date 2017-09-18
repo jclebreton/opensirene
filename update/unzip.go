@@ -40,11 +40,14 @@ func unzipFile(zipFile zipFile, progress chan map[string]float64) ([]csvFile, er
 				fdir = fpath[:lastIndex]
 			}
 
-			err = os.MkdirAll(fdir, os.ModePerm)
-			if err != nil {
-				log.Fatal(err)
-				return nil, err
+			if fdir != "" {
+				err = os.MkdirAll(fdir, os.ModePerm)
+				if err != nil {
+					log.Fatal(err)
+					return nil, err
+				}
 			}
+
 			f, err := os.OpenFile(
 				fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
