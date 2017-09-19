@@ -3,19 +3,13 @@ package main
 import (
 	"fmt"
 
-	"io/ioutil"
-
-	"strconv"
-
 	"log"
-	"os"
 
 	"github.com/docopt/docopt-go"
-	"golang.org/x/sys/unix"
 )
 
 var url = "http://files.data.gouv.fr/sirene"
-var nbWorkers = 100
+var nbWorkersMax = 100
 
 func main() {
 	usage := `Update database from scratch.
@@ -33,41 +27,24 @@ Options:
 	//fmt.Println(arguments)
 
 	//Working directory
-	var wd string
-	if arguments["--wd"] != nil {
-		wd = arguments["--wd"].(string)
-	} else {
-		temp, err := ioutil.TempDir("/tmp/", "tmp")
-		if err != nil {
-			fmt.Printf("Error: %s", err)
-			return
-		}
-		wd = temp
-	}
-	err := os.MkdirAll(wd, os.ModePerm)
+	wd, err := getWorkingDirectory(arguments)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	if unix.Access(wd, unix.W_OK) != nil {
-		log.Fatal("Workng directory is not writable")
-	}
 	fmt.Printf("Working directory: %s\n", wd)
 
 	//Max workers
-	if arguments["--maxworkers"] != nil {
-		n, err := strconv.Atoi(arguments["--maxworkers"].(string))
-		if err != nil || n <= 0 || n > 100 {
-			fmt.Println("Number of workers must be >= 1 and <=100")
-			return
-		}
-		nbWorkers = n
+	nbWorkers, err := getNbWorkers(arguments)
+	if err != nil {
+		log.Fatal(err)
+		return
 	}
 	fmt.Printf("Number of workers: %d\n", nbWorkers)
 
 	//Update from scratch
 	if arguments["complete"].(bool) {
-		csvFiles := downloadAndExtract(wd)
+		csvFiles := downloadAndExtract(wd, nbWorkers)
 		fmt.Printf("\nNumber of CSV files: %d\n", len(csvFiles))
 		fmt.Printf("Process completed\n")
 	}

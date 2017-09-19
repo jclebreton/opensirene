@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func downloadAndExtract(dest string) []csvFile {
+func downloadAndExtract(dest string, nbWorkers int) []csvFile {
 	zipFiles := getZipList(url, dest)
 
 	//Progress
