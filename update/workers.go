@@ -17,7 +17,7 @@ func downloadAndExtract(dest string) []csvFile {
 
 	//Workers
 	nbZipFiles := len(zipFiles)
-	workerChan := make(chan zipFile, nbZipFiles)
+	workerChan := make(chan zipFile)
 	resultChan := make(chan []csvFile, nbZipFiles)
 	defer close(workerChan)
 	defer close(resultChan)
@@ -26,9 +26,11 @@ func downloadAndExtract(dest string) []csvFile {
 	}
 
 	//Send Zip files
-	for _, zipFile := range zipFiles {
-		workerChan <- zipFile
-	}
+	go func() {
+		for _, zipFile := range zipFiles {
+			workerChan <- zipFile
+		}
+	}()
 
 	//Waiting CSV files
 	var csvFiles []csvFile
