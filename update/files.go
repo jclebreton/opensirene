@@ -34,7 +34,6 @@ func getZipListFromScratch(monthName, url, dest string) (files []zipFile, err er
 }
 
 //isWorkingDay returns true if current day is a working day
-//TODO: Add easter public holiday
 func isWorkingDay(day time.Time) bool {
 	//Weekend
 	dayName := day.Format("Monday")
@@ -43,10 +42,18 @@ func isWorkingDay(day time.Time) bool {
 	}
 
 	//Public holidays
-	if (day.Month() == 1 && day.Day() == 1) || (day.Month() == 5 && day.Day() == 1) ||
-		(day.Month() == 5 && day.Day() == 8) || (day.Month() == 7 && day.Day() == 14) ||
-		(day.Month() == 8 && day.Day() == 15) || (day.Month() == 11 && day.Day() == 1) ||
-		(day.Month() == 11 && day.Day() == 11) || (day.Month() == 12 && day.Day() == 25) {
+	easter := getEasterDay(day)
+	if (day.Month() == 1 && day.Day() == 1) || //Jour de l'an
+		(easter.Month() == day.Month() && easter.Day()+1 == day.Day()) || //Lundi de Paques
+		(day.Month() == 5 && day.Day() == 1) || //Fete du travail
+		(day.Month() == 5 && day.Day() == 8) || //Liberation
+		(day.Month() == 5 && day.Day() == 25) || //Ascension
+		(day.Month() == 6 && day.Day() == 5) || //Pentecote
+		(day.Month() == 7 && day.Day() == 14) || //Revolution
+		(day.Month() == 8 && day.Day() == 15) || //Assomption
+		(day.Month() == 11 && day.Day() == 1) || //Toussaint
+		(day.Month() == 11 && day.Day() == 11) || //Armistice
+		(day.Month() == 12 && day.Day() == 25) { //Noel
 		return false
 	}
 
