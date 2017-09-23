@@ -45,7 +45,14 @@ Options:
 
 	//Update from scratch
 	if arguments["complete"].(bool) {
-		csvFiles, err := downloadAndExtract(getMonth(arguments), wd, nbWorkers)
+
+		zipFiles, err := getZipListFromScratch(getMonth(arguments), url, wd)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		csvFiles, err := downloadAndExtract(zipFiles, nbWorkers)
 		if err != nil {
 			log.Fatal(err)
 			return

@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-//getFiles returns the files list to download
-func getZipList(monthName, url, dest string) (files []zipFile, err error) {
+//getFiles returns all the files to start from scratch
+func getZipListFromScratch(monthName, url, dest string) (files []zipFile, err error) {
 
 	//Start date
 	firstDayOfMonth, err := getStartingDate(monthName)
