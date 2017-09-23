@@ -19,16 +19,9 @@ func getZipListFromScratch(monthName, url, dest string) (files []zipFile, err er
 	n := getNumOfDaysForMonth(firstDayOfMonth)
 	day := firstDayOfMonth
 	for i := 1; i <= n; i++ {
-		dayName := day.Format("Monday")
-
-		//No files the weekend
-		if dayName != "Saturday" && dayName != "Sunday" {
-
-			//No files in the future
-			if time.Now().After(day) {
-				file := getIncrementalFile(day, dest)
-				files = append(files, file)
-			}
+		if isWorkingDay(day) && time.Now().After(day) {
+			file := getIncrementalFile(day, dest)
+			files = append(files, file)
 		}
 		day = firstDayOfMonth.AddDate(0, 0, i)
 	}
@@ -38,6 +31,26 @@ func getZipListFromScratch(monthName, url, dest string) (files []zipFile, err er
 	files = append(files, file)
 
 	return files, nil
+}
+
+//isWorkingDay returns true if current day is a working day
+//TODO: Add easter public holiday
+func isWorkingDay(day time.Time) bool {
+	//Weekend
+	dayName := day.Format("Monday")
+	if dayName == "Saturday" || dayName == "Sunday" {
+		return false
+	}
+
+	//Public holidays
+	if (day.Month() == 1 && day.Day() == 1) || (day.Month() == 5 && day.Day() == 1) ||
+		(day.Month() == 5 && day.Day() == 8) || (day.Month() == 7 && day.Day() == 14) ||
+		(day.Month() == 8 && day.Day() == 15) || (day.Month() == 11 && day.Day() == 1) ||
+		(day.Month() == 11 && day.Day() == 11) || (day.Month() == 12 && day.Day() == 25) {
+		return false
+	}
+
+	return true
 }
 
 //getNumOfDays returns the number of the days in the month for current date
