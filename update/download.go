@@ -8,12 +8,15 @@ import (
 )
 
 //downloadZipFile will download a file
-func downloadZipFile(file zipFile, progress chan map[string]float64) (err error) {
+func downloadZipFile(file zipFile, progress chan map[string]float64, errorsChan chan error) error {
 	resp, _ := http.Get(file.url)
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Remote file not found: %s", file.filename)
+		err := fmt.Errorf("Remote file not found: %s", file.filename)
+		progress <- map[string]float64{file.filename: 100}
+		errorsChan <- err
+		return err
 	}
 
 	out, _ := os.Create(file.path)
@@ -26,8 +29,9 @@ func downloadZipFile(file zipFile, progress chan map[string]float64) (err error)
 		progress: progress,
 	}
 
-	_, err = io.Copy(out, src)
+	_, err := io.Copy(out, src)
 	if err != nil {
+		errorsChan <- err
 		return err
 	}
 

@@ -27,8 +27,8 @@ func getZipListFromScratch(monthName, url, dest string) (files []zipFile, err er
 	}
 
 	//Stock file
-	file := getCompleteFile(firstDayOfMonth.AddDate(0, -1, 0).Add(time.Nanosecond), dest)
-	files = append(files, file)
+	//file := getCompleteFile(firstDayOfMonth.AddDate(0, -1, 0).Add(time.Nanosecond), dest)
+	//files = append(files, file)
 
 	return files, nil
 }

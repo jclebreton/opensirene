@@ -51,6 +51,7 @@ Options:
 			log.Fatal(err)
 			return
 		}
+		fmt.Printf("Number of ZIP files: %d\n", len(zipFiles))
 
 		csvFiles, err := downloadAndExtract(zipFiles, nbWorkers)
 		if err != nil {

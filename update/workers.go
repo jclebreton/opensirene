@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -13,6 +14,12 @@ func downloadAndExtract(zipFiles []zipFile, nbWorkers int) ([]csvFile, error) {
 	defer close(downloadProgressChan)
 	defer close(unzipProgressChan)
 
+	errorsChan := make(chan error)
+	endErrorsChan := make(chan bool)
+	defer close(errorsChan)
+	defer close(endErrorsChan)
+	go listenErrors(errorsChan, endErrorsChan)
+
 	//Workers
 	nbZipFiles := len(zipFiles)
 	workerChan := make(chan zipFile)
@@ -20,7 +27,7 @@ func downloadAndExtract(zipFiles []zipFile, nbWorkers int) ([]csvFile, error) {
 	defer close(workerChan)
 	defer close(resultChan)
 	for id := 1; id <= nbWorkers; id++ {
-		go startWorker(id, workerChan, resultChan, downloadProgressChan, unzipProgressChan)
+		go startWorker(id, workerChan, resultChan, downloadProgressChan, unzipProgressChan, errorsChan)
 	}
 
 	//Send Zip files
@@ -39,14 +46,36 @@ func downloadAndExtract(zipFiles []zipFile, nbWorkers int) ([]csvFile, error) {
 		}
 	}
 
+	endErrorsChan <- true
+
 	return csvFiles, nil
 }
 
-func startWorker(id int, workerChan <-chan zipFile, resultChan chan<- []csvFile, downloadProgressChan, unzipProgressChan chan map[string]float64) {
+func listenErrors(errorsChan chan error, end chan bool) {
+	var errors []error
+loop:
+	for {
+		select {
+		case error := <-errorsChan:
+			errors = append(errors, error)
+		case <-end:
+			break loop
+		default:
+		}
+	}
+	fmt.Printf("\nNumber of errors: %d", len(errors))
+	for _, err := range errors {
+		fmt.Printf("\n- %s", err)
+	}
+}
+
+func startWorker(id int, workerChan <-chan zipFile, resultChan chan<- []csvFile, downloadProgressChan,
+	unzipProgressChan chan map[string]float64, errorsChan chan error) {
 	for zipFile := range workerChan {
-		err := downloadZipFile(zipFile, downloadProgressChan)
+		err := downloadZipFile(zipFile, downloadProgressChan, errorsChan)
 		if err != nil {
-			log.Fatal(err)
+			unzipProgressChan <- map[string]float64{zipFile.filename: 100}
+			resultChan <- []csvFile{}
 			return
 		}
 
