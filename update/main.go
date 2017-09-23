@@ -9,7 +9,7 @@ import (
 )
 
 var url = "http://files.data.gouv.fr/sirene"
-var nbWorkersMax = 100
+var nbWorkersMax = 31
 
 func main() {
 	usage := `Update database from scratch.
