@@ -1,6 +1,12 @@
-hash: e95886104b9e86531e19750ae8d1f3e0df5c04f97073bf89200386075f80bd7b
-updated: 2017-09-17T14:51:25.102075461+02:00
+hash: c7bfe87ff5e09eb84ef299e2eff484da4fddde76eaa0dcc8b50f38745c455df7
+updated: 2017-09-23T22:49:30.622177726+02:00
 imports:
 - name: github.com/docopt/docopt-go
   version: 784ddc588536785e7299f7272f39101f7faccc3f
+- name: github.com/stretchr/testify
+  version: 890a5c3458b43e6104ff5da8dfa139d013d77544
+- name: golang.org/x/sys
+  version: 429f518978ab01db8bb6f44b66785088e7fba58b
+  subpackages:
+  - unix
 devImports: []
