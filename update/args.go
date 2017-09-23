@@ -8,6 +8,8 @@ import (
 
 	"errors"
 
+	"time"
+
 	"golang.org/x/sys/unix"
 )
 
@@ -47,4 +49,16 @@ func getNbWorkers(arguments map[string]interface{}) (int, error) {
 	}
 
 	return nbWorkersMax, nil
+}
+
+func getMonth(arguments map[string]interface{}) string {
+	var month string
+
+	if arguments["--month"] != nil {
+		month = arguments["--month"].(string)
+	} else {
+		month = time.Now().Format("Jan")
+	}
+
+	return month
 }

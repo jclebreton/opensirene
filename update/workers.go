@@ -5,9 +5,12 @@ import (
 	"os"
 )
 
-func downloadAndExtract(dest string, nbWorkers int) []csvFile {
-	zipFiles := getZipList(url, dest)
-
+func downloadAndExtract(month, dest string, nbWorkers int) ([]csvFile, error) {
+	zipFiles, err := getZipList(month, url, dest)
+	if err != nil {
+		return nil, err
+	}
+	
 	//Progress
 	downloadProgressChan := make(chan map[string]float64)
 	unzipProgressChan := make(chan map[string]float64)
@@ -41,7 +44,7 @@ func downloadAndExtract(dest string, nbWorkers int) []csvFile {
 		}
 	}
 
-	return csvFiles
+	return csvFiles, nil
 }
 
 func startWorker(id int, workerChan <-chan zipFile, resultChan chan<- []csvFile, downloadProgressChan, unzipProgressChan chan map[string]float64) {
