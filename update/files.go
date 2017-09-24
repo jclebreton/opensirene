@@ -69,9 +69,9 @@ func getNumOfDaysForMonth(d time.Time) int {
 //getDayNumber returns the day's number in the year
 func getDayNumber(d time.Time) int {
 	year, _, _ := d.Date()
-	first := time.Date(year, time.January, 1, 0, 0, 0, 0, time.Local)
+	first := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)
 
-	return int(math.Ceil(d.Local().Sub(first).Hours() / 24))
+	return int(math.Ceil(d.Local().Sub(first).Hours()/24)) + 1
 }
 
 //getStartingDate returns the corresponding time object for asked month

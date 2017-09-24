@@ -28,5 +28,5 @@ func getEasterDay(date time.Time) time.Time {
 		r = 22 + d + e
 	}
 
-	return time.Date(year, time.March, r, 0, 0, 0, 0, time.Local)
+	return time.Date(year, time.March, r, 0, 0, 0, 0, time.UTC)
 }
