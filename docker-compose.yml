@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+
+  opensirenedb:
+    build:
+      dockerfile: Dockerfile.db
+      context: .
+    ports:
+      - "5432"
+
+  update:
+    build:
+      dockerfile: Dockerfile.update
+      context: .
+    depends_on:
+      - opensirenedb
+    command: update complete

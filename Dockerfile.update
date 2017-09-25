@@ -1,0 +1,11 @@
+FROM golang
+
+ADD . /go/src/github.com/jclebreton/opensirene
+
+RUN go get -v github.com/Masterminds/glide
+RUN cd /go/src/github.com/Masterminds/glide && go install
+RUN cd /go/src/github.com/jclebreton/opensirene && glide install
+
+RUN go install github.com/jclebreton/opensirene/update
+
+CMD ["/go/bin/update"]
