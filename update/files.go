@@ -7,7 +7,7 @@ import (
 )
 
 //getFiles returns all the files to start from scratch
-func getZipListFromScratch(monthName, url, dest string) (files []zipFile, err error) {
+func getScratchZipList(monthName, url, dest string) (files []zipFile, err error) {
 
 	//Start date
 	firstDayOfMonth, err := getStartingDate(monthName)
@@ -20,14 +20,14 @@ func getZipListFromScratch(monthName, url, dest string) (files []zipFile, err er
 	day := firstDayOfMonth
 	for i := 1; i <= n; i++ {
 		if isWorkingDay(day) && time.Now().After(day) {
-			file := getIncrementalFile(day, dest)
+			file := getIncrementalFile(day, dest, url)
 			files = append(files, file)
 		}
 		day = firstDayOfMonth.AddDate(0, 0, i)
 	}
 
 	//Stock file
-	file := getCompleteFile(firstDayOfMonth.AddDate(0, -1, 0).Add(time.Nanosecond), dest)
+	file := getCompleteFile(firstDayOfMonth.AddDate(0, -1, 0).Add(time.Nanosecond), dest, url)
 	files = append(files, file)
 
 	return files, nil
@@ -102,20 +102,20 @@ func getStartingDate(month string) (time.Time, error) {
 }
 
 //getIncrementalFile returns the incremental file for the current date
-func getIncrementalFile(d time.Time, dest string) zipFile {
+func getIncrementalFile(d time.Time, dest, url string) zipFile {
 	y, _, _ := d.Date()
 	n := getDayNumber(d)
-	return getFile(fmt.Sprintf("sirene_%d%03d_E_Q", y, n), "incremental", dest)
+	return getFile(fmt.Sprintf("sirene_%d%03d_E_Q", y, n), "incremental", dest, url)
 }
 
 //getCompleteFile returns the stock file for the current date
-func getCompleteFile(d time.Time, dest string) zipFile {
+func getCompleteFile(d time.Time, dest, url string) zipFile {
 	y, m, _ := d.Date()
-	return getFile(fmt.Sprintf("sirene_%d%02d_L_M", y, m), "complete", dest)
+	return getFile(fmt.Sprintf("sirene_%d%02d_L_M", y, m), "complete", dest, url)
 }
 
 //getFile returns zip file with all meta data
-func getFile(name, updateType, dest string) zipFile {
+func getFile(name, updateType, dest, url string) zipFile {
 	file := zipFile{
 		name:       name,
 		updateType: updateType,

@@ -9,7 +9,7 @@ import (
 
 func Test_unzip_success(t *testing.T) {
 	//Get valid list
-	zipFiles, err := getZipListFromScratch("Jan", url, "/tmp")
+	zipFiles, err := getScratchZipList("Jan", url, "/tmp")
 	assert.NoError(t, err)
 
 	//Download one file
