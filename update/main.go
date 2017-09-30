@@ -8,11 +8,12 @@ import (
 )
 
 var url = "http://files.data.gouv.fr/sirene"
+var logFile = "opensirene.log"
 var nbWorkersMax = 31
 
 func init() {
 	log.SetFormatter(&log.JSONFormatter{})
-	file, err := os.OpenFile("opensirene.log", os.O_CREATE|os.O_WRONLY, 0666)
+	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY, 0666)
 	if err == nil {
 		log.SetOutput(file)
 	}
