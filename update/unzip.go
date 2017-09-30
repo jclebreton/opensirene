@@ -68,8 +68,8 @@ func unzipFile(zipFile zipFile, progress chan map[string]float64) ([]csvFile, er
 			}
 
 			result = append(result, csvFile{
-				filename: fpath,
-				path:     f.Name(),
+				filename: file.Name,
+				path:     fpath,
 			})
 		}
 	}
