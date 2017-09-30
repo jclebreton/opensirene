@@ -9,19 +9,25 @@ French company database based on French government open data
 
 This project is not yet operational. It is still under development.
 
+### Build
+```
+$ go build -o opensirene-cli github.com/jclebreton/opensirene/update
+```
+
+
 ### Update database from scratch
 ```
-$ go run update/*.go complete
+$ ./opensirene-cli complete
 ```
 
 ### Update database with daily upgrade file
 ```
-$ go run update/*.go daily
+$ ./opensirene-cli daily
 ```
 
 ### Options
 ```
-$ go run update/*.go --help
+$ ./opensirene-cli --help
 
 Opensirene
 

@@ -23,7 +23,8 @@ func Test_unzip_success(t *testing.T) {
 	csvFiles, err := unzipFile(zipFiles[1], progress)
 	assert.NoError(t, err)
 	assert.True(t, len(csvFiles) >= 1)
-	assert.Regexp(t, "/tmp/sirc-[0-9EQ_]+.csv", csvFiles[0].filename)
+	assert.Regexp(t, "sirc-[0-9EQ_]+.csv", csvFiles[0].filename)
+	assert.Regexp(t, "/tmp/sirc-[0-9EQ_]+.csv", csvFiles[0].path)
 
 	//Check file on disk
 	stat, err := os.Stat(csvFiles[0].path)
