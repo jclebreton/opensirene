@@ -11,8 +11,11 @@ var url = "http://files.data.gouv.fr/sirene"
 var nbWorkersMax = 31
 
 func init() {
-	//log.SetFormatter(&log.JSONFormatter{})
-	log.SetOutput(os.Stdout)
+	log.SetFormatter(&log.JSONFormatter{})
+	file, err := os.OpenFile("opensirene.log", os.O_CREATE|os.O_WRONLY, 0666)
+	if err == nil {
+		log.SetOutput(file)
+	}
 	log.SetLevel(log.DebugLevel)
 }
 

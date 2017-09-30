@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 
+	"strings"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -52,20 +54,21 @@ func downloadAndExtract(zipFiles []zipFile, nbWorkers int) ([]csvFile, error) {
 }
 
 func listenErrors(errorsChan chan error, end chan bool) {
-	var errors []error
+	var errors []string
 loop:
 	for {
 		select {
 		case error := <-errorsChan:
-			errors = append(errors, error)
+			errors = append(errors, error.Error())
 		case <-end:
 			break loop
 		default:
 		}
 	}
+
 	log.WithFields(log.Fields{
 		"Number": len(errors),
-		"Errors": errors,
+		"Errors": strings.Join(errors, ", "),
 	}).Error("Errors during processing files")
 }
 
