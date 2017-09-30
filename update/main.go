@@ -12,9 +12,13 @@ var url = "http://files.data.gouv.fr/sirene"
 var nbWorkersMax = 31
 
 func main() {
-	usage := `Update database from scratch.
+	usage := `Opensirene
+
+French company database based on French government open data.
+Github: https://github.com/jclebreton/opensirene
 
 Usage:
+  update daily [--wd=<path>]
   update complete [--wd=<path>] [--maxworkers=<int>] [--month=<string>]
   update -h | --help
 
@@ -44,21 +48,26 @@ Options:
 	fmt.Printf("Number of workers: %d\n", nbWorkers)
 
 	//Update from scratch
+	var zipFiles []zipFile
 	if arguments["complete"].(bool) {
-
-		zipFiles, err := getZipListFromScratch(getMonth(arguments), url, wd)
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-		fmt.Printf("Number of ZIP files: %d\n", len(zipFiles))
-
-		csvFiles, err := downloadAndExtract(zipFiles, nbWorkers)
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-		fmt.Printf("\nNumber of CSV files: %d\n", len(csvFiles))
-		fmt.Printf("Process completed\n")
+		zipFiles, err = getScratchZipList(getMonth(arguments), url, wd)
+		fmt.Printf("Prepare complete update\n")
+	} else {
+		zipFiles, err = getDailyZipList(url, wd)
+		fmt.Printf("Prepare daily update\n")
 	}
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	fmt.Printf("Number of ZIP files: %d\n", len(zipFiles))
+
+	csvFiles, err := downloadAndExtract(zipFiles, nbWorkers)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	fmt.Printf("\nNumber of CSV files: %d\n", len(csvFiles))
+
 }

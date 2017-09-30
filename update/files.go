@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"time"
@@ -31,6 +32,27 @@ func getScratchZipList(monthName, url, dest string) (files []zipFile, err error)
 	files = append(files, file)
 
 	return files, nil
+}
+
+//getFiles returns all the files to start from scratch
+func getDailyZipList(url, dest string) (files []zipFile, err error) {
+
+	day := time.Now().AddDate(0, 0, -1)
+	if !isWorkingDay(day) {
+		return nil, errors.New("Not a working day")
+	}
+
+	file := getIncrementalFile(day, dest, url)
+	if remoteFileExist(file) {
+		return append(files, file), nil
+	}
+
+	file = getCompleteFile(day, dest, url)
+	if remoteFileExist(file) {
+		return append(files, file), nil
+	}
+
+	return nil, errors.New("No daily file")
 }
 
 //isWorkingDay returns true if current day is a working day

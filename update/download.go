@@ -37,3 +37,10 @@ func downloadZipFile(file zipFile, progress chan map[string]float64, errorsChan 
 
 	return nil
 }
+
+//remoteFileExist will check if a remote file exist
+func remoteFileExist(file zipFile) bool {
+	resp, _ := http.Head(file.url)
+	defer resp.Body.Close()
+	return resp.StatusCode == 200
+}
