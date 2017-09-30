@@ -48,11 +48,6 @@ func getDailyZipList(url, dest string) (files []zipFile, err error) {
 		return append(files, file), nil
 	}
 
-	file = getCompleteFile(day, dest, url)
-	if remoteFileExist(file) {
-		return append(files, file), nil
-	}
-
 	return nil, errors.New("No daily file")
 }
 
