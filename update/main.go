@@ -16,7 +16,7 @@ func init() {
 	if err == nil {
 		log.SetOutput(file)
 	}
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
 func main() {
@@ -26,17 +26,22 @@ French company database based on French government open data.
 Github: https://github.com/jclebreton/opensirene
 
 Usage:
-  update daily [--wd=<path>]
-  update complete [--wd=<path>] [--maxworkers=<int>] [--month=<string>]
+  update daily [--wd=<path>] [--debug]
+  update complete [--wd=<path>] [--maxworkers=<int>] [--month=<string>] [--debug]
   update -h | --help
 
 Options:
   --wd=<path>        Working directory path (by default: /tmp/tmp[0-9]{8,})
   --maxworkers=<int> Maximum number of workers to use for processing files (min: 1, max: 100)
   --month=<string>   Month to download (ex: Sep)
+  --debug            Enable debugging
   -h --help          Show this screen.`
 
 	arguments, _ := docopt.Parse(usage, nil, true, "", false)
+
+	if arguments["--debug"].(bool) {
+		log.SetLevel(log.DebugLevel)
+	}
 
 	//Working directory
 	wd, err := getWorkingDirectory(arguments)
