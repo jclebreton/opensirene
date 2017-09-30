@@ -43,7 +43,7 @@ func getNbWorkers(arguments map[string]interface{}) (int, error) {
 	if arguments["--maxworkers"] != nil {
 		n, err := strconv.Atoi(arguments["--maxworkers"].(string))
 		if err != nil || n <= 0 || n > nbWorkersMax {
-			return 0, errors.New("Number of workers must be >= 1 and <=100")
+			return 0, errors.New("Number of workers must be >= 1 and <=31")
 		}
 		return n, nil
 	}

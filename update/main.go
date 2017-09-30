@@ -33,7 +33,7 @@ Usage:
 
 Options:
   --wd=<path>        Working directory path (by default: /tmp/tmp[0-9]{8,})
-  --maxworkers=<int> Maximum number of workers to use for processing files (min: 1, max: 100)
+  --maxworkers=<int> Maximum number of workers to use for processing files (min: 1, max: 31)
   --month=<string>   Month to download (ex: Sep)
   --debug            Enable debugging
   -h --help          Show this screen.`
