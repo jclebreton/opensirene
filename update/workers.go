@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func downloadAndExtract(zipFiles []zipFile, nbWorkers int) ([]csvFile, error) {
@@ -63,10 +63,10 @@ loop:
 		default:
 		}
 	}
-	fmt.Printf("\nNumber of errors: %d", len(errors))
-	for _, err := range errors {
-		fmt.Printf("\n- %s", err)
-	}
+	log.WithFields(log.Fields{
+		"Number": len(errors),
+		"Errors": errors,
+	}).Error("Errors during processing files")
 }
 
 func startWorker(id int, workerChan <-chan zipFile, resultChan chan<- []csvFile, downloadProgressChan,

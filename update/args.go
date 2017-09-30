@@ -48,6 +48,10 @@ func getNbWorkers(arguments map[string]interface{}) (int, error) {
 		return n, nil
 	}
 
+	if arguments["daily"].(bool) {
+		return 1, nil
+	}
+
 	return nbWorkersMax, nil
 }
 

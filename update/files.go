@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strings"
 	"time"
 )
 
@@ -53,6 +54,22 @@ func getDailyZipList(url, dest string) (files []zipFile, err error) {
 	}
 
 	return nil, errors.New("No daily file")
+}
+
+func getZipFileNames(files []zipFile) string {
+	var l []string
+	for _, f := range files {
+		l = append(l, f.filename)
+	}
+	return strings.Join(l, ", ")
+}
+
+func getCsvFileNames(files []csvFile) string {
+	var l []string
+	for _, f := range files {
+		l = append(l, f.filename)
+	}
+	return strings.Join(l, ", ")
 }
 
 //isWorkingDay returns true if current day is a working day

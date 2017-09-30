@@ -2,3 +2,4 @@ package: github.com/jclebreton/opensirene
 import:
 - package: github.com/docopt/docopt-go
 - package: github.com/stretchr/testify
+- package: github.com/sirupsen/logrus

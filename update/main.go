@@ -1,15 +1,20 @@
 package main
 
 import (
-	"fmt"
-
-	"log"
+	"os"
 
 	"github.com/docopt/docopt-go"
+	log "github.com/sirupsen/logrus"
 )
 
 var url = "http://files.data.gouv.fr/sirene"
 var nbWorkersMax = 31
+
+func init() {
+	//log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.DebugLevel)
+}
 
 func main() {
 	usage := `Opensirene
@@ -29,7 +34,6 @@ Options:
   -h --help          Show this screen.`
 
 	arguments, _ := docopt.Parse(usage, nil, true, "", false)
-	//fmt.Println(arguments)
 
 	//Working directory
 	wd, err := getWorkingDirectory(arguments)
@@ -37,7 +41,6 @@ Options:
 		log.Fatal(err)
 		return
 	}
-	fmt.Printf("Working directory: %s\n", wd)
 
 	//Max workers
 	nbWorkers, err := getNbWorkers(arguments)
@@ -45,29 +48,41 @@ Options:
 		log.Fatal(err)
 		return
 	}
-	fmt.Printf("Number of workers: %d\n", nbWorkers)
+
+	log.WithFields(log.Fields{
+		"Working directory": wd,
+		"Number of workers": nbWorkers,
+	}).Debug()
 
 	//Update from scratch
 	var zipFiles []zipFile
 	if arguments["complete"].(bool) {
 		zipFiles, err = getScratchZipList(getMonth(arguments), url, wd)
-		fmt.Printf("Prepare complete update\n")
-	} else {
+	} else if arguments["daily"].(bool) {
 		zipFiles, err = getDailyZipList(url, wd)
-		fmt.Printf("Prepare daily update\n")
+	} else {
+		log.Fatal("No command selected")
+		return
 	}
 
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	fmt.Printf("Number of ZIP files: %d\n", len(zipFiles))
+
+	log.WithFields(log.Fields{
+		"Number of files": len(zipFiles),
+		"Filenames":       getZipFileNames(zipFiles),
+	}).Info("Zip files to dowload")
 
 	csvFiles, err := downloadAndExtract(zipFiles, nbWorkers)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	fmt.Printf("\nNumber of CSV files: %d\n", len(csvFiles))
 
+	log.WithFields(log.Fields{
+		"Number of files": len(csvFiles),
+		"Filenames":       getCsvFileNames(csvFiles),
+	}).Info("CSV files extracted")
 }

@@ -1,12 +1,19 @@
-hash: c7bfe87ff5e09eb84ef299e2eff484da4fddde76eaa0dcc8b50f38745c455df7
-updated: 2017-09-23T22:49:30.622177726+02:00
+hash: e49a5f1c9861902e1fd5b5236f452fada859024988a2836499b5218e05d6d204
+updated: 2017-09-30T13:45:49.204149246+02:00
 imports:
 - name: github.com/docopt/docopt-go
   version: 784ddc588536785e7299f7272f39101f7faccc3f
+- name: github.com/sirupsen/logrus
+  version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/stretchr/testify
   version: 890a5c3458b43e6104ff5da8dfa139d013d77544
+- name: golang.org/x/crypto
+  version: 76eec36fa14229c4b25bb894c2d0e591527af429
+  subpackages:
+  - ssh/terminal
 - name: golang.org/x/sys
   version: 429f518978ab01db8bb6f44b66785088e7fba58b
   subpackages:
   - unix
+  - windows
 devImports: []
