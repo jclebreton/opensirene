@@ -8,7 +8,8 @@ import (
 )
 
 func Test_getEasterDay(t *testing.T) {
-	date := time.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC)
+	_ = SetParisLocation()
+	date := time.Date(2017, 1, 1, 0, 0, 0, 1, location)
 	easterDay := getEasterDay(date)
 	assert.Equal(t, 2017, easterDay.Year())
 	assert.Equal(t, time.Month(4), easterDay.Month())
@@ -16,20 +17,21 @@ func Test_getEasterDay(t *testing.T) {
 }
 
 func Test_isWorkingDay(t *testing.T) {
-	year := time.Now().Year()
+	_ = SetParisLocation()
+	year := time.Now().In(location).Year()
 
-	nouvelAn := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
-	feteDuTravail := time.Date(year, 5, 1, 0, 0, 0, 0, time.UTC)
-	dDay := time.Date(year, 5, 8, 0, 0, 0, 0, time.UTC)
-	ascension := time.Date(year, 5, 25, 0, 0, 0, 0, time.UTC)
-	pentecote := time.Date(year, 6, 5, 0, 0, 0, 0, time.UTC)
-	revolution := time.Date(year, 7, 14, 0, 0, 0, 0, time.UTC)
-	assomption := time.Date(year, 8, 15, 0, 0, 0, 0, time.UTC)
-	toussaint := time.Date(year, 11, 1, 0, 0, 0, 0, time.UTC)
-	armistice := time.Date(year, 11, 11, 0, 0, 0, 0, time.UTC)
-	noel := time.Date(year, 12, 25, 0, 0, 0, 0, time.UTC)
-	lundiDePaques := getEasterDay(time.Now()).AddDate(0, 0, 1)
-	sunday := getEasterDay(time.Now())
+	nouvelAn := time.Date(year, 1, 1, 0, 0, 0, 1, location)
+	feteDuTravail := time.Date(year, 5, 1, 0, 0, 0, 1, location)
+	dDay := time.Date(year, 5, 8, 0, 0, 0, 1, location)
+	ascension := time.Date(year, 5, 25, 0, 0, 0, 1, location)
+	pentecote := time.Date(year, 6, 5, 0, 0, 0, 1, location)
+	revolution := time.Date(year, 7, 14, 0, 0, 0, 1, location)
+	assomption := time.Date(year, 8, 15, 0, 0, 0, 1, location)
+	toussaint := time.Date(year, 11, 1, 0, 0, 0, 1, location)
+	armistice := time.Date(year, 11, 11, 0, 0, 0, 1, location)
+	noel := time.Date(year, 12, 25, 0, 0, 0, 1, location)
+	lundiDePaques := getEasterDay(time.Now().In(location)).AddDate(0, 0, 1)
+	sunday := getEasterDay(time.Now().In(location))
 	saturday := sunday.AddDate(0, 0, -1)
 	monday := lundiDePaques.AddDate(0, 0, 7)
 	thuesday := lundiDePaques.AddDate(0, 0, 1)
@@ -52,29 +54,32 @@ func Test_isWorkingDay(t *testing.T) {
 }
 
 func Test_getNumOfDaysForMonth(t *testing.T) {
-	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 28, getNumOfDaysForMonth(time.Date(2017, 2, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 3, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 30, getNumOfDaysForMonth(time.Date(2017, 4, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 5, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 30, getNumOfDaysForMonth(time.Date(2017, 6, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 7, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 8, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 30, getNumOfDaysForMonth(time.Date(2017, 9, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 10, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 30, getNumOfDaysForMonth(time.Date(2017, 11, 1, 0, 0, 0, 0, time.UTC)))
-	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 12, 1, 0, 0, 0, 0, time.UTC)))
+	_ = SetParisLocation()
+	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 1, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 28, getNumOfDaysForMonth(time.Date(2017, 2, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 3, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 30, getNumOfDaysForMonth(time.Date(2017, 4, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 5, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 30, getNumOfDaysForMonth(time.Date(2017, 6, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 7, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 8, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 30, getNumOfDaysForMonth(time.Date(2017, 9, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 10, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 30, getNumOfDaysForMonth(time.Date(2017, 11, 1, 0, 0, 0, 1, location)))
+	assert.Equal(t, 31, getNumOfDaysForMonth(time.Date(2017, 12, 1, 0, 0, 0, 1, location)))
 }
 
 func Test_getDayNumber(t *testing.T) {
-	day := time.Date(time.Now().Year(), 1, 1, 0, 0, 0, 0, time.UTC)
-	for i := 0; i < 365; i++ {
-		assert.Equal(t, i+1, getDayNumber(day.AddDate(0, 0, i)))
+	_ = SetParisLocation()
+	day := time.Date(time.Now().Year(), 1, 1, 0, 0, 0, 1, location)
+	for i := 1; i <= 365; i++ {
+		assert.Equal(t, i, getDayNumber(day.AddDate(0, 0, i-1)))
 	}
 }
 
 func Test_getStartingDate(t *testing.T) {
-	currentMonth := time.Now()
+	_ = SetParisLocation()
+	currentMonth := time.Now().In(location)
 	previousMonth := currentMonth.AddDate(0, -1, 0)
 	nextMonth := currentMonth.AddDate(0, 1, 0)
 

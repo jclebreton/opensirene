@@ -8,12 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var buffer = 1000
-
 func Test_downloadZipFile_not_found(t *testing.T) {
 	file := ZipFile{url: "http://ovh.net/files/notfound.dat"}
-	progress := make(chan map[string]float64, buffer)
-	errorsChan := make(chan error, buffer)
+	progress := make(chan map[string]float64, 100000)
+	errorsChan := make(chan error, 100000)
 	err := file.download(progress, errorsChan)
 	assert.Error(t, err)
 }
@@ -24,8 +22,8 @@ func Test_downloadZipFile_success(t *testing.T) {
 		url:      "http://ovh.net/files/1Mio.dat",
 		path:     "/tmp/1Mio.dat",
 	}
-	progressChan := make(chan map[string]float64, buffer)
-	errorsChan := make(chan error, buffer)
+	progressChan := make(chan map[string]float64, 100000)
+	errorsChan := make(chan error, 100000)
 
 	//Download file
 	err := file.download(progressChan, errorsChan)
@@ -52,13 +50,13 @@ func Test_unzip_success(t *testing.T) {
 	assert.NoError(t, err)
 
 	//Download one file
-	progressChan := make(chan map[string]float64, buffer)
-	errorsChan := make(chan error, buffer)
+	progressChan := make(chan map[string]float64, 100000)
+	errorsChan := make(chan error, 100000)
 	err = zipFiles[1].download(progressChan, errorsChan)
 	assert.NoError(t, err)
 
 	//Unzip
-	progress := make(chan map[string]float64, buffer)
+	progress := make(chan map[string]float64, 100000)
 	csvFiles, err := zipFiles[1].unzip(progress)
 	assert.NoError(t, err)
 	assert.True(t, len(csvFiles) >= 1)

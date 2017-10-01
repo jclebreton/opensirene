@@ -14,8 +14,8 @@ func Test_Passthrue_Read(t *testing.T) {
 		url:      "http://ovh.net/files/1Mio.dat",
 		path:     "/tmp/1Mio.dat",
 	}
-	progressChan := make(chan map[string]float64, buffer)
-	errorsChan := make(chan error, buffer)
+	progressChan := make(chan map[string]float64, 100000)
+	errorsChan := make(chan error, 100000)
 	err := file.download(progressChan, errorsChan)
 	assert.NoError(t, err)
 
@@ -25,7 +25,7 @@ func Test_Passthrue_Read(t *testing.T) {
 	defer r.Close()
 
 	//Read it
-	progressChan = make(chan map[string]float64, buffer)
+	progressChan = make(chan map[string]float64, 100000)
 	pt := PassThru{
 		Reader:   r,
 		filename: "foo",

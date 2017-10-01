@@ -66,10 +66,12 @@ loop:
 		}
 	}
 
-	log.WithFields(log.Fields{
-		"Number": len(errors),
-		"Errors": strings.Join(errors, ", "),
-	}).Error("Errors during processing files")
+	if len(errors) > 0 {
+		log.WithFields(log.Fields{
+			"Number": len(errors),
+			"Errors": strings.Join(errors, ", "),
+		}).Error("Errors during processing files")
+	}
 }
 
 func startWorker(id int, workerChan <-chan ZipFile, resultChan chan<- []csvFile, downloadProgressChan,

@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var location *time.Location
+
 //getEasterDay returns the date of the easter day
 func getEasterDay(date time.Time) time.Time {
 	var a, b, c, d, e, r int
@@ -33,7 +35,7 @@ func getEasterDay(date time.Time) time.Time {
 		r = 22 + d + e
 	}
 
-	return time.Date(year, time.March, r, 0, 0, 0, 0, time.UTC)
+	return time.Date(year, time.March, r, 0, 0, 0, 1, location)
 }
 
 //isWorkingDay returns true if current day is a working day
@@ -44,10 +46,19 @@ func isWorkingDay(day time.Time) bool {
 		return false
 	}
 
-	//Public holidays
+	//Public holidays or the day after a holiday
+	if isPublicDay(day) {
+		return false
+	}
+
+	return true
+}
+
+//Public holidays
+func isPublicDay(day time.Time) bool {
 	easter := getEasterDay(day)
-	if (day.Month() == 1 && day.Day() == 1) || //Jour de l'an
-		(easter.Month() == day.Month() && easter.Day()+1 == day.Day()) || //Lundi de Paques
+	return (day.Month() == 1 && day.Day() == 1) || //Jour de l'an
+		(day.Month() == easter.Month() && day.Day() == easter.Day()+1) || //Lundi de Paques (avril)
 		(day.Month() == 5 && day.Day() == 1) || //Fete du travail
 		(day.Month() == 5 && day.Day() == 8) || //Liberation
 		(day.Month() == 5 && day.Day() == 25) || //Ascension
@@ -56,30 +67,26 @@ func isWorkingDay(day time.Time) bool {
 		(day.Month() == 8 && day.Day() == 15) || //Assomption
 		(day.Month() == 11 && day.Day() == 1) || //Toussaint
 		(day.Month() == 11 && day.Day() == 11) || //Armistice
-		(day.Month() == 12 && day.Day() == 25) { //Noel
-		return false
-	}
-
-	return true
+		(day.Month() == 12 && day.Day() == 25) //Noel
 }
 
 //getNumOfDays returns the number of the days in the month for current date
 func getNumOfDaysForMonth(d time.Time) int {
-	t := time.Date(d.Year(), d.Month(), 32, 0, 0, 0, 0, time.UTC)
+	t := time.Date(d.Year(), d.Month(), 32, 0, 0, 0, 1, location)
 	return 32 - t.Day()
 }
 
 //getDayNumber returns the day's number in the year
 func getDayNumber(d time.Time) int {
 	year, _, _ := d.Date()
-	first := time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC)
+	first := time.Date(year, time.January, 1, 0, 0, 0, 1, d.Location())
 
-	return int(math.Ceil(d.Local().Sub(first).Hours()/24)) + 1
+	return int(math.Ceil(d.Sub(first).Hours()/24)) + 1
 }
 
 //getStartingDate returns the corresponding time object for asked month
 func getStartingDate(month string) (time.Time, error) {
-	y, _, _ := time.Now().Date()
+	y, _, _ := time.Now().In(location).Date()
 	layout := "2006-Jan-02"
 	pattern := "%d-%s-01"
 
@@ -90,7 +97,7 @@ func getStartingDate(month string) (time.Time, error) {
 		return time.Time{}, err
 	}
 
-	if date.Before(time.Now()) {
+	if date.Before(time.Now().In(location)) {
 		return date, nil
 	}
 
@@ -102,4 +109,13 @@ func getStartingDate(month string) (time.Time, error) {
 	}
 
 	return date, nil
+}
+
+func SetParisLocation() error {
+	l, err := time.LoadLocation("Europe/Paris")
+	if err != nil {
+		return err
+	}
+	location = l
+	return nil
 }

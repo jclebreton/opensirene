@@ -2,6 +2,7 @@ package download_extract
 
 import (
 	"testing"
+
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -15,13 +16,13 @@ func Test_getScratchZipList(t *testing.T) {
 }
 
 func Test_getIncrementalFile(t *testing.T) {
-	file := getIncrementalFile(time.Now(), "/tmp", "http://example.com")
+	file := getIncrementalFile(time.Now().In(location), "/tmp", "http://example.com")
 	assert.Regexp(t, "sirene_[0-9]+_E_Q", file.name)
 	assert.Regexp(t, "/tmp/sirene_[0-9]{7}_E_Q.zip", file.path)
 }
 
 func Test_getCompleteFile(t *testing.T) {
-	file := getCompleteFile(time.Now(), "/tmp", "http://example.com")
+	file := getCompleteFile(time.Now().In(location), "/tmp", "http://example.com")
 	assert.Regexp(t, "sirene_[0-9]{6}_L_M", file.name)
 	assert.Regexp(t, "/tmp/sirene_[0-9]{6}_L_M.zip", file.path)
 }
@@ -33,4 +34,12 @@ func Test_getFile(t *testing.T) {
 	assert.Equal(t, "foo.zip", file.filename)
 	assert.Equal(t, "http://example.com/foo.zip", file.url)
 	assert.Equal(t, "/tmp/foo.zip", file.path)
+}
+
+func Test_FileNumber(t *testing.T) {
+	_ = SetParisLocation()
+	day := time.Date(2017, 1, 2, 0, 0, 0, 1, location)
+	file := getIncrementalFile(day, "/tmp", "http://example.com")
+	assert.Equal(t, "sirene_2017002_E_Q.zip", file.filename)
+	assert.Equal(t, "/tmp/sirene_2017002_E_Q.zip", file.path)
 }
