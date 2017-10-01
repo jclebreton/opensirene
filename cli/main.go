@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 
+	"fmt"
+
 	"github.com/docopt/docopt-go"
 	"github.com/jclebreton/opensirene/download-extract"
 	log "github.com/sirupsen/logrus"
@@ -96,4 +98,6 @@ Options:
 		"Number of files": len(csvFiles),
 		"Filenames":       download_extract.GetCsvFileNames(csvFiles),
 	}).Info("CSV files extracted")
+
+	fmt.Println()
 }
