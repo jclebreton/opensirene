@@ -38,21 +38,22 @@ Options:
   --debug            Enable debugging
   -h --help          Show this screen.`
 
-	arguments, _ := docopt.Parse(usage, nil, true, "", false)
+	a, _ := docopt.Parse(usage, nil, true, "", false)
+	args := args{list: a}
 
-	if arguments["--debug"].(bool) {
+	if args.isDebug() {
 		log.SetLevel(log.DebugLevel)
 	}
 
 	//Working directory
-	wd, err := getWorkingDirectory(arguments)
+	wd, err := args.getWorkingDirectory()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
 	//Max workers
-	nbWorkers, err := getNbWorkers(arguments)
+	nbWorkers, err := args.getNbWorkers()
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -65,9 +66,9 @@ Options:
 
 	//Update from scratch
 	var zipFiles []zipFile
-	if arguments["complete"].(bool) {
-		zipFiles, err = getScratchZipList(getMonth(arguments), url, wd)
-	} else if arguments["daily"].(bool) {
+	if args.isCompleteUpdate() {
+		zipFiles, err = getScratchZipList(args.getMonth(), url, wd)
+	} else if args.isDailyUpdate() {
 		zipFiles, err = getDailyZipList(url, wd)
 	} else {
 		log.Fatal("No command selected")

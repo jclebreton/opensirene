@@ -13,12 +13,16 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func getWorkingDirectory(arguments map[string]interface{}) (string, error) {
+type args struct {
+	list map[string]interface{}
+}
+
+func (a *args) getWorkingDirectory() (string, error) {
 
 	var wd string
 
-	if arguments["--wd"] != nil {
-		wd = arguments["--wd"].(string)
+	if a.list["--wd"] != nil {
+		wd = a.list["--wd"].(string)
 	} else {
 		temp, err := ioutil.TempDir("/tmp/", "tmp")
 		if err != nil {
@@ -39,9 +43,9 @@ func getWorkingDirectory(arguments map[string]interface{}) (string, error) {
 	return wd, nil
 }
 
-func getNbWorkers(arguments map[string]interface{}) (int, error) {
-	if arguments["--maxworkers"] != nil {
-		n, err := strconv.Atoi(arguments["--maxworkers"].(string))
+func (a *args) getNbWorkers() (int, error) {
+	if a.list["--maxworkers"] != nil {
+		n, err := strconv.Atoi(a.list["--maxworkers"].(string))
 		if err != nil || n <= 0 || n > nbWorkersMax {
 			return 0, errors.New("Number of workers must be >= 1 and <=31")
 		}
@@ -51,14 +55,26 @@ func getNbWorkers(arguments map[string]interface{}) (int, error) {
 	return nbWorkersMax, nil
 }
 
-func getMonth(arguments map[string]interface{}) string {
+func (a *args) getMonth() string {
 	var month string
 
-	if arguments["--month"] != nil {
-		month = arguments["--month"].(string)
+	if a.list["--month"] != nil {
+		month = a.list["--month"].(string)
 	} else {
 		month = time.Now().Format("Jan")
 	}
 
 	return month
+}
+
+func (a *args) isDebug() bool {
+	return a.list["--debug"].(bool)
+}
+
+func (a *args) isCompleteUpdate() bool {
+	return a.list["complete"].(bool)
+}
+
+func (a *args) isDailyUpdate() bool {
+	return a.list["daily"].(bool)
 }

@@ -16,7 +16,7 @@ func Test_Passthrue_Read(t *testing.T) {
 	}
 	progressChan := make(chan map[string]float64, buffer)
 	errorsChan := make(chan error, buffer)
-	err := downloadZipFile(file, progressChan, errorsChan)
+	err := file.download(progressChan, errorsChan)
 	assert.NoError(t, err)
 
 	//Open it

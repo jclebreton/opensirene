@@ -2,15 +2,64 @@ package main
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-//unzipFile will un-compress a zip archive
-func unzipFile(zipFile zipFile, progress chan map[string]float64) ([]csvFile, error) {
+type zipFile struct {
+	name       string
+	filename   string
+	path       string
+	url        string
+	updateType string
+	csvFiles   []csvFile
+}
+
+//download will download the zip file
+func (file *zipFile) download(progress chan map[string]float64, errorsChan chan error) error {
+	resp, _ := http.Get(file.url)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		err := fmt.Errorf("Remote file not found: %s", file.filename)
+		progress <- map[string]float64{file.filename: 100}
+		errorsChan <- err
+		return err
+	}
+
+	out, _ := os.Create(file.path)
+	defer out.Close()
+
+	src := &PassThru{
+		Reader:   resp.Body,
+		total:    float64(resp.ContentLength),
+		filename: file.filename,
+		progress: progress,
+	}
+
+	_, err := io.Copy(out, src)
+	if err != nil {
+		errorsChan <- err
+		return err
+	}
+
+	return nil
+}
+
+//remoteFileExist will check if the corresponding remote file exist
+func (file *zipFile) remoteExist() bool {
+	resp, _ := http.Head(file.url)
+	defer resp.Body.Close()
+	return resp.StatusCode == 200
+}
+
+//unzip will un-compress the zip archive
+func (zipFile *zipFile) unzip(progress chan map[string]float64) ([]csvFile, error) {
 
 	dest := filepath.Dir(zipFile.path)
 

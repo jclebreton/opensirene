@@ -75,14 +75,14 @@ loop:
 func startWorker(id int, workerChan <-chan zipFile, resultChan chan<- []csvFile, downloadProgressChan,
 	unzipProgressChan chan map[string]float64, errorsChan chan error) {
 	for zipFile := range workerChan {
-		err := downloadZipFile(zipFile, downloadProgressChan, errorsChan)
+		err := zipFile.download(downloadProgressChan, errorsChan)
 		if err != nil {
 			unzipProgressChan <- map[string]float64{zipFile.filename: 100}
 			resultChan <- []csvFile{}
 			return
 		}
 
-		zipFile.csvFiles, err = unzipFile(zipFile, unzipProgressChan)
+		zipFile.csvFiles, err = zipFile.unzip(unzipProgressChan)
 		if err != nil {
 			log.Fatal(err)
 			return
