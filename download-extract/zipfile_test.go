@@ -1,4 +1,4 @@
-package main
+package download_extract
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ import (
 var buffer = 1000
 
 func Test_downloadZipFile_not_found(t *testing.T) {
-	file := zipFile{url: "http://ovh.net/files/notfound.dat"}
+	file := ZipFile{url: "http://ovh.net/files/notfound.dat"}
 	progress := make(chan map[string]float64, buffer)
 	errorsChan := make(chan error, buffer)
 	err := file.download(progress, errorsChan)
@@ -19,7 +19,7 @@ func Test_downloadZipFile_not_found(t *testing.T) {
 }
 
 func Test_downloadZipFile_success(t *testing.T) {
-	file := zipFile{
+	file := ZipFile{
 		filename: "1Mio.dat",
 		url:      "http://ovh.net/files/1Mio.dat",
 		path:     "/tmp/1Mio.dat",
@@ -48,7 +48,7 @@ func Test_downloadZipFile_success(t *testing.T) {
 
 func Test_unzip_success(t *testing.T) {
 	//Get valid list
-	zipFiles, err := getScratchZipList("Jan", url, "/tmp")
+	zipFiles, err := GetScratchZipList("Jan", "http://files.data.gouv.fr/sirene", "/tmp")
 	assert.NoError(t, err)
 
 	//Download one file

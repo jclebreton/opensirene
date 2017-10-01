@@ -1,4 +1,4 @@
-package main
+package download_extract
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 )
 
 //getFiles returns all the files to start from scratch
-func getScratchZipList(monthName, url, dest string) (files []zipFile, err error) {
+func GetScratchZipList(monthName, url, dest string) (files []ZipFile, err error) {
 
 	//Start date
 	firstDayOfMonth, err := getStartingDate(monthName)
@@ -35,7 +35,7 @@ func getScratchZipList(monthName, url, dest string) (files []zipFile, err error)
 }
 
 //getFiles returns all the files to start from scratch
-func getDailyZipList(url, dest string) (files []zipFile, err error) {
+func GetDailyZipList(url, dest string) (files []ZipFile, err error) {
 
 	day := time.Now().AddDate(0, 0, -1)
 	if !isWorkingDay(day) {
@@ -50,7 +50,7 @@ func getDailyZipList(url, dest string) (files []zipFile, err error) {
 	return nil, errors.New("No daily file")
 }
 
-func getZipFileNames(files []zipFile) string {
+func GetZipFileNames(files []ZipFile) string {
 	var l []string
 	for _, f := range files {
 		l = append(l, f.filename)
@@ -58,7 +58,7 @@ func getZipFileNames(files []zipFile) string {
 	return strings.Join(l, ", ")
 }
 
-func getCsvFileNames(files []csvFile) string {
+func GetCsvFileNames(files []csvFile) string {
 	var l []string
 	for _, f := range files {
 		l = append(l, f.filename)
@@ -67,21 +67,21 @@ func getCsvFileNames(files []csvFile) string {
 }
 
 //getIncrementalFile returns the incremental file for the current date
-func getIncrementalFile(d time.Time, dest, url string) zipFile {
+func getIncrementalFile(d time.Time, dest, url string) ZipFile {
 	y, _, _ := d.Date()
 	n := getDayNumber(d)
 	return getFile(fmt.Sprintf("sirene_%d%03d_E_Q", y, n), "incremental", dest, url)
 }
 
 //getCompleteFile returns the stock file for the current date
-func getCompleteFile(d time.Time, dest, url string) zipFile {
+func getCompleteFile(d time.Time, dest, url string) ZipFile {
 	y, m, _ := d.Date()
 	return getFile(fmt.Sprintf("sirene_%d%02d_L_M", y, m), "complete", dest, url)
 }
 
 //getFile returns zip file with all meta data
-func getFile(name, updateType, dest, url string) zipFile {
-	file := zipFile{
+func getFile(name, updateType, dest, url string) ZipFile {
+	file := ZipFile{
 		name:       name,
 		updateType: updateType,
 		filename:   fmt.Sprintf("%s.zip", name),

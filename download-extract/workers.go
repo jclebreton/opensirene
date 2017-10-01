@@ -1,4 +1,4 @@
-package main
+package download_extract
 
 import (
 	"os"
@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func downloadAndExtract(zipFiles []zipFile, nbWorkers int) ([]csvFile, error) {
+func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int) ([]csvFile, error) {
 	//Progress
 	downloadProgressChan := make(chan map[string]float64)
 	unzipProgressChan := make(chan map[string]float64)
@@ -24,7 +24,7 @@ func downloadAndExtract(zipFiles []zipFile, nbWorkers int) ([]csvFile, error) {
 
 	//Workers
 	nbZipFiles := len(zipFiles)
-	workerChan := make(chan zipFile)
+	workerChan := make(chan ZipFile)
 	resultChan := make(chan []csvFile, nbZipFiles)
 	defer close(workerChan)
 	defer close(resultChan)
@@ -72,7 +72,7 @@ loop:
 	}).Error("Errors during processing files")
 }
 
-func startWorker(id int, workerChan <-chan zipFile, resultChan chan<- []csvFile, downloadProgressChan,
+func startWorker(id int, workerChan <-chan ZipFile, resultChan chan<- []csvFile, downloadProgressChan,
 	unzipProgressChan chan map[string]float64, errorsChan chan error) {
 	for zipFile := range workerChan {
 		err := zipFile.download(downloadProgressChan, errorsChan)

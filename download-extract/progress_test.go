@@ -1,4 +1,4 @@
-package main
+package download_extract
 
 import (
 	"os"
@@ -9,7 +9,7 @@ import (
 
 func Test_Passthrue_Read(t *testing.T) {
 	//Download temp file
-	file := zipFile{
+	file := ZipFile{
 		filename: "1Mio.dat",
 		url:      "http://ovh.net/files/1Mio.dat",
 		path:     "/tmp/1Mio.dat",

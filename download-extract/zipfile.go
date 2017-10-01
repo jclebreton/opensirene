@@ -1,4 +1,4 @@
-package main
+package download_extract
 
 import (
 	"archive/zip"
@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type zipFile struct {
+type ZipFile struct {
 	name       string
 	filename   string
 	path       string
@@ -21,7 +21,7 @@ type zipFile struct {
 }
 
 //download will download the zip file
-func (file *zipFile) download(progress chan map[string]float64, errorsChan chan error) error {
+func (file *ZipFile) download(progress chan map[string]float64, errorsChan chan error) error {
 	resp, _ := http.Get(file.url)
 	defer resp.Body.Close()
 
@@ -52,14 +52,14 @@ func (file *zipFile) download(progress chan map[string]float64, errorsChan chan 
 }
 
 //remoteFileExist will check if the corresponding remote file exist
-func (file *zipFile) remoteExist() bool {
+func (file *ZipFile) remoteExist() bool {
 	resp, _ := http.Head(file.url)
 	defer resp.Body.Close()
 	return resp.StatusCode == 200
 }
 
 //unzip will un-compress the zip archive
-func (zipFile *zipFile) unzip(progress chan map[string]float64) ([]csvFile, error) {
+func (zipFile *ZipFile) unzip(progress chan map[string]float64) ([]csvFile, error) {
 
 	dest := filepath.Dir(zipFile.path)
 

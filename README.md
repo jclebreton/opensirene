@@ -12,7 +12,7 @@ This project is not yet operational. It is still under development.
 ### Build
 ```
 $ glide install
-$ go build -o opensirene-cli github.com/jclebreton/opensirene/update
+$ go build -o opensirene-cli github.com/jclebreton/opensirene/cli
 ```
 
 

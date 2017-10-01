@@ -1,4 +1,4 @@
-package main
+package download_extract
 
 import (
 	"testing"
@@ -8,9 +8,7 @@ import (
 )
 
 func Test_getScratchZipList(t *testing.T) {
-	url := ""
-	dest := ""
-	zipList, err := getScratchZipList("Jan", url, dest)
+	zipList, err := GetScratchZipList("Jan", "", "")
 	assert.NoError(t, err)
 	assert.True(t, len(zipList) > 0)
 	assert.Contains(t, zipList[0].name, "sirene_")

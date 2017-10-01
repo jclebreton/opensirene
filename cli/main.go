@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/docopt/docopt-go"
+	"github.com/jclebreton/opensirene/download-extract"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -65,11 +66,11 @@ Options:
 	}).Debug()
 
 	//Update from scratch
-	var zipFiles []zipFile
+	var zipFiles []download_extract.ZipFile
 	if args.isCompleteUpdate() {
-		zipFiles, err = getScratchZipList(args.getMonth(), url, wd)
+		zipFiles, err = download_extract.GetScratchZipList(args.getMonth(), url, wd)
 	} else if args.isDailyUpdate() {
-		zipFiles, err = getDailyZipList(url, wd)
+		zipFiles, err = download_extract.GetDailyZipList(url, wd)
 	} else {
 		log.Fatal("No command selected")
 		return
@@ -82,10 +83,10 @@ Options:
 
 	log.WithFields(log.Fields{
 		"Number of files": len(zipFiles),
-		"Filenames":       getZipFileNames(zipFiles),
+		"Filenames":       download_extract.GetZipFileNames(zipFiles),
 	}).Info("Zip files to dowload")
 
-	csvFiles, err := downloadAndExtract(zipFiles, nbWorkers)
+	csvFiles, err := download_extract.DownloadAndExtract(zipFiles, nbWorkers)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -93,6 +94,6 @@ Options:
 
 	log.WithFields(log.Fields{
 		"Number of files": len(csvFiles),
-		"Filenames":       getCsvFileNames(csvFiles),
+		"Filenames":       download_extract.GetCsvFileNames(csvFiles),
 	}).Info("CSV files extracted")
 }

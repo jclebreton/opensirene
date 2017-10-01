@@ -1,4 +1,4 @@
-package main
+package download_extract
 
 import (
 	"fmt"
