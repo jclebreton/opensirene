@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int) ([]csvFile, error) {
+func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int) ([]CsvFile, error) {
 	//Progress
 	downloadProgressChan := make(chan map[string]float64)
 	unzipProgressChan := make(chan map[string]float64)
@@ -25,7 +25,7 @@ func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int) ([]csvFile, error) {
 	//Workers
 	nbZipFiles := len(zipFiles)
 	workerChan := make(chan ZipFile)
-	resultChan := make(chan []csvFile, nbZipFiles)
+	resultChan := make(chan []CsvFile, nbZipFiles)
 	defer close(workerChan)
 	defer close(resultChan)
 	for id := 1; id <= nbWorkers; id++ {
@@ -40,7 +40,7 @@ func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int) ([]csvFile, error) {
 	}()
 
 	//Waiting CSV files
-	var csvFiles []csvFile
+	var csvFiles []CsvFile
 	for i := 1; i <= nbZipFiles; i++ {
 		files := <-resultChan
 		for _, f := range files {
@@ -74,13 +74,13 @@ loop:
 	}
 }
 
-func startWorker(id int, workerChan <-chan ZipFile, resultChan chan<- []csvFile, downloadProgressChan,
+func startWorker(id int, workerChan <-chan ZipFile, resultChan chan<- []CsvFile, downloadProgressChan,
 	unzipProgressChan chan map[string]float64, errorsChan chan error) {
 	for zipFile := range workerChan {
 		err := zipFile.download(downloadProgressChan, errorsChan)
 		if err != nil {
 			unzipProgressChan <- map[string]float64{zipFile.filename: 100}
-			resultChan <- []csvFile{}
+			resultChan <- []CsvFile{}
 			return
 		}
 

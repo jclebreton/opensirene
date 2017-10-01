@@ -1,6 +1,6 @@
 package download_extract
 
-type csvFile struct {
+type CsvFile struct {
 	filename string
 	path     string
 }

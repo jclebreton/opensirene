@@ -17,7 +17,7 @@ type ZipFile struct {
 	path       string
 	url        string
 	updateType string
-	csvFiles   []csvFile
+	csvFiles   []CsvFile
 }
 
 //download will download the zip file
@@ -59,7 +59,7 @@ func (file *ZipFile) remoteExist() bool {
 }
 
 //unzip will un-compress the zip archive
-func (zipFile *ZipFile) unzip(progress chan map[string]float64) ([]csvFile, error) {
+func (zipFile *ZipFile) unzip(progress chan map[string]float64) ([]CsvFile, error) {
 
 	dest := filepath.Dir(zipFile.path)
 
@@ -69,7 +69,7 @@ func (zipFile *ZipFile) unzip(progress chan map[string]float64) ([]csvFile, erro
 	}
 	defer r.Close()
 
-	var result []csvFile
+	var result []CsvFile
 
 	for _, f := range r.File {
 		rc, err := f.Open()
@@ -116,7 +116,7 @@ func (zipFile *ZipFile) unzip(progress chan map[string]float64) ([]csvFile, erro
 				return nil, err
 			}
 
-			result = append(result, csvFile{
+			result = append(result, CsvFile{
 				filename: file.Name,
 				path:     fpath,
 			})

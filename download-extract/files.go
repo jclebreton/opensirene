@@ -71,7 +71,7 @@ func GetZipFileNames(files []ZipFile) string {
 	return strings.Join(l, ", ")
 }
 
-func GetCsvFileNames(files []csvFile) string {
+func GetCsvFileNames(files []CsvFile) string {
 	var l []string
 	for _, f := range files {
 		l = append(l, f.filename)

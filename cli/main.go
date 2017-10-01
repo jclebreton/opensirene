@@ -97,5 +97,18 @@ Options:
 		"Filenames":       download_extract.GetCsvFileNames(csvFiles),
 	}).Info("CSV files extracted")
 
+	//db, err := database.InitDBClient()
+	//if err != nil {
+	//	log.Fatal(err)
+	//	return
+	//}
+	//
+	//copyFromSource := database.InitCopyFromSource("/home/jc/sept/sirc-17804_9075_14209_201708_L_M_20170901_025839232.csv")
+	//err = db.ImportStockFile(copyFromSource)
+	//if err != nil {
+	//	log.Fatal(err)
+	//	return
+	//}
+
 	fmt.Println()
 }

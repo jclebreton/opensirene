@@ -3,3 +3,5 @@ import:
 - package: github.com/docopt/docopt-go
 - package: github.com/stretchr/testify
 - package: github.com/sirupsen/logrus
+- package: github.com/jackc/pgx
+- package: github.com/pkg/errors

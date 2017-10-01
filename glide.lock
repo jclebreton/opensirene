@@ -1,8 +1,22 @@
-hash: e49a5f1c9861902e1fd5b5236f452fada859024988a2836499b5218e05d6d204
-updated: 2017-09-30T13:45:49.204149246+02:00
+hash: a76987283b0fe80a60b52deaec313c123d420985bee355bd6817608d6e455543
+updated: 2017-10-01T21:56:46.815173038+02:00
 imports:
 - name: github.com/docopt/docopt-go
   version: 784ddc588536785e7299f7272f39101f7faccc3f
+- name: github.com/jackc/pgx
+  version: 63f58fd32edb5684b9e9f4cfaac847c6b42b3917
+  subpackages:
+  - internal/sanitize
+  - pgio
+  - pgproto3
+  - pgtype
+  - chunkreader
+- name: github.com/jclebreton/opensirene
+  version: c71c600e18dcc1edb368c291164ff2688e47eb7e
+  subpackages:
+  - download-extract
+- name: github.com/pkg/errors
+  version: 2b3a18b5f0fb6b4f9190549597d3f962c02bc5eb
 - name: github.com/sirupsen/logrus
   version: 89742aefa4b206dcf400792f3bd35b542998eb3b
 - name: github.com/stretchr/testify
