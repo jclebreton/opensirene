@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	docopt "github.com/docopt/docopt-go"
+
 	"strconv"
 
 	"errors"
@@ -15,6 +17,11 @@ import (
 
 type args struct {
 	list map[string]interface{}
+}
+
+func InitArgs(usage string) args {
+	arguments, _ := docopt.Parse(usage, nil, true, "", false)
+	return args{list: arguments}
 }
 
 func (a *args) getWorkingDirectory() (string, error) {

@@ -5,7 +5,6 @@ import (
 
 	"fmt"
 
-	"github.com/docopt/docopt-go"
 	"github.com/jclebreton/opensirene/download-extract"
 	log "github.com/sirupsen/logrus"
 )
@@ -41,8 +40,7 @@ Options:
   --debug            Enable debugging
   -h --help          Show this screen.`
 
-	a, _ := docopt.Parse(usage, nil, true, "", false)
-	args := args{list: a}
+	args := InitArgs(usage)
 
 	if args.isDebug() {
 		log.SetLevel(log.DebugLevel)
