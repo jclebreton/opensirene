@@ -40,21 +40,28 @@ func getEasterDay(date time.Time) time.Time {
 
 //isWorkingDay returns true if current day is a working day
 func isWorkingDay(day time.Time) bool {
-	//Weekend
-	dayName := day.Format("Monday")
-	if dayName == "Saturday" || dayName == "Sunday" {
-		return false
-	}
-
-	//Public holidays or the day after a holiday
-	if isPublicDay(day) {
+	if isWeekend(day) || isPublicDay(day) || isNextMonthInWeekend(day) {
 		return false
 	}
 
 	return true
 }
 
-//Public holidays
+//isEndOfMonthInWeekend returns true if the the next month is in the weekend
+func isNextMonthInWeekend(day time.Time) bool {
+	tomorrow := day.AddDate(0, 0, 1)
+	afterTomorrow := day.AddDate(0, 0, 2)
+
+	return tomorrow.Day() == 1 || afterTomorrow.Day() == 1
+}
+
+//isWeekend returns true if the current day is in the weekend
+func isWeekend(day time.Time) bool {
+	dayName := day.Format("Monday")
+	return dayName == "Saturday" || dayName == "Sunday"
+}
+
+//isPublicDay return true if the current day is a public holiday
 func isPublicDay(day time.Time) bool {
 	easter := getEasterDay(day)
 	return (day.Month() == 1 && day.Day() == 1) || //Jour de l'an
