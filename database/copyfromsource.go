@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	iconv "github.com/djimenez/iconv-go"
 )
 
 type source struct {
@@ -66,8 +68,11 @@ func (s *source) Next() bool {
 		return false
 	}
 
+	//Convert to UTF8
+	lineUTF8, _ := iconv.ConvertString(line, "windows-1252", "utf-8")
+
 	//Parse line
-	r := csv.NewReader(strings.NewReader(line))
+	r := csv.NewReader(strings.NewReader(lineUTF8))
 	r.Comma = ';'
 	records, err := r.Read()
 	if err != nil {

@@ -5,3 +5,4 @@ import:
 - package: github.com/sirupsen/logrus
 - package: github.com/jackc/pgx
 - package: github.com/pkg/errors
+- package: github.com/djimenez/iconv-go

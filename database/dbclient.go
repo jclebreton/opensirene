@@ -23,7 +23,7 @@ func InitDBClient() (*DBClient, error) {
 		ConnConfig:     *connectConfig,
 		MaxConnections: 5,
 		AfterConnect: func(conn *pgx.Conn) error {
-			_, err := conn.Exec("SET CLIENT_ENCODING TO 'WIN1252'")
+			_, err := conn.Exec("SET CLIENT_ENCODING TO 'UTF-8'")
 			return err
 		},
 	}
