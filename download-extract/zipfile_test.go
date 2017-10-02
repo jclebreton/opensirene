@@ -38,10 +38,6 @@ func Test_downloadZipFile_success(t *testing.T) {
 	//Progress chan
 	progress := <-progressChan
 	assert.True(t, progress["1Mio.dat"] > 0)
-
-	////Errors chan
-	//error := <-errorsChan
-	//assert.NoError(t, error)
 }
 
 func Test_unzip_success(t *testing.T) {
@@ -57,7 +53,9 @@ func Test_unzip_success(t *testing.T) {
 
 	//Unzip
 	progress := make(chan map[string]float64, 100000)
-	csvFiles, err := zipFiles[1].unzip(progress)
+	err = zipFiles[1].unzip(progress)
+	csvFiles := zipFiles[1].csvFiles
+
 	assert.NoError(t, err)
 	assert.True(t, len(csvFiles) >= 1)
 	assert.Regexp(t, "sirc-[0-9EQ_]+.csv", csvFiles[0].filename)

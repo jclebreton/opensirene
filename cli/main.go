@@ -98,17 +98,17 @@ Options:
 	importProgressChan := make(chan map[string]float64)
 	go download_extract.Progress(len(zipFiles), downloadProgressChan, unzipProgressChan, importProgressChan)
 
-	////Download and extract
-	//csvFiles, err := download_extract.DownloadAndExtract(zipFiles, nbWorkers, downloadProgressChan, unzipProgressChan)
-	//if err != nil {
-	//	log.Fatal(err)
-	//	return
-	//}
-	//
-	//log.WithFields(log.Fields{
-	//	"Number of files": len(csvFiles),
-	//	"Filenames":       download_extract.GetCsvFileNames(csvFiles),
-	//}).Info("CSV files extracted")
+	//Download and extract
+	csvFiles, err := download_extract.DownloadAndExtract(zipFiles, nbWorkers, downloadProgressChan, unzipProgressChan)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"Number of files": len(csvFiles),
+		"Filenames":       download_extract.GetCsvFileNames(csvFiles),
+	}).Info("CSV files extracted")
 
 	//Database connection
 	db, err := database.InitDBClient()

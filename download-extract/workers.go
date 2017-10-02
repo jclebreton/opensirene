@@ -81,7 +81,7 @@ func startWorker(id int, workerChan <-chan ZipFile, resultChan chan<- []CsvFile,
 			return
 		}
 
-		zipFile.csvFiles, err = zipFile.unzip(unzipProgressChan)
+		err = zipFile.unzip(unzipProgressChan)
 		if err != nil {
 			log.Fatal(err)
 			return

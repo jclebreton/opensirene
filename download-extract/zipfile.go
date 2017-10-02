@@ -59,13 +59,13 @@ func (file *ZipFile) remoteExist() bool {
 }
 
 //unzip will un-compress the zip archive
-func (zipFile *ZipFile) unzip(progress chan map[string]float64) ([]CsvFile, error) {
+func (zipFile *ZipFile) unzip(progress chan map[string]float64) error {
 
 	dest := filepath.Dir(zipFile.path)
 
 	r, err := zip.OpenReader(zipFile.path)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer r.Close()
 
@@ -74,7 +74,7 @@ func (zipFile *ZipFile) unzip(progress chan map[string]float64) ([]CsvFile, erro
 	for _, f := range r.File {
 		rc, err := f.Open()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		defer rc.Close()
 
@@ -93,14 +93,14 @@ func (zipFile *ZipFile) unzip(progress chan map[string]float64) ([]CsvFile, erro
 				err = os.MkdirAll(fdir, os.ModePerm)
 				if err != nil {
 					log.Fatal(err)
-					return nil, err
+					return err
 				}
 			}
 
 			f, err := os.OpenFile(
 				fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
-				return nil, err
+				return err
 			}
 			defer f.Close()
 
@@ -113,15 +113,17 @@ func (zipFile *ZipFile) unzip(progress chan map[string]float64) ([]CsvFile, erro
 
 			_, err = io.Copy(f, src)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 			result = append(result, CsvFile{
-				filename: file.Name,
-				path:     fpath,
+				updateType: zipFile.updateType,
+				filename:   file.Name,
+				path:       fpath,
 			})
 		}
 	}
 
-	return result, nil
+	zipFile.csvFiles = result
+	return nil
 }
