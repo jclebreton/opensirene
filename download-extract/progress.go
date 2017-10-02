@@ -6,10 +6,12 @@ import (
 )
 
 //Progress will print the progression percents to stdout
-func Progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipProgress <-chan map[string]float64, importProgress <-chan map[string]float64) {
+func Progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipProgress <-chan map[string]float64,
+	importProgress <-chan map[string]float64, updateProgress <-chan map[string]float64) {
 	downloadResults := map[string]float64{}
 	unzipResults := map[string]float64{}
 	importResults := map[string]float64{}
+	updateResults := map[string]float64{}
 
 	for {
 		select {
@@ -24,6 +26,10 @@ func Progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipP
 		case up := <-importProgress:
 			for k, v := range up {
 				importResults[k] = v
+			}
+		case up := <-updateProgress:
+			for k, v := range up {
+				updateResults[k] = v
 			}
 		default:
 		}
@@ -42,17 +48,25 @@ func Progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipP
 		}
 		totalUnzipProgress = totalUnzipProgress / float64(nbZipFiles)
 
-		//Unzip Progress
+		//Copy Progress
 		var totalImportProgress float64
 		for _, v := range importResults {
 			totalImportProgress += v
 		}
 		totalImportProgress = totalImportProgress / float64(nbZipFiles)
 
-		fmt.Printf("\rDownload progress: %.2f%% - Unzip progress: %.2f%% - Import progress: %.2f%%", totalDownloadProgress, totalUnzipProgress, totalImportProgress)
+		//Update Progress
+		var totalUpdateProgress float64
+		for _, v := range updateResults {
+			totalUpdateProgress += v
+		}
+		totalUpdateProgress = totalUpdateProgress / float64(nbZipFiles)
+
+		fmt.Printf("\rDownload: %.2f%% - Unzip: %.2f%% - Copy: %.2f%% - Update: %.2f%%", totalDownloadProgress,
+			totalUnzipProgress, totalImportProgress, totalUpdateProgress)
 
 		//End
-		if totalDownloadProgress >= 100 && totalUnzipProgress >= 100 && totalImportProgress >= 100 {
+		if totalDownloadProgress >= 100 && totalUnzipProgress >= 100 && totalImportProgress >= 100 && totalUpdateProgress >= 100 {
 			break
 		}
 	}

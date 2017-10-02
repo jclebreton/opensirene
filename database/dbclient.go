@@ -43,7 +43,7 @@ func (client *DBClient) ImportCSVFile(table string, columns []string, source pgx
 	return copyCount, nil
 }
 
-func (client *DBClient) ApplyIncrementaliate() error {
+func (client *DBClient) ApplyIncremental() error {
 
 	//Clean temporary
 	_, err := client.conn.Exec("TRUNCATE TABLE temp_incremental")

@@ -96,7 +96,9 @@ Options:
 	downloadProgressChan := make(chan map[string]float64)
 	unzipProgressChan := make(chan map[string]float64)
 	importProgressChan := make(chan map[string]float64)
-	go download_extract.Progress(len(zipFiles), downloadProgressChan, unzipProgressChan, importProgressChan)
+	updateProgressChan := make(chan map[string]float64)
+	go download_extract.Progress(len(zipFiles), downloadProgressChan, unzipProgressChan,
+		importProgressChan, updateProgressChan)
 
 	//Download and extract
 	completeUpdate, incrementalUpdates, err := download_extract.DownloadAndExtract(
@@ -110,10 +112,10 @@ Options:
 		return
 	}
 
-	//completeUpdate := download_extract.CsvFile{
-	//	Filename: "Stock",
-	//	Path:     "/home/jc/sept/stock.csv",
-	//}
+	completeUpdate = download_extract.CsvFile{
+		Filename: "Stock",
+		Path:     "/home/jc/sept/stock.csv",
+	}
 	//
 	//incrementalUpdates := []download_extract.CsvFile{
 	//	{
@@ -158,14 +160,14 @@ Options:
 		copyCount, err = update.ImportIncrementalUpdateFile(incrementalUpdate.Path, importProgressChan)
 		if err != nil {
 			log.Error(err)
-			return
+			break
 		}
 
 		//Apply incremental update
-		err = db.ApplyIncrementaliate()
+		err = db.ApplyIncremental()
 		if err != nil {
 			log.Error(err)
-			return
+			break
 		}
 
 		log.WithFields(log.Fields{
@@ -173,6 +175,8 @@ Options:
 			"Type":  incrementalUpdate.UpdateType,
 			"Total": copyCount,
 		}).Info("Importation successful")
+
+		updateProgressChan <- map[string]float64{incrementalUpdate.Filename: 100}
 	}
 
 	fmt.Printf("\nAll CSV files has been imported to database.\n")

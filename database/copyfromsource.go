@@ -2,9 +2,7 @@ package database
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/csv"
-	"io"
 	"os"
 	"strings"
 
@@ -64,6 +62,7 @@ func (s *source) Next() bool {
 	err := s.scanner.Err()
 	if err != nil {
 		defer s.file.Close()
+		s.progress <- map[string]float64{s.path: 100}
 		s.err = err
 		return false
 	}
@@ -76,6 +75,7 @@ func (s *source) Next() bool {
 	r.Comma = ';'
 	records, err := r.Read()
 	if err != nil {
+		s.progress <- map[string]float64{s.path: 100}
 		s.err = err
 		return false
 	}
@@ -88,7 +88,7 @@ func (s *source) Next() bool {
 	s.values = values
 
 	//Progress
-	s.cpt += float64(len(line)) + 1
+	s.cpt += float64(len(line))
 	s.progress <- map[string]float64{s.path: (s.cpt / s.total) * 100}
 
 	return true
@@ -103,23 +103,4 @@ func (s *source) Values() ([]interface{}, error) {
 // this is not nil *Conn.CopyFrom will abort the copy.
 func (s *source) Err() error {
 	return s.err
-}
-
-func lineCounter(r io.Reader) (int, error) {
-	buf := make([]byte, 32*1024)
-	count := 0
-	lineSep := []byte{'\n'}
-
-	for {
-		c, err := r.Read(buf)
-		count += bytes.Count(buf[:c], lineSep)
-
-		switch {
-		case err == io.EOF:
-			return count, nil
-
-		case err != nil:
-			return count, err
-		}
-	}
 }
