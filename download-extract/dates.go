@@ -47,12 +47,17 @@ func isWorkingDay(day time.Time) bool {
 	return true
 }
 
-//isEndOfMonthInWeekend returns true if the the next month is in the weekend
+//isEndOfMonthInWeekend returns true if the the next month is or was in the weekend
 func isNextMonthInWeekend(day time.Time) bool {
+	beforeYesterday := day.AddDate(0, 0, -2)
+	yesterday := day.AddDate(0, 0, -1)
 	tomorrow := day.AddDate(0, 0, 1)
 	afterTomorrow := day.AddDate(0, 0, 2)
 
-	return tomorrow.Day() == 1 || afterTomorrow.Day() == 1
+	return (isWeekend(beforeYesterday) && beforeYesterday.Day() == 1) ||
+		(isWeekend(yesterday) && yesterday.Day() == 1) ||
+		(isWeekend(tomorrow) && tomorrow.Day() == 1) ||
+		(isWeekend(afterTomorrow) && afterTomorrow.Day() == 1)
 }
 
 //isWeekend returns true if the current day is in the weekend

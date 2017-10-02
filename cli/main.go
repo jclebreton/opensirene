@@ -86,6 +86,11 @@ Options:
 		"Filenames":       download_extract.GetZipFileNames(zipFiles),
 	}).Info("Zip files to dowload")
 
+	if len(zipFiles) == 0 {
+		fmt.Println("No files to download")
+		return
+	}
+
 	csvFiles, err := download_extract.DownloadAndExtract(zipFiles, nbWorkers)
 	if err != nil {
 		log.Fatal(err)
