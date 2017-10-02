@@ -117,9 +117,9 @@ func (zipFile *ZipFile) unzip(progress chan map[string]float64) error {
 			}
 
 			result = append(result, CsvFile{
-				updateType: zipFile.updateType,
-				filename:   file.Name,
-				path:       fpath,
+				UpdateType: zipFile.updateType,
+				Filename:   file.Name,
+				Path:       fpath,
 			})
 		}
 	}

@@ -35,8 +35,8 @@ func GetScratchZipList(monthName, url, dest string) (files []ZipFile, err error)
 	}
 
 	//Stock file
-	//file := getCompleteFile(firstDayOfMonth.AddDate(0, -1, 0).Add(time.Nanosecond), dest, url)
-	//files = append(files, file)
+	file := getCompleteFile(firstDayOfMonth.AddDate(0, -1, 0).Add(time.Nanosecond), dest, url)
+	files = append(files, file)
 
 	return files, nil
 }
@@ -74,7 +74,7 @@ func GetZipFileNames(files []ZipFile) string {
 func GetCsvFileNames(files []CsvFile) string {
 	var l []string
 	for _, f := range files {
-		l = append(l, f.filename)
+		l = append(l, f.Filename)
 	}
 	return strings.Join(l, ", ")
 }

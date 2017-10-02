@@ -8,7 +8,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int, downloadProgressChan, unzipProgressChan chan map[string]float64) ([]CsvFile, error) {
+func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int, downloadProgressChan,
+	unzipProgressChan chan map[string]float64) (completeUpdate CsvFile, incrementalUpdates []CsvFile, err error) {
+
 	//Progress
 	defer close(downloadProgressChan)
 	defer close(unzipProgressChan)
@@ -37,17 +39,21 @@ func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int, downloadProgressChan,
 	}()
 
 	//Waiting CSV files
-	var csvFiles []CsvFile
 	for i := 1; i <= nbZipFiles; i++ {
 		files := <-resultChan
 		for _, f := range files {
-			csvFiles = append(csvFiles, f)
+			if f.UpdateType == "complete" {
+				completeUpdate = f
+			} else {
+				incrementalUpdates = append(incrementalUpdates, f)
+			}
+
 		}
 	}
 
 	endErrorsChan <- true
 
-	return csvFiles, nil
+	return completeUpdate, incrementalUpdates, nil
 }
 
 func listenErrors(errorsChan chan error, end chan bool) {

@@ -99,15 +99,21 @@ Options:
 	go download_extract.Progress(len(zipFiles), downloadProgressChan, unzipProgressChan, importProgressChan)
 
 	//Download and extract
-	csvFiles, err := download_extract.DownloadAndExtract(zipFiles, nbWorkers, downloadProgressChan, unzipProgressChan)
+	completeUpdate, dailyUpdates, err := download_extract.DownloadAndExtract(
+		zipFiles,
+		nbWorkers,
+		downloadProgressChan,
+		unzipProgressChan,
+	)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
 	log.WithFields(log.Fields{
-		"Number of files": len(csvFiles),
-		"Filenames":       download_extract.GetCsvFileNames(csvFiles),
+		"Complete file":           completeUpdate.Filename,
+		"Total incremental files": len(dailyUpdates),
+		"Incremental files":       download_extract.GetCsvFileNames(dailyUpdates),
 	}).Info("CSV files extracted")
 
 	//Database connection
@@ -117,15 +123,13 @@ Options:
 		return
 	}
 
-	//Open stock file
-	copyFromSource, err := database.InitCopyFromSource(
-		"/home/jc/sept/stock.csv",
-		importProgressChan,
-	)
+	//Import files
+	copyFromSource, err := database.InitCopyFromSource(completeUpdate.Path, importProgressChan)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+
 	err = db.ImportStockFile(copyFromSource)
 	if err != nil {
 		log.Fatal(err)
