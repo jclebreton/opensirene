@@ -2,41 +2,63 @@ package database
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/csv"
+	"io"
 	"os"
 	"strings"
 )
 
 type source struct {
-	file    *os.File
-	scanner *bufio.Scanner
-	values  []interface{}
-	err     error
-	cpt     int
+	file     *os.File
+	path     string
+	scanner  *bufio.Scanner
+	values   []interface{}
+	err      error
+	progress chan<- map[string]float64
+	cpt      float64
+	total    float64
 }
 
-func InitCopyFromSource(path string) *source {
+func InitCopyFromSource(path string, progress chan<- map[string]float64) (*source, error) {
 	source := &source{}
 
 	file, err := os.Open(path)
 	if err != nil {
-		source.err = err
+		return nil, err
 	}
 
 	source.file = file
+	source.path = path
 	source.scanner = bufio.NewScanner(file)
+	source.progress = progress
+
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	source.total = float64(stat.Size())
 	source.Next()
-	source.cpt = 0
-	return source
+
+	return source, nil
 }
 
 // Next returns true if there is another row and makes the next row data
 // available to Values(). When there are no more rows available or an error
 // has occurred it returns false.
 func (s *source) Next() bool {
-	s.scanner.Scan()
-	line := s.scanner.Text()
 
+	//Read line
+	ok := s.scanner.Scan()
+
+	//EOF
+	if !ok {
+		s.progress <- map[string]float64{s.path: 100}
+		return false
+	}
+
+	line := s.scanner.Text()
 	err := s.scanner.Err()
 	if err != nil {
 		defer s.file.Close()
@@ -44,25 +66,26 @@ func (s *source) Next() bool {
 		return false
 	}
 
+	//Parse line
 	r := csv.NewReader(strings.NewReader(line))
 	r.Comma = ';'
-
 	records, err := r.Read()
 	if err != nil {
 		s.err = err
 		return false
 	}
 
+	//Build result
 	var values []interface{}
 	for _, v := range records {
 		values = append(values, v)
 	}
 	s.values = values
-	if s.cpt == 1000 {
-		return false
-	}
 
-	s.cpt++
+	//Progress
+	s.cpt += float64(len(line)) + 1
+	s.progress <- map[string]float64{s.path: (s.cpt / s.total) * 100}
+
 	return true
 }
 
@@ -75,4 +98,23 @@ func (s *source) Values() ([]interface{}, error) {
 // this is not nil *Conn.CopyFrom will abort the copy.
 func (s *source) Err() error {
 	return s.err
+}
+
+func lineCounter(r io.Reader) (int, error) {
+	buf := make([]byte, 32*1024)
+	count := 0
+	lineSep := []byte{'\n'}
+
+	for {
+		c, err := r.Read(buf)
+		count += bytes.Count(buf[:c], lineSep)
+
+		switch {
+		case err == io.EOF:
+			return count, nil
+
+		case err != nil:
+			return count, err
+		}
+	}
 }

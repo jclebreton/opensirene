@@ -5,6 +5,7 @@ import (
 
 	"fmt"
 
+	"github.com/jclebreton/opensirene/database"
 	"github.com/jclebreton/opensirene/download-extract"
 	log "github.com/sirupsen/logrus"
 )
@@ -91,29 +92,45 @@ Options:
 		return
 	}
 
-	csvFiles, err := download_extract.DownloadAndExtract(zipFiles, nbWorkers)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	//Start progression
+	downloadProgressChan := make(chan map[string]float64)
+	unzipProgressChan := make(chan map[string]float64)
+	importProgressChan := make(chan map[string]float64)
+	go download_extract.Progress(len(zipFiles), downloadProgressChan, unzipProgressChan, importProgressChan)
 
-	log.WithFields(log.Fields{
-		"Number of files": len(csvFiles),
-		"Filenames":       download_extract.GetCsvFileNames(csvFiles),
-	}).Info("CSV files extracted")
-
-	//db, err := database.InitDBClient()
+	////Download and extract
+	//csvFiles, err := download_extract.DownloadAndExtract(zipFiles, nbWorkers, downloadProgressChan, unzipProgressChan)
 	//if err != nil {
 	//	log.Fatal(err)
 	//	return
 	//}
 	//
-	//copyFromSource := database.InitCopyFromSource("/home/jc/sept/sirc-17804_9075_14209_201708_L_M_20170901_025839232.csv")
-	//err = db.ImportStockFile(copyFromSource)
-	//if err != nil {
-	//	log.Fatal(err)
-	//	return
-	//}
+	//log.WithFields(log.Fields{
+	//	"Number of files": len(csvFiles),
+	//	"Filenames":       download_extract.GetCsvFileNames(csvFiles),
+	//}).Info("CSV files extracted")
+
+	//Database connection
+	db, err := database.InitDBClient()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	//Open stock file
+	copyFromSource, err := database.InitCopyFromSource(
+		"/home/jc/sept/stock.csv",
+		importProgressChan,
+	)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	err = db.ImportStockFile(copyFromSource)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 
 	fmt.Println()
 }

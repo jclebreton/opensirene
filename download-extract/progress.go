@@ -5,10 +5,11 @@ import (
 	"io"
 )
 
-//progress will print the progression percents to stdout
-func progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipProgress <-chan map[string]float64) {
+//Progress will print the progression percents to stdout
+func Progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipProgress <-chan map[string]float64, importProgress <-chan map[string]float64) {
 	downloadResults := map[string]float64{}
 	unzipResults := map[string]float64{}
+	importResults := map[string]float64{}
 
 	for {
 		select {
@@ -20,27 +21,38 @@ func progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipP
 			for k, v := range up {
 				unzipResults[k] = v
 			}
+		case up := <-importProgress:
+			for k, v := range up {
+				importResults[k] = v
+			}
 		default:
 		}
 
-		//Download progress
+		//Download Progress
 		var totalDownloadProgress float64
 		for _, v := range downloadResults {
 			totalDownloadProgress += v
 		}
 		totalDownloadProgress = totalDownloadProgress / float64(nbZipFiles)
 
-		//Unzip progress
+		//Unzip Progress
 		var totalUnzipProgress float64
 		for _, v := range unzipResults {
 			totalUnzipProgress += v
 		}
 		totalUnzipProgress = totalUnzipProgress / float64(nbZipFiles)
 
-		fmt.Printf("\rDownload progress: %.1f%% - Unzip progress: %.1f%%", totalDownloadProgress, totalUnzipProgress)
+		//Unzip Progress
+		var totalImportProgress float64
+		for _, v := range importResults {
+			totalImportProgress += v
+		}
+		//totalImportProgress = totalImportProgress / float64(nbZipFiles)
+
+		fmt.Printf("\rDownload progress: %.2f%% - Unzip progress: %.2f%% - Import progress: %.2f%%", totalDownloadProgress, totalUnzipProgress, totalImportProgress)
 
 		//End
-		if totalDownloadProgress >= 100 && totalUnzipProgress >= 100 {
+		if totalDownloadProgress >= 100 && totalUnzipProgress >= 100 && totalImportProgress >= 100 {
 			break
 		}
 	}

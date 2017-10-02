@@ -8,11 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int) ([]CsvFile, error) {
+func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int, downloadProgressChan, unzipProgressChan chan map[string]float64) ([]CsvFile, error) {
 	//Progress
-	downloadProgressChan := make(chan map[string]float64)
-	unzipProgressChan := make(chan map[string]float64)
-	go progress(len(zipFiles), downloadProgressChan, unzipProgressChan)
 	defer close(downloadProgressChan)
 	defer close(unzipProgressChan)
 

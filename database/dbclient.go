@@ -59,7 +59,7 @@ func (client *DBClient) ImportStockFile(source pgx.CopyFromSource) error {
 		return err
 	}
 
-	fmt.Println("Total", copyCount)
+	fmt.Printf("\nTotal: %d", copyCount)
 
 	return nil
 }
