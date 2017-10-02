@@ -98,22 +98,34 @@ Options:
 	importProgressChan := make(chan map[string]float64)
 	go download_extract.Progress(len(zipFiles), downloadProgressChan, unzipProgressChan, importProgressChan)
 
-	//Download and extract
-	completeUpdate, dailyUpdates, err := download_extract.DownloadAndExtract(
-		zipFiles,
-		nbWorkers,
-		downloadProgressChan,
-		unzipProgressChan,
-	)
-	if err != nil {
-		log.Fatal(err)
-		return
+	////Download and extract
+	//completeUpdate, incrementalUpdates, err := download_extract.DownloadAndExtract(
+	//	zipFiles,
+	//	nbWorkers,
+	//	downloadProgressChan,
+	//	unzipProgressChan,
+	//)
+	//if err != nil {
+	//	log.Fatal(err)
+	//	return
+	//}
+
+	completeUpdate := download_extract.CsvFile{
+		Filename: "Stock",
+		Path:     "/home/jc/sept/stock.csv",
+	}
+
+	incrementalUpdates := []download_extract.CsvFile{
+		{
+			UpdateType: "incremental",
+			Path:       "/home/jc/sept/incremental.csv",
+		},
 	}
 
 	log.WithFields(log.Fields{
 		"Complete file":           completeUpdate.Filename,
-		"Total incremental files": len(dailyUpdates),
-		"Incremental files":       download_extract.GetCsvFileNames(dailyUpdates),
+		"Total incremental files": len(incrementalUpdates),
+		"Incremental files":       download_extract.GetCsvFileNames(incrementalUpdates),
 	}).Info("CSV files extracted")
 
 	//Database connection
@@ -123,18 +135,25 @@ Options:
 		return
 	}
 
-	//Import files
-	copyFromSource, err := database.InitCopyFromSource(completeUpdate.Path, importProgressChan)
+	update := database.InitUpdate(db)
+
+	//Save complete update
+	copyCount, err := update.ImportCompleteUpdateFile(completeUpdate.Path, importProgressChan)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	err = db.ImportStockFile(copyFromSource)
+	//Save incremental updates
+	copyCount, err = update.ImportIncermentalUpdateFile(incrementalUpdates[0].Path, importProgressChan)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	fmt.Println()
+	log.WithFields(log.Fields{
+		"Total": copyCount,
+	}).Info("Number of enterprises saved to db")
+
+	fmt.Printf("\nAll CSV files has been imported to database.\n")
 }

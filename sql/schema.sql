@@ -102,7 +102,7 @@ CREATE TABLE enterprises (
 );
 
 
-CREATE TABLE temp_daily (
+CREATE TABLE temp_incremental (
   siren          TEXT NULL,
   nic            TEXT NULL,
   l1_normalisee  TEXT NULL,

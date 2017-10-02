@@ -22,7 +22,7 @@ type source struct {
 	total    float64
 }
 
-func InitCopyFromSource(path string, progress chan<- map[string]float64) (*source, error) {
+func InitCopyFromFile(path string, progress chan<- map[string]float64) (*source, error) {
 	source := &source{}
 
 	file, err := os.Open(path)
