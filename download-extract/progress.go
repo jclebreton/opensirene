@@ -47,7 +47,7 @@ func Progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipP
 		for _, v := range importResults {
 			totalImportProgress += v
 		}
-		//totalImportProgress = totalImportProgress / float64(nbZipFiles)
+		totalImportProgress = totalImportProgress / float64(nbZipFiles)
 
 		fmt.Printf("\rDownload progress: %.2f%% - Unzip progress: %.2f%% - Import progress: %.2f%%", totalDownloadProgress, totalUnzipProgress, totalImportProgress)
 

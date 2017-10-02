@@ -98,29 +98,33 @@ Options:
 	importProgressChan := make(chan map[string]float64)
 	go download_extract.Progress(len(zipFiles), downloadProgressChan, unzipProgressChan, importProgressChan)
 
-	////Download and extract
-	//completeUpdate, incrementalUpdates, err := download_extract.DownloadAndExtract(
-	//	zipFiles,
-	//	nbWorkers,
-	//	downloadProgressChan,
-	//	unzipProgressChan,
-	//)
-	//if err != nil {
-	//	log.Fatal(err)
-	//	return
+	//Download and extract
+	completeUpdate, incrementalUpdates, err := download_extract.DownloadAndExtract(
+		zipFiles,
+		nbWorkers,
+		downloadProgressChan,
+		unzipProgressChan,
+	)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	//completeUpdate := download_extract.CsvFile{
+	//	Filename: "Stock",
+	//	Path:     "/home/jc/sept/stock.csv",
 	//}
-
-	completeUpdate := download_extract.CsvFile{
-		Filename: "Stock",
-		Path:     "/home/jc/sept/stock.csv",
-	}
-
-	incrementalUpdates := []download_extract.CsvFile{
-		{
-			UpdateType: "incremental",
-			Path:       "/home/jc/sept/incremental.csv",
-		},
-	}
+	//
+	//incrementalUpdates := []download_extract.CsvFile{
+	//	{
+	//		UpdateType: "incremental",
+	//		Path:       "/home/jc/sept/sirc-17804_9075_14211_2017244_E_Q_20170902_022234303.csv",
+	//	},
+	//	{
+	//		UpdateType: "incremental",
+	//		Path:       "/home/jc/sept/sirc-17804_9075_14211_2017247_E_Q_20170905_022240981.csv",
+	//	},
+	//}
 
 	log.WithFields(log.Fields{
 		"Complete file":           completeUpdate.Filename,
@@ -135,25 +139,41 @@ Options:
 		return
 	}
 
-	update := database.InitUpdate(db)
-
 	//Save complete update
+	update := database.InitUpdate(db)
 	copyCount, err := update.ImportCompleteUpdateFile(completeUpdate.Path, importProgressChan)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	log.WithFields(log.Fields{
+		"File":  completeUpdate.Filename,
+		"Type":  completeUpdate.UpdateType,
+		"Total": copyCount,
+	}).Info("Importation successful")
 
 	//Save incremental updates
-	copyCount, err = update.ImportIncermentalUpdateFile(incrementalUpdates[0].Path, importProgressChan)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	for _, incrementalUpdate := range incrementalUpdates {
 
-	log.WithFields(log.Fields{
-		"Total": copyCount,
-	}).Info("Number of enterprises saved to db")
+		copyCount, err = update.ImportIncrementalUpdateFile(incrementalUpdate.Path, importProgressChan)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		//Apply incremental update
+		err = db.ApplyIncrementaliate()
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		log.WithFields(log.Fields{
+			"File":  incrementalUpdate.Filename,
+			"Type":  incrementalUpdate.UpdateType,
+			"Total": copyCount,
+		}).Info("Importation successful")
+	}
 
 	fmt.Printf("\nAll CSV files has been imported to database.\n")
 }

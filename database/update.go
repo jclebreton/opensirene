@@ -34,7 +34,7 @@ func (update *Update) ImportCompleteUpdateFile(path string, progress chan map[st
 	return copyCount, nil
 }
 
-func (update *Update) ImportIncermentalUpdateFile(path string, progress chan map[string]float64) (int, error) {
+func (update *Update) ImportIncrementalUpdateFile(path string, progress chan map[string]float64) (int, error) {
 	copyFromSource, err := InitCopyFromFile(path, progress)
 	if err != nil {
 		return 0, err
