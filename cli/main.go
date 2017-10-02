@@ -112,10 +112,10 @@ Options:
 		return
 	}
 
-	completeUpdate = download_extract.CsvFile{
-		Filename: "Stock",
-		Path:     "/home/jc/sept/stock.csv",
-	}
+	//completeUpdate = download_extract.CsvFile{
+	//	Filename: "Stock",
+	//	Path:     "/home/jc/sept/stock.csv",
+	//}
 	//
 	//incrementalUpdates := []download_extract.CsvFile{
 	//	{
