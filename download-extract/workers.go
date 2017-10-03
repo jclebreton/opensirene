@@ -9,7 +9,7 @@ import (
 )
 
 func DownloadAndExtract(zipFiles []ZipFile, nbWorkers int, downloadProgressChan,
-	unzipProgressChan chan map[string]float64) (completeUpdate CsvFile, incrementalUpdates []CsvFile, err error) {
+	unzipProgressChan chan Progression) (completeUpdate CsvFile, incrementalUpdates []CsvFile, err error) {
 
 	//Progress
 	defer close(downloadProgressChan)
@@ -78,11 +78,11 @@ loop:
 }
 
 func startWorker(id int, workerChan <-chan ZipFile, resultChan chan<- []CsvFile, downloadProgressChan,
-	unzipProgressChan chan map[string]float64, errorsChan chan error) {
+	unzipProgressChan chan Progression, errorsChan chan error) {
 	for zipFile := range workerChan {
 		err := zipFile.download(downloadProgressChan, errorsChan)
 		if err != nil {
-			unzipProgressChan <- map[string]float64{zipFile.filename: 100}
+			unzipProgressChan <- Progression{Name: zipFile.filename, Curr: 100}
 			resultChan <- []CsvFile{}
 			return
 		}

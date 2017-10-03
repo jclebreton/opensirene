@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	iconv "github.com/djimenez/iconv-go"
+	"github.com/jclebreton/opensirene/download-extract"
 )
 
 type source struct {
@@ -15,12 +16,12 @@ type source struct {
 	scanner  *bufio.Scanner
 	values   []interface{}
 	err      error
-	progress chan<- map[string]float64
+	progress chan<- download_extract.Progression
 	cpt      float64
 	total    float64
 }
 
-func InitCopyFromFile(path string, progress chan<- map[string]float64) (*source, error) {
+func InitCopyFromFile(path string, progress chan<- download_extract.Progression) (*source, error) {
 	source := &source{}
 
 	file, err := os.Open(path)
@@ -54,7 +55,7 @@ func (s *source) Next() bool {
 
 	//EOF
 	if !ok {
-		s.progress <- map[string]float64{s.path: 100}
+		s.progress <- download_extract.Progression{Name: s.path, Curr: 100}
 		return false
 	}
 
@@ -62,7 +63,7 @@ func (s *source) Next() bool {
 	err := s.scanner.Err()
 	if err != nil {
 		defer s.file.Close()
-		s.progress <- map[string]float64{s.path: 100}
+		s.progress <- download_extract.Progression{Name: s.path, Curr: 100}
 		s.err = err
 		return false
 	}
@@ -75,7 +76,7 @@ func (s *source) Next() bool {
 	r.Comma = ';'
 	records, err := r.Read()
 	if err != nil {
-		s.progress <- map[string]float64{s.path: 100}
+		s.progress <- download_extract.Progression{Name: s.path, Curr: 100}
 		s.err = err
 		return false
 	}
@@ -89,7 +90,7 @@ func (s *source) Next() bool {
 
 	//Progress
 	s.cpt += float64(len(line))
-	s.progress <- map[string]float64{s.path: (s.cpt / s.total) * 100}
+	s.progress <- download_extract.Progression{Name: s.path, Curr: 100}
 
 	return true
 }

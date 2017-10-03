@@ -1,5 +1,7 @@
 package database
 
+import "github.com/jclebreton/opensirene/download-extract"
+
 type Update struct {
 	db *DBClient
 }
@@ -8,7 +10,7 @@ func InitUpdate(db *DBClient) *Update {
 	return &Update{db: db}
 }
 
-func (update *Update) ImportCompleteUpdateFile(path string, progress chan map[string]float64) (int, error) {
+func (update *Update) ImportCompleteUpdateFile(path string, progress chan download_extract.Progression) (int, error) {
 	copyFromSource, err := InitCopyFromFile(path, progress)
 	if err != nil {
 		return 0, err
@@ -34,7 +36,7 @@ func (update *Update) ImportCompleteUpdateFile(path string, progress chan map[st
 	return copyCount, nil
 }
 
-func (update *Update) ImportIncrementalUpdateFile(path string, progress chan map[string]float64) (int, error) {
+func (update *Update) ImportIncrementalUpdateFile(path string, progress chan download_extract.Progression) (int, error) {
 	copyFromSource, err := InitCopyFromFile(path, progress)
 	if err != nil {
 		return 0, err

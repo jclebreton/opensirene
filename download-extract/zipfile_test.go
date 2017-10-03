@@ -10,7 +10,7 @@ import (
 
 func Test_downloadZipFile_not_found(t *testing.T) {
 	file := ZipFile{url: "http://ovh.net/files/notfound.dat"}
-	progress := make(chan map[string]float64, 100000)
+	progress := make(chan Progression, 100000)
 	errorsChan := make(chan error, 100000)
 	err := file.download(progress, errorsChan)
 	assert.Error(t, err)
@@ -22,7 +22,7 @@ func Test_downloadZipFile_success(t *testing.T) {
 		url:      "http://ovh.net/files/1Mio.dat",
 		path:     "/tmp/1Mio.dat",
 	}
-	progressChan := make(chan map[string]float64, 100000)
+	progressChan := make(chan Progression, 100000)
 	errorsChan := make(chan error, 100000)
 
 	//Download file
@@ -37,7 +37,7 @@ func Test_downloadZipFile_success(t *testing.T) {
 
 	//Progress chan
 	progress := <-progressChan
-	assert.True(t, progress["1Mio.dat"] > 0)
+	assert.True(t, progress.Curr > 0)
 }
 
 func Test_unzip_success(t *testing.T) {
@@ -46,13 +46,13 @@ func Test_unzip_success(t *testing.T) {
 	assert.NoError(t, err)
 
 	//Download one file
-	progressChan := make(chan map[string]float64, 100000)
+	progressChan := make(chan Progression, 100000)
 	errorsChan := make(chan error, 100000)
 	err = zipFiles[1].download(progressChan, errorsChan)
 	assert.NoError(t, err)
 
 	//Unzip
-	progress := make(chan map[string]float64, 100000)
+	progress := make(chan Progression, 100000)
 	err = zipFiles[1].unzip(progress)
 	csvFiles := zipFiles[1].csvFiles
 

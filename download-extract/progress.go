@@ -5,71 +5,64 @@ import (
 	"io"
 )
 
+type Progression struct {
+	Name string
+	Curr float64
+}
+
+type ProgressionBar struct {
+	Progress chan Progression
+	Total    int
+}
+
 //Progress will print the progression percents to stdout
-func Progress(nbZipFiles int, downloadProgress <-chan map[string]float64, unzipProgress <-chan map[string]float64,
-	importProgress <-chan map[string]float64, updateProgress <-chan map[string]float64) {
-	downloadResults := map[string]float64{}
-	unzipResults := map[string]float64{}
-	importResults := map[string]float64{}
-	updateResults := map[string]float64{}
+func Progress(downloadProgress, unzipProgress, importProgress, updateProgress ProgressionBar) {
+	downloadList := make(map[string]float64)
+	unzipList := make(map[string]float64)
+	importList := make(map[string]float64)
+	updateList := make(map[string]float64)
 
 	for {
 		select {
-		case dp := <-downloadProgress:
-			for k, v := range dp {
-				downloadResults[k] = v
-			}
-		case up := <-unzipProgress:
-			for k, v := range up {
-				unzipResults[k] = v
-			}
-		case up := <-importProgress:
-			for k, v := range up {
-				importResults[k] = v
-			}
-		case up := <-updateProgress:
-			for k, v := range up {
-				updateResults[k] = v
-			}
+		case p := <-downloadProgress.Progress:
+			downloadList[p.Name] = p.Curr
+		case p := <-unzipProgress.Progress:
+			unzipList[p.Name] = p.Curr
+		case p := <-importProgress.Progress:
+			importList[p.Name] = p.Curr
+		case p := <-updateProgress.Progress:
+			updateList[p.Name] = p.Curr
 		default:
 		}
 
-		//Download Progress
-		var totalDownloadProgress float64
-		for _, v := range downloadResults {
-			totalDownloadProgress += v
-		}
-		totalDownloadProgress = totalDownloadProgress / float64(nbZipFiles)
+		totalDownload := getPercentTotal(downloadList, downloadProgress.Total)
+		totalUnzip := getPercentTotal(unzipList, unzipProgress.Total)
+		totalImport := getPercentTotal(importList, importProgress.Total)
+		totalUpdate := getPercentTotal(updateList, updateProgress.Total)
 
-		//Unzip Progress
-		var totalUnzipProgress float64
-		for _, v := range unzipResults {
-			totalUnzipProgress += v
-		}
-		totalUnzipProgress = totalUnzipProgress / float64(nbZipFiles)
+		fmt.Printf("\rDownload: %.2f%% - Unzip: %.2f%% - Import: %.2f%% - Update: %.2f%%",
+			totalDownload,
+			totalUnzip,
+			totalImport,
+			totalUpdate,
+		)
 
-		//Copy Progress
-		var totalImportProgress float64
-		for _, v := range importResults {
-			totalImportProgress += v
-		}
-		totalImportProgress = totalImportProgress / float64(nbZipFiles)
-
-		//Update Progress
-		var totalUpdateProgress float64
-		for _, v := range updateResults {
-			totalUpdateProgress += v
-		}
-		totalUpdateProgress = totalUpdateProgress / float64(nbZipFiles)
-
-		fmt.Printf("\rDownload: %.2f%% - Unzip: %.2f%% - Copy: %.2f%% - Update: %.2f%%", totalDownloadProgress,
-			totalUnzipProgress, totalImportProgress, totalUpdateProgress)
-
-		//End
-		if totalDownloadProgress >= 100 && totalUnzipProgress >= 100 && totalImportProgress >= 100 && totalUpdateProgress >= 100 {
+		if totalDownload >= 100 && totalUnzip >= 100 && totalImport >= 100 && totalUpdate >= 100 {
 			break
 		}
 	}
+}
+
+func getPercentTotal(list map[string]float64, total int) float64 {
+	if len(list) == 0 {
+		return 0
+	}
+
+	var t float64
+	for _, v := range list {
+		t += v
+	}
+	return t / float64(total)
 }
 
 // PassThru code originally from
@@ -79,7 +72,7 @@ type PassThru struct {
 	curr     int64
 	total    float64
 	filename string
-	progress chan map[string]float64
+	progress chan Progression
 }
 
 //Override native Read
@@ -89,7 +82,7 @@ func (pt *PassThru) Read(p []byte) (int, error) {
 
 	// last read will have EOF err
 	if err == nil || (err == io.EOF && n > 0) {
-		pt.progress <- map[string]float64{pt.filename: (float64(pt.curr) / pt.total) * 100}
+		pt.progress <- Progression{Name: pt.filename, Curr: (float64(pt.curr) / pt.total) * 100}
 	}
 
 	return n, err

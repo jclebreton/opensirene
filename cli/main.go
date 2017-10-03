@@ -93,26 +93,25 @@ Options:
 	}
 
 	//Start progression
-	downloadProgressChan := make(chan map[string]float64)
-	unzipProgressChan := make(chan map[string]float64)
-	importProgressChan := make(chan map[string]float64)
-	updateProgressChan := make(chan map[string]float64)
-	go download_extract.Progress(len(zipFiles), downloadProgressChan, unzipProgressChan,
-		importProgressChan, updateProgressChan)
+	downloadProgressChan := download_extract.ProgressionBar{Progress: make(chan download_extract.Progression), Total: len(zipFiles)}
+	unzipProgressChan := download_extract.ProgressionBar{Progress: make(chan download_extract.Progression), Total: len(zipFiles)}
+	importProgressChan := download_extract.ProgressionBar{Progress: make(chan download_extract.Progression), Total: len(zipFiles)}
+	updateProgressChan := download_extract.ProgressionBar{Progress: make(chan download_extract.Progression), Total: len(zipFiles) - 1}
+	go download_extract.Progress(downloadProgressChan, unzipProgressChan, importProgressChan, updateProgressChan)
 
 	//Download and extract
 	completeUpdate, incrementalUpdates, err := download_extract.DownloadAndExtract(
 		zipFiles,
 		nbWorkers,
-		downloadProgressChan,
-		unzipProgressChan,
+		downloadProgressChan.Progress,
+		unzipProgressChan.Progress,
 	)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	//completeUpdate = download_extract.CsvFile{
+	//completeUpdate := download_extract.CsvFile{
 	//	Filename: "Stock",
 	//	Path:     "/home/jc/sept/stock.csv",
 	//}
@@ -143,7 +142,7 @@ Options:
 
 	//Save complete update
 	update := database.InitUpdate(db)
-	copyCount, err := update.ImportCompleteUpdateFile(completeUpdate.Path, importProgressChan)
+	copyCount, err := update.ImportCompleteUpdateFile(completeUpdate.Path, importProgressChan.Progress)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -157,7 +156,7 @@ Options:
 	//Save incremental updates
 	for _, incrementalUpdate := range incrementalUpdates {
 
-		copyCount, err = update.ImportIncrementalUpdateFile(incrementalUpdate.Path, importProgressChan)
+		copyCount, err = update.ImportIncrementalUpdateFile(incrementalUpdate.Path, importProgressChan.Progress)
 		if err != nil {
 			log.Error(err)
 			break
@@ -176,7 +175,7 @@ Options:
 			"Total": copyCount,
 		}).Info("Importation successful")
 
-		updateProgressChan <- map[string]float64{incrementalUpdate.Filename: 100}
+		updateProgressChan.Progress <- download_extract.Progression{Name: incrementalUpdate.Filename, Curr: 100}
 	}
 
 	fmt.Printf("\nAll CSV files has been imported to database.\n")

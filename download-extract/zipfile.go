@@ -21,13 +21,13 @@ type ZipFile struct {
 }
 
 //download will download the zip file
-func (file *ZipFile) download(progress chan map[string]float64, errorsChan chan error) error {
+func (file *ZipFile) download(progress chan Progression, errorsChan chan error) error {
 	resp, _ := http.Get(file.url)
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		err := fmt.Errorf("Remote file not found: %s", file.filename)
-		progress <- map[string]float64{file.filename: 100}
+		progress <- Progression{Name: file.filename, Curr: 100}
 		errorsChan <- err
 		return err
 	}
@@ -59,7 +59,7 @@ func (file *ZipFile) remoteExist() bool {
 }
 
 //unzip will un-compress the zip archive
-func (zipFile *ZipFile) unzip(progress chan map[string]float64) error {
+func (zipFile *ZipFile) unzip(progress chan Progression) error {
 
 	dest := filepath.Dir(zipFile.path)
 
