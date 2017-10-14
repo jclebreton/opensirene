@@ -25,14 +25,12 @@ func init() {
 
 func main() {
 	usage := `Opensirene
-
 French company database based on French government open data.
 Github: https://github.com/jclebreton/opensirene
 
 Usage:
-  update daily [--wd=<path>] [--debug]
-  update complete [--wd=<path>] [--maxworkers=<int>] [--month=<string>] [--debug]
-  update -h | --help
+  cli complete [--wd=<path>] [--maxworkers=<int>] [--month=<string>] [--debug]
+  cli -h | --help
 
 Options:
   --wd=<path>        Working directory path (by default: /tmp/tmp[0-9]{8,})
@@ -67,16 +65,7 @@ Options:
 	}).Debug()
 
 	//Update from scratch
-	var zipFiles []download_extract.ZipFile
-	if args.isCompleteUpdate() {
-		zipFiles, err = download_extract.GetScratchZipList(args.getMonth(), url, wd)
-	} else if args.isDailyUpdate() {
-		zipFiles, err = download_extract.GetDailyZipList(url, wd)
-	} else {
-		log.Fatal("No command selected")
-		return
-	}
-
+	zipFiles, err := download_extract.GetScratchZipList(args.getMonth(), url, wd)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -110,22 +99,6 @@ Options:
 		log.Fatal(err)
 		return
 	}
-
-	//completeUpdate := download_extract.CsvFile{
-	//	Filename: "Stock",
-	//	Path:     "/home/jc/sept/stock.csv",
-	//}
-	//
-	//incrementalUpdates := []download_extract.CsvFile{
-	//	{
-	//		UpdateType: "incremental",
-	//		Path:       "/home/jc/sept/sirc-17804_9075_14211_2017244_E_Q_20170902_022234303.csv",
-	//	},
-	//	{
-	//		UpdateType: "incremental",
-	//		Path:       "/home/jc/sept/sirc-17804_9075_14211_2017247_E_Q_20170905_022240981.csv",
-	//	},
-	//}
 
 	log.WithFields(log.Fields{
 		"Complete file":           completeUpdate.Filename,

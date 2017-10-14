@@ -77,11 +77,3 @@ func (a *args) getMonth() string {
 func (a *args) isDebug() bool {
 	return a.list["--debug"].(bool)
 }
-
-func (a *args) isCompleteUpdate() bool {
-	return a.list["complete"].(bool)
-}
-
-func (a *args) isDailyUpdate() bool {
-	return a.list["daily"].(bool)
-}
