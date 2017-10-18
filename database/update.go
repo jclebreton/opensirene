@@ -60,5 +60,11 @@ func (update *Update) ImportIncrementalUpdateFile(path string, progress chan dow
 		return 0, err
 	}
 
+	//Optimize table
+	err = update.db.Optimize("temp_incremental")
+	if err != nil {
+		return 0, err
+	}
+
 	return copyCount, nil
 }

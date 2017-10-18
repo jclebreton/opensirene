@@ -101,6 +101,8 @@ CREATE TABLE enterprises (
   datemaj        TEXT NULL
 );
 
+CREATE INDEX ON enterprises (siren, nic);
+
 
 CREATE TABLE temp_incremental (
   siren          TEXT NULL,
@@ -222,3 +224,6 @@ CREATE TABLE temp_incremental (
   siretps        TEXT NULL,
   tel            TEXT NULL
 );
+
+CREATE INDEX ON temp_incremental (siren, nic) WHERE vmaj IN ('E', 'O', 'I');
+CREATE INDEX ON temp_incremental (vmaj) WHERE vmaj IN ('C', 'D', 'F');

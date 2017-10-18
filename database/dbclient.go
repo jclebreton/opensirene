@@ -1,6 +1,10 @@
 package database
 
-import "github.com/jackc/pgx"
+import (
+	"fmt"
+
+	"github.com/jackc/pgx"
+)
 
 type DBClient struct {
 	conn *pgx.ConnPool
@@ -43,20 +47,21 @@ func (client *DBClient) ImportCSVFile(table string, columns []string, source pgx
 	return copyCount, nil
 }
 
-func (client *DBClient) ApplyIncremental() error {
-
-	//Clean temporary
-	_, err := client.conn.Exec("TRUNCATE TABLE temp_incremental")
+//Optimize table: create visibility map
+func (client *DBClient) Optimize(table string) error {
+	_, err := client.conn.Exec(fmt.Sprintf("VACUUM ANALYZE %s", table))
 	if err != nil {
 		return err
 	}
+}
+
+func (client *DBClient) ApplyIncremental() error {
 
 	//Delete removed (E), exited (O) and modified (I) companies
-	_, err = client.conn.Exec(`
+	_, err := client.conn.Exec(`
 		DELETE FROM enterprises e
 		USING temp_incremental i
-		WHERE e.siren = i.siren
-		AND e.nic = i.nic
+		WHERE (e.siren, e.nic) = (i.siren, i.nic)
 		AND i.vmaj IN ('E', 'O', 'I')
 	`)
 	if err != nil {
