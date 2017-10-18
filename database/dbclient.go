@@ -50,9 +50,7 @@ func (client *DBClient) ImportCSVFile(table string, columns []string, source pgx
 //Optimize table: create visibility map
 func (client *DBClient) Optimize(table string) error {
 	_, err := client.conn.Exec(fmt.Sprintf("VACUUM ANALYZE %s", table))
-	if err != nil {
-		return err
-	}
+	return err
 }
 
 func (client *DBClient) ApplyIncremental() error {
