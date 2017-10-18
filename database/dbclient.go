@@ -96,11 +96,5 @@ func (client *DBClient) ApplyIncremental() error {
 		return err
 	}
 
-	//Clean
-	_, err = client.conn.Exec("TRUNCATE TABLE temp_incremental")
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
