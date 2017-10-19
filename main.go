@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"time"
+
+	flag "github.com/ogier/pflag"
+	"github.com/sirupsen/logrus"
 
 	"github.com/Depado/lightsiren/conf"
 	"github.com/Depado/lightsiren/opendata"
-	flag "github.com/ogier/pflag"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -20,8 +22,12 @@ func main() {
 		logrus.WithError(err).Fatal("Couldn't parse configuration")
 	}
 	s := time.Now()
-	if err = opendata.Grab(); err != nil {
+	var d *opendata.Dataset
+	if d, err = opendata.Grab(); err != nil {
 		logrus.WithError(err).Fatal("Couldn't grab data")
+	}
+	for _, v := range d.Resources {
+		fmt.Println(v)
 	}
 	logrus.WithField("took", time.Since(s)).Info("Done !")
 }

@@ -2,6 +2,7 @@ package conf
 
 import (
 	"io/ioutil"
+	"os"
 
 	"github.com/sirupsen/logrus"
 
@@ -11,9 +12,10 @@ import (
 
 // Conf holds the necessary configuration for the application to work
 type Conf struct {
-	Database Database `yaml:"database"`
-	Server   Server   `yaml:"server"`
-	LogLevel string   `yaml:"loglevel" env:"LOGLEVEL" default:"info"`
+	Database     Database `yaml:"database"`
+	Server       Server   `yaml:"server"`
+	LogLevel     string   `yaml:"loglevel" env:"LOGLEVEL" default:"info"`
+	DownloadPath string   `yaml:"download_path" env:"DOWNLOAD_PATH" default:"downloads"`
 }
 
 // C is the main exported configuration
@@ -47,6 +49,9 @@ func (c *Conf) Parse() error {
 		logrus.SetLevel(logrus.DebugLevel)
 	default:
 		logrus.WithField("provided", c.LogLevel).Warn("Invalid log level, fallback to Info level")
+	}
+	if _, err = os.Stat(c.DownloadPath); os.IsNotExist(err) {
+		os.MkdirAll(c.DownloadPath, os.ModePerm)
 	}
 	return Parse(c)
 }
