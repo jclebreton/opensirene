@@ -1,6 +1,9 @@
 package opendata
 
-import "io"
+import (
+	"io"
+	"path/filepath"
+)
 
 // Resource describes a single resource in the dataset API
 type Resource struct {
@@ -27,5 +30,5 @@ func (r Resource) Download(to io.Writer) {
 }
 
 func (r Resource) DownloadToFile(to string) {
-
+	filepath.Split(to)
 }
