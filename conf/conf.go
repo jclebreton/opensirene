@@ -18,6 +18,7 @@ type Conf struct {
 	DownloadPath string   `yaml:"download_path" env:"DOWNLOAD_PATH" default:"downloads"`
 }
 
+
 // C is the main exported configuration
 var C Conf
 

@@ -1,19 +1,20 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	flag "github.com/ogier/pflag"
 	"github.com/sirupsen/logrus"
 
 	"github.com/Depado/lightsiren/conf"
+	"github.com/Depado/lightsiren/download"
 	"github.com/Depado/lightsiren/opendata"
 )
 
 func main() {
 	var err error
 	var cnf string
+	var sfs opendata.SireneFiles
 
 	flag.StringVarP(&cnf, "conf", "c", "conf.yml", "Path to the configuration file")
 	flag.Parse()
@@ -22,12 +23,9 @@ func main() {
 		logrus.WithError(err).Fatal("Couldn't parse configuration")
 	}
 	s := time.Now()
-	var d *opendata.Dataset
-	if d, err = opendata.Grab(); err != nil {
-		logrus.WithError(err).Fatal("Couldn't grab data")
+	if sfs, err = opendata.GrabLatestFull(); err != nil {
+		logrus.WithError(err).Fatal("Couldn't grab full")
 	}
-	for _, v := range d.Resources {
-		fmt.Println(v)
-	}
+	download.Do(sfs)
 	logrus.WithField("took", time.Since(s)).Info("Done !")
 }
