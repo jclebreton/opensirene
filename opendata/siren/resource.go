@@ -2,6 +2,7 @@ package siren
 
 import (
 	"net/url"
+	"os"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -49,6 +50,14 @@ func NewFromResource(r opendata.Resource) (*RemoteFile, error) {
 			return &sf, errors.Wrap(err, "unparsable day of year")
 		}
 		sf.YearDay = yd
+	}
+	if _, err := os.Stat(sf.Path); os.IsNotExist(err) {
+		sf.OnDisk = false
+	} else {
+		sf.OnDisk, err = sf.ChecksumMatch()
+		if err != nil {
+			return &sf, err
+		}
 	}
 	return &sf, nil
 }

@@ -45,18 +45,22 @@ const (
 // RemoteFile is a struct that adds and remove some fields from a Resource
 // struct and actually keep only useful fields
 type RemoteFile struct {
-	Checksum opendata.Checksum
-	URL      string
-	FileName string
-	Path     string
-	Type     FileType
-	YearDay  int
-	Size     int64
+	Checksum       opendata.Checksum
+	URL            string
+	FileName       string
+	Path           string
+	Type           FileType
+	YearDay        int
+	Size           int64
+	OnDisk         bool
+	ExtractedFiles []string
 }
 
 // RemoteFiles is a slice of pointers to RemoteFile
 type RemoteFiles []*RemoteFile
 
+// CalculateChecksum generates the checksum of the file using the hasher type
+// as defined in the Checksum.Type field
 func (rf *RemoteFile) CalculateChecksum() (string, error) {
 	var hasher hash.Hash
 	switch rf.Checksum.Type {
@@ -79,6 +83,8 @@ func (rf *RemoteFile) CalculateChecksum() (string, error) {
 	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
 }
 
+// ChecksumMatch calculates the checksum of the file on disk and checks if it
+// matches the checksum defined in the Checksum.Value field
 func (rf *RemoteFile) ChecksumMatch() (bool, error) {
 	sum, err := rf.CalculateChecksum()
 	if err != nil {
@@ -196,6 +202,7 @@ func (rf *RemoteFile) Unzip() error {
 			}
 		}
 	}
+	rf.ExtractedFiles = filenames
 	return nil
 }
 
@@ -235,6 +242,7 @@ func GrabLatestFull() (RemoteFiles, error) {
 		}
 		if rf.Type == DailyType && rf.YearDay < first {
 			logrus.Warn("Ignored daily that is before the first day of month")
+			continue
 		}
 		rfs = append(rfs, rf)
 		if rf.Type == StockType {

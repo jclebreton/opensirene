@@ -18,21 +18,24 @@ func worker(id int, bar *pb.ProgressBar, jobs <-chan *siren.RemoteFile, results 
 		bar.ShowFinalTime = true
 		bar.ShowTimeLeft = true
 
-		// Download
-		bar.Prefix("[Downloading] " + s.FileName)
-		if err = s.DownloadWithProgress(bar); err != nil {
-			results <- err
-			continue
-		}
+		// If file is already present on disk, skip the downlod part
+		if !s.OnDisk {
+			// Download
+			bar.Prefix("[Downloading] " + s.FileName)
+			if err = s.DownloadWithProgress(bar); err != nil {
+				results <- err
+				continue
+			}
 
-		// Checksum
-		bar.Prefix("[Checksum]" + s.FileName)
-		if ok, err = s.ChecksumMatch(); err != nil {
-			results <- err
-			continue
-		} else if !ok {
-			results <- fmt.Errorf("Checksum did not match for %s", s.FileName)
-			continue
+			// Checksum
+			bar.Prefix("[Checksum]" + s.FileName)
+			if ok, err = s.ChecksumMatch(); err != nil {
+				results <- err
+				continue
+			} else if !ok {
+				results <- fmt.Errorf("Checksum did not match for %s", s.FileName)
+				continue
+			}
 		}
 
 		// Extracting
