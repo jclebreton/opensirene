@@ -8,13 +8,13 @@ import (
 
 	"github.com/Depado/lightsiren/conf"
 	"github.com/Depado/lightsiren/download"
-	"github.com/Depado/lightsiren/opendata"
+	"github.com/Depado/lightsiren/opendata/siren"
 )
 
 func main() {
 	var err error
 	var cnf string
-	var sfs opendata.SireneFiles
+	var sfs siren.RemoteFiles
 
 	flag.StringVarP(&cnf, "conf", "c", "conf.yml", "Path to the configuration file")
 	flag.Parse()
@@ -23,9 +23,11 @@ func main() {
 		logrus.WithError(err).Fatal("Couldn't parse configuration")
 	}
 	s := time.Now()
-	if sfs, err = opendata.GrabLatestFull(); err != nil {
+	if sfs, err = siren.GrabLatestFull(); err != nil {
 		logrus.WithError(err).Fatal("Couldn't grab full")
 	}
-	download.Do(sfs)
+	if err = download.Do(sfs, 4); err != nil {
+		logrus.WithError(err).Fatal("Couldn't retrieve files")
+	}
 	logrus.WithField("took", time.Since(s)).Info("Done !")
 }

@@ -1,42 +1,82 @@
 package download
 
 import (
-	"sync"
+	"fmt"
 	"time"
 
-	"github.com/Depado/lightsiren/opendata"
+	"github.com/Depado/lightsiren/opendata/siren"
 	"github.com/cheggaaa/pb"
-	"github.com/sirupsen/logrus"
 )
 
-func Do(sfs opendata.SireneFiles) {
+func worker(id int, bar *pb.ProgressBar, jobs <-chan *siren.RemoteFile, results chan<- error) {
 	var err error
-	var wg sync.WaitGroup
+	var ok bool
 
-	for _, sf := range sfs {
-		wg.Add(1)
-		go func(s *opendata.SireneFile) {
-			defer wg.Done()
-			if err = s.GetFileSize(); err != nil {
-				logrus.WithError(err).Fatal("Can't get file size")
-			}
-		}(sf)
+	for s := range jobs {
+		bar.Set(0)
+		bar.ShowPercent = true
+		bar.ShowFinalTime = true
+		bar.ShowTimeLeft = true
+
+		// Download
+		bar.Prefix("[Downloading] " + s.FileName)
+		if err = s.DownloadWithProgress(bar); err != nil {
+			results <- err
+			continue
+		}
+
+		// Checksum
+		bar.Prefix("[Checksum]" + s.FileName)
+		if ok, err = s.ChecksumMatch(); err != nil {
+			results <- err
+			continue
+		} else if !ok {
+			results <- fmt.Errorf("Checksum did not match for %s", s.FileName)
+			continue
+		}
+
+		// Extracting
+		bar.Prefix("[Unzipping] " + s.FileName)
+		if err = s.Unzip(); err != nil {
+			results <- err
+			continue
+		}
+
+		bar.Prefix("[Done] " + s.FileName)
+		results <- nil
 	}
-	wg.Wait()
-	pool, err := pb.StartPool()
-	if err != nil {
-		panic(err)
+}
+
+// Do downloads and processes the sirene files
+func Do(sfs siren.RemoteFiles, workers int) error {
+	var err error
+	var pool *pb.Pool
+
+	size := len(sfs)
+	jobs := make(chan *siren.RemoteFile, size)
+	results := make(chan error, size)
+
+	if pool, err = pb.StartPool(); err != nil {
+		return err
 	}
-	for _, sf := range sfs {
-		wg.Add(1)
-		go func(s *opendata.SireneFile) {
-			defer wg.Done()
-			bar := pb.New(int(s.Size)).SetUnits(pb.U_BYTES).SetRefreshRate(time.Millisecond * 10)
-			pool.Add(bar)
-			s.DownloadWithProgress(bar)
-			s.UnzipWithProgress(bar)
-		}(sf)
+	defer pool.Stop()
+
+	for w := 1; w <= workers; w++ {
+		bar := pb.New(0).SetUnits(pb.U_BYTES).SetRefreshRate(time.Millisecond * 10)
+		pool.Add(bar)
+		go worker(w, bar, jobs, results)
 	}
-	wg.Wait()
-	pool.Stop()
+	for _, s := range sfs {
+		jobs <- s
+	}
+	close(jobs)
+
+	for i := 1; i <= size; i++ {
+		err = <-results
+		if err != nil {
+			return err
+		}
+	}
+	close(results)
+	return nil
 }
