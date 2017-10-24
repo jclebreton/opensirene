@@ -28,7 +28,7 @@ func worker(id int, bar *pb.ProgressBar, jobs <-chan *siren.RemoteFile, results 
 			}
 
 			// Checksum
-			bar.Prefix("[Checksum]" + s.FileName)
+			bar.Prefix("[Checksum] " + s.FileName)
 			if ok, err = s.ChecksumMatch(); err != nil {
 				results <- err
 				continue

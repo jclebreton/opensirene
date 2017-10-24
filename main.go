@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/Depado/lightsiren/conf"
+	"github.com/Depado/lightsiren/database"
 	"github.com/Depado/lightsiren/download"
 	"github.com/Depado/lightsiren/opendata/siren"
 )
@@ -26,11 +27,26 @@ func main() {
 	}
 	if full {
 		s := time.Now()
+		if err = database.InitImportClient(); err != nil {
+			logrus.WithError(err).Fatal("Couldn't initalize pgx")
+		}
 		if sfs, err = siren.GrabLatestFull(); err != nil {
 			logrus.WithError(err).Fatal("Couldn't grab full")
 		}
 		if err = download.Do(sfs, 4); err != nil {
 			logrus.WithError(err).Fatal("Couldn't retrieve files")
+		}
+		cis, err := sfs.ToCSVImport()
+		if err != nil {
+			logrus.WithError(err).Fatal("Couldn't convert to CSVImport")
+		}
+		for _, ci := range cis {
+			if err = ci.Prepare(); err != nil {
+				logrus.WithError(err).Fatal("Couldn't prepare import")
+			}
+			if err = ci.Copy(database.ImportClient.Conn); err != nil {
+				logrus.WithError(err).Fatal("Couldn't copy")
+			}
 		}
 		logrus.WithField("took", time.Since(s)).Info("Done !")
 	}

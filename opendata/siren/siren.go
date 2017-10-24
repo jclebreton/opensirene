@@ -62,7 +62,10 @@ type RemoteFiles []*RemoteFile
 // CalculateChecksum generates the checksum of the file using the hasher type
 // as defined in the Checksum.Type field
 func (rf *RemoteFile) CalculateChecksum() (string, error) {
+	var err error
+	var f *os.File
 	var hasher hash.Hash
+
 	switch rf.Checksum.Type {
 	case "sha256":
 		hasher = sha256.New()
@@ -70,13 +73,12 @@ func (rf *RemoteFile) CalculateChecksum() (string, error) {
 		return "", fmt.Errorf("unknown hashing function : %s", rf.Checksum.Type)
 	}
 
-	f, err := os.Open(rf.Path)
-	if err != nil {
+	if f, err = os.Open(rf.Path); err != nil {
 		return "", err
 	}
 	defer f.Close()
 
-	if _, err := io.Copy(hasher, f); err != nil {
+	if _, err = io.Copy(hasher, f); err != nil {
 		return "", err
 	}
 
@@ -222,6 +224,8 @@ func Grab() (*opendata.Dataset, error) {
 	return target, nil
 }
 
+// GrabLatestFull retrieves all the files that needs to be downloaded and
+// applied to the database in inverse order (stock first, then each daily file)
 func GrabLatestFull() (RemoteFiles, error) {
 	var err error
 	var ds *opendata.Dataset
@@ -248,6 +252,10 @@ func GrabLatestFull() (RemoteFiles, error) {
 		if rf.Type == StockType {
 			break
 		}
+	}
+
+	for i, j := 0, len(rfs)-1; i < j; i, j = i+1, j-1 {
+		rfs[i], rfs[j] = rfs[j], rfs[i]
 	}
 
 	return rfs, err
