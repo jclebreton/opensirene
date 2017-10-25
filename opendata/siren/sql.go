@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"io"
 	"os"
+	"strconv"
 
 	"github.com/sirupsen/logrus"
 
@@ -16,7 +17,7 @@ import (
 )
 
 var cols = []string{
-	"siren", "nic", "l1_normalisee", "l2_normalisee", "l3_normalisee", "l4_normalisee",
+	"siret", "siren", "nic", "l1_normalisee", "l2_normalisee", "l3_normalisee", "l4_normalisee",
 	"l5_normalisee", "l6_normalisee", "l7_normalisee", "l1_declaree", "l2_declaree", "l3_declaree", "l4_declaree",
 	"l5_declaree", "l6_declaree", "l7_declaree", "numvoie", "indrep", "typvoie", "libvoie", "codpos", "cedex",
 	"rpet", "libreg", "depet", "arronet", "ctonet", "comet", "libcom", "du", "tu", "uu", "epci", "tcd", "zemet",
@@ -89,7 +90,7 @@ func (c *CSVImport) Prepare() error {
 	c.bar.ShowTimeLeft = true
 	c.bar.Prefix("Importing " + c.path)
 	c.bar.Start()
-	c.Next()
+	c.reader.Read() // Skip the header part
 
 	return nil
 }
@@ -101,6 +102,7 @@ func (c *CSVImport) Prepare() error {
 func (c *CSVImport) Next() bool {
 	var err error
 	var rec []string
+	var siret int64
 	var values []interface{}
 
 	if rec, err = c.reader.Read(); err != nil {
@@ -117,12 +119,17 @@ func (c *CSVImport) Next() bool {
 	}
 
 	tot := 0
+	if siret, err = strconv.ParseInt(rec[0]+rec[1], 10, 0); err != nil {
+		c.err = err
+		return false
+	}
+	values = append(values, siret)
 	for _, v := range rec {
 		values = append(values, v)
 		tot += len(v) + 3 // two quotes and the ;
 	}
 	c.values = values
-	c.bar.Add(tot - 1)
+	c.bar.Add(tot - 2)
 
 	return true
 }
