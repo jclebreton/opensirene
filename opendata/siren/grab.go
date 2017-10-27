@@ -9,6 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var location *time.Location
+
 // Grab can be used to grab the full dataset object
 func Grab() (*opendata.Dataset, error) {
 	r, err := http.Get(datasetEndpoint + sirenID)
@@ -55,6 +57,7 @@ func GrabLatestFull() (RemoteFiles, error) {
 		}
 	}
 
+	// Revert the slice to get the right order
 	for i, j := 0, len(rfs)-1; i < j; i, j = i+1, j-1 {
 		rfs[i], rfs[j] = rfs[j], rfs[i]
 	}

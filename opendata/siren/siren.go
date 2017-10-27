@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/cheggaaa/pb"
 	"github.com/pkg/errors"
@@ -20,8 +19,6 @@ import (
 	"github.com/Depado/lightsiren/conf"
 	"github.com/Depado/lightsiren/opendata"
 )
-
-var location *time.Location
 
 const (
 	nafID           = "59593c53a3a7291dcf9c82bf/"
