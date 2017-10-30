@@ -48,6 +48,9 @@ func main() {
 			if err = ci.Copy(database.ImportClient.Conn); err != nil {
 				logrus.WithError(err).Fatal("Couldn't copy")
 			}
+			if err = ci.Update(database.ImportClient.Conn); err != nil {
+				logrus.WithError(err).Fatal("Couldn't apply update")
+			}
 		}
 		logrus.WithField("took", time.Since(s)).Info("Done !")
 	}

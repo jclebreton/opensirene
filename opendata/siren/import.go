@@ -14,6 +14,8 @@ import (
 	"github.com/cheggaaa/pb"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
+	"fmt"
+	"strings"
 )
 
 var cols = []string{
@@ -55,6 +57,9 @@ func (c *CSVImport) Copy(db *pgx.ConnPool) error {
 		}
 		logrus.WithField("records", c).Info("Imported Stock file")
 	case DailyType:
+		if _, err := db.Exec("TRUNCATE table temp_incremental"); err != nil {
+			return errors.Wrap(err, "couldn't truncate table temp_incremental")
+		}
 		c, err := db.CopyFrom(pgx.Identifier{"temp_incremental"}, majcols, c)
 		if err != nil {
 			return errors.Wrap(err, "couldn't copyfrom")
@@ -140,4 +145,39 @@ func (c *CSVImport) Values() ([]interface{}, error) {
 // this is not nil *Conn.CopyFrom will abort the copy.
 func (c *CSVImport) Err() error {
 	return c.err
+}
+
+// Update update stock table from daily update file
+func (c *CSVImport) Update(db *pgx.ConnPool) error {
+	if c.kind == DailyType {
+		var err error
+
+		//Delete removed (E), exited (O) and modified (I) companies
+		_, err = db.Exec(`
+			DELETE FROM enterprises e
+			USING temp_incremental i
+			WHERE (e.siren, e.nic) = (i.siren, i.nic)
+			AND i.vmaj IN ('E', 'O', 'I')
+		`)
+		if err != nil {
+			return errors.Wrap(err, "couldn't remove enterprises from temp_incremental table")
+		}
+
+		//Adds new companies (C), which enter (D) and have been modified (F)
+		var icols []string
+		for _, col:= range cols {
+			icols = append(icols, "i."+col)
+		}
+		_, err = db.Exec(fmt.Sprintf(
+			"INSERT INTO enterprises (%s) SELECT %s FROM temp_incremental i WHERE i.vmaj in ('C', 'D', 'F')",
+			strings.Join(cols, ", "),
+			strings.Join(icols, ", "),
+			))
+
+		if err != nil {
+			return errors.Wrap(err, "couldn't insert enterprises from temp_incremental table")
+		}
+	}
+
+	return nil
 }
