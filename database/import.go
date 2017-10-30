@@ -4,6 +4,8 @@ import (
 	"github.com/jackc/pgx"
 
 	"github.com/jclebreton/opensirene/conf"
+	"github.com/pkg/errors"
+
 )
 
 type PgxClient struct {
@@ -66,4 +68,29 @@ func InitImportClient() error {
 	}
 
 	return nil
+}
+
+// TryLock set a mutex for database write
+func (c *PgxClient) TryLock() error {
+	var result bool
+	err := c.Conn.QueryRow("SELECT pg_try_advisory_lock(42)").Scan(&result)
+	if err != nil {
+		return err
+	}
+	if !result {
+		return errors.New("mutex is already taken")
+	}
+}
+
+
+// Unlock remove the current mutex
+func (c *PgxClient) Unlock() error {
+	var result bool
+	err := c.Conn.QueryRow("SELECT pg_advisory_unlock(42)").Scan(&result)
+	if err != nil {
+		return err
+	}
+	if !result {
+		return errors.New("unable to release the mutex")
+	}
 }
