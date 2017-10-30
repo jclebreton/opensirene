@@ -1,5 +1,5 @@
 CREATE TABLE enterprises (
-  siret          BIGINT UNIQUE NULL,
+  siret          TEXT UNIQUE NULL,
   siren          TEXT NULL,
   nic            TEXT NULL,
   l1_normalisee  TEXT NULL,
@@ -107,7 +107,7 @@ CREATE INDEX ON enterprises (siren, nic);
 CREATE INDEX ON enterprises (siret);
 
 CREATE TABLE temp_incremental (
-  siret          BIGINT NULL,
+  siret          TEXT NULL,
   siren          TEXT NULL,
   nic            TEXT NULL,
   l1_normalisee  TEXT NULL,

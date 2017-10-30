@@ -2,9 +2,9 @@ package siren
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"os"
-	"strconv"
 
 	"github.com/sirupsen/logrus"
 
@@ -102,7 +102,7 @@ func (c *CSVImport) Prepare() error {
 func (c *CSVImport) Next() bool {
 	var err error
 	var rec []string
-	var siret int64
+	var siret string
 	var values []interface{}
 
 	if rec, err = c.reader.Read(); err != nil {
@@ -119,17 +119,14 @@ func (c *CSVImport) Next() bool {
 	}
 
 	tot := 0
-	if siret, err = strconv.ParseInt(rec[0]+rec[1], 10, 0); err != nil {
-		c.err = err
-		return false
-	}
+	siret = fmt.Sprintf("%s%s", rec[0], rec[1])
 	values = append(values, siret)
 	for _, v := range rec {
 		values = append(values, v)
 		tot += len(v) + 3 // two quotes and the ;
 	}
 	c.values = values
-	c.bar.Add(tot - 2)
+	c.bar.Add(tot - 3)
 
 	return true
 }

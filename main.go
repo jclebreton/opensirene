@@ -10,6 +10,7 @@ import (
 	"github.com/jclebreton/opensirene/database"
 	"github.com/jclebreton/opensirene/download"
 	"github.com/jclebreton/opensirene/opendata/siren"
+	"github.com/jclebreton/opensirene/router"
 )
 
 func main() {
@@ -49,5 +50,14 @@ func main() {
 			}
 		}
 		logrus.WithField("took", time.Since(s)).Info("Done !")
+	}
+
+	if err = database.InitQueryClient(); err != nil {
+		logrus.WithError(err).Fatal("Couldn't initialize GORM")
+	}
+	defer database.DB.Close()
+
+	if err = router.SetupAndRun(); err != nil {
+		logrus.WithError(err).Fatal("Could not run the server")
 	}
 }

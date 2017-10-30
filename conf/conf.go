@@ -18,7 +18,6 @@ type Conf struct {
 	DownloadPath string   `yaml:"download_path" env:"DOWNLOAD_PATH" default:"downloads"`
 }
 
-
 // C is the main exported configuration
 var C Conf
 
@@ -30,6 +29,9 @@ func (c *Conf) Parse() error {
 		return errors.Wrap(err, "couldn't parse Database struct")
 	}
 	if err = Parse(&c.Server); err != nil {
+		return errors.Wrap(err, "couldn't parse Server struct")
+	}
+	if err = Parse(&c.Server.Cors); err != nil {
 		return errors.Wrap(err, "couldn't parse Server struct")
 	}
 	if err = Parse(c); err != nil {

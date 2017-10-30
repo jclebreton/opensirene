@@ -12,7 +12,7 @@ type Database struct {
 	Password string `yaml:"password" env:"DB_PASSWORD"`
 	Host     string `yaml:"host" env:"DB_HOST" default:"127.0.0.1"`
 	Port     int    `yaml:"port" env:"DB_PORT" default:"5432"`
-	SSLMode  string `yaml:"sslmode" env:"DB_SSL_MODE"`
+	SSLMode  string `yaml:"sslmode" env:"DB_SSL_MODE" default:"disable"`
 }
 
 // ConnectionString generates and returns the connection string used by the
