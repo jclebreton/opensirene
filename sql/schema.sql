@@ -1,3 +1,12 @@
+CREATE TABLE history (
+  id        BIGINT PRIMARY KEY UNIQUE NOT NULL,
+  datetime  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  type      TEXT NOT NULL,
+  filename  TEXT NOT NULL,
+  state     BOOL NOT NULL,
+  error     TEXT NULL
+);
+
 CREATE TABLE enterprises (
   siret          TEXT UNIQUE NULL,
   siren          TEXT NULL,
