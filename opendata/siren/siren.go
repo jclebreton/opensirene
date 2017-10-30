@@ -31,10 +31,10 @@ type FileType int
 
 // Defines the different filetype constants
 const (
-	StockType FileType = iota
+	OtherType FileType = iota
+	StockType
 	DailyType
 	MonthlyType
-	OtherType
 )
 
 // RemoteFile is a struct that adds and remove some fields from a Resource
