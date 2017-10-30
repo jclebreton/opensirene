@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jclebreton/opensirene/opendata/siren"
 	"github.com/cheggaaa/pb"
+	"github.com/jclebreton/opensirene/opendata/siren"
 )
 
 func worker(id int, bar *pb.ProgressBar, jobs <-chan *siren.RemoteFile, results chan<- error) {

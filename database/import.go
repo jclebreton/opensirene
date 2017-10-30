@@ -5,7 +5,6 @@ import (
 
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/pkg/errors"
-
 )
 
 type PgxClient struct {
@@ -80,8 +79,8 @@ func (c *PgxClient) TryLock() error {
 	if !result {
 		return errors.New("mutex is already taken")
 	}
+	return nil
 }
-
 
 // Unlock remove the current mutex
 func (c *PgxClient) Unlock() error {
@@ -93,4 +92,5 @@ func (c *PgxClient) Unlock() error {
 	if !result {
 		return errors.New("unable to release the mutex")
 	}
+	return nil
 }

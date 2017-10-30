@@ -11,11 +11,11 @@ import (
 	"github.com/jackc/pgx"
 	"github.com/pkg/errors"
 
+	"strings"
+
 	"github.com/cheggaaa/pb"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
-	"fmt"
-	"strings"
 )
 
 var cols = []string{
@@ -165,14 +165,14 @@ func (c *CSVImport) Update(db *pgx.ConnPool) error {
 
 		//Adds new companies (C), which enter (D) and have been modified (F)
 		var icols []string
-		for _, col:= range cols {
+		for _, col := range cols {
 			icols = append(icols, "i."+col)
 		}
 		_, err = db.Exec(fmt.Sprintf(
 			"INSERT INTO enterprises (%s) SELECT %s FROM temp_incremental i WHERE i.vmaj in ('C', 'D', 'F')",
 			strings.Join(cols, ", "),
 			strings.Join(icols, ", "),
-			))
+		))
 
 		if err != nil {
 			return errors.Wrap(err, "couldn't insert enterprises from temp_incremental table")
