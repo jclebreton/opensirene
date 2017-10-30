@@ -15,5 +15,8 @@
 .glide/
 conf*.yml
 downloads/*
-lightsiren
+opensirene
+
+# Libs
+vendor
 
