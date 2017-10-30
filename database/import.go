@@ -3,7 +3,7 @@ package database
 import (
 	"github.com/jackc/pgx"
 
-	"github.com/Depado/lightsiren/conf"
+	"github.com/jclebreton/opensirene/conf"
 )
 
 type PgxClient struct {

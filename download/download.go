@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Depado/lightsiren/opendata/siren"
+	"github.com/jclebreton/opensirene/opendata/siren"
 	"github.com/cheggaaa/pb"
 )
 

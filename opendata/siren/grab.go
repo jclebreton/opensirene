@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Depado/lightsiren/opendata"
+	"github.com/jclebreton/opensirene/opendata"
 	"github.com/sirupsen/logrus"
 )
 

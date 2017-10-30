@@ -6,10 +6,10 @@ import (
 	flag "github.com/ogier/pflag"
 	"github.com/sirupsen/logrus"
 
-	"github.com/Depado/lightsiren/conf"
-	"github.com/Depado/lightsiren/database"
-	"github.com/Depado/lightsiren/download"
-	"github.com/Depado/lightsiren/opendata/siren"
+	"github.com/jclebreton/opensirene/conf"
+	"github.com/jclebreton/opensirene/database"
+	"github.com/jclebreton/opensirene/download"
+	"github.com/jclebreton/opensirene/opendata/siren"
 )
 
 func main() {

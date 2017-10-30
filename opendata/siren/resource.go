@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Depado/lightsiren/conf"
-	"github.com/Depado/lightsiren/opendata"
+	"github.com/jclebreton/opensirene/conf"
+	"github.com/jclebreton/opensirene/opendata"
 	"github.com/pkg/errors"
 )
 

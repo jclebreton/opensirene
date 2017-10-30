@@ -16,8 +16,8 @@ import (
 	"github.com/cheggaaa/pb"
 	"github.com/pkg/errors"
 
-	"github.com/Depado/lightsiren/conf"
-	"github.com/Depado/lightsiren/opendata"
+	"github.com/jclebreton/opensirene/conf"
+	"github.com/jclebreton/opensirene/opendata"
 )
 
 const (
