@@ -38,18 +38,19 @@ var majcols = append(cols, "eve", "dateve", "typcreh", "dreactet", "dreacten", "
 // CSVImport is a struct helper to import a CSV file to the database
 // It implementes the pgx.Copy interface
 type CSVImport struct {
-	file   *os.File
-	kind   FileType
-	path   string
-	bar    *pb.ProgressBar
-	reader *csv.Reader
-	values []interface{}
-	err    error
+	file    *os.File
+	Kind    FileType
+	path    string
+	bar     *pb.ProgressBar
+	reader  *csv.Reader
+	values  []interface{}
+	err     error
+	ZipName string
 }
 
 // Copy actually copies the content of the CSV file to the database
 func (c *CSVImport) Copy(db *pgx.ConnPool) error {
-	switch c.kind {
+	switch c.Kind {
 	case StockType:
 		c, err := db.CopyFrom(pgx.Identifier{"enterprises"}, cols, c)
 		if err != nil {
@@ -149,11 +150,15 @@ func (c *CSVImport) Err() error {
 
 // Update update stock table from daily update file
 func (c *CSVImport) Update(db *pgx.ConnPool) error {
-	if c.kind == DailyType {
+	if c.Kind == DailyType {
 		var err error
 
-		//Delete removed (E), exited (O) and modified (I) companies
-		_, err = db.Exec(`
+		// Create transaction to avoid corruptions
+		transaction, err := db.Begin()
+		defer transaction.Rollback()
+
+		// Delete removed (E), exited (O) and modified (I) companies
+		_, err = transaction.Exec(`
 			DELETE FROM enterprises e
 			USING temp_incremental i
 			WHERE (e.siren, e.nic) = (i.siren, i.nic)
@@ -163,20 +168,21 @@ func (c *CSVImport) Update(db *pgx.ConnPool) error {
 			return errors.Wrap(err, "couldn't remove enterprises from temp_incremental table")
 		}
 
-		//Adds new companies (C), which enter (D) and have been modified (F)
+		// Adds new companies (C), which enter (D) and have been modified (F)
 		var icols []string
 		for _, col := range cols {
 			icols = append(icols, "i."+col)
 		}
-		_, err = db.Exec(fmt.Sprintf(
+		_, err = transaction.Exec(fmt.Sprintf(
 			"INSERT INTO enterprises (%s) SELECT %s FROM temp_incremental i WHERE i.vmaj in ('C', 'D', 'F')",
 			strings.Join(cols, ", "),
 			strings.Join(icols, ", "),
 		))
-
 		if err != nil {
 			return errors.Wrap(err, "couldn't insert enterprises from temp_incremental table")
 		}
+
+		transaction.Commit()
 	}
 
 	return nil

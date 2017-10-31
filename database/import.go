@@ -94,3 +94,22 @@ func (c *PgxClient) Unlock() error {
 	}
 	return nil
 }
+
+// Update update stock table from daily update file
+func LogImport(db *pgx.ConnPool, action, msg, filename string, isSuccess bool) error {
+	var err error
+
+	_, err = db.Exec(
+		"INSERT INTO history (action, is_success, filename, msg) VALUES ($1, $2, $3, $4)",
+		action,
+		isSuccess,
+		filename,
+		msg,
+	)
+
+	if err != nil {
+		return errors.Wrap(err, "couldn't log sql transaction")
+	}
+
+	return nil
+}

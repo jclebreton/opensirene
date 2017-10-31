@@ -6,8 +6,9 @@ func (rfs RemoteFiles) ToCSVImport() ([]*CSVImport, error) {
 	var out []*CSVImport
 	for _, rf := range rfs {
 		out = append(out, &CSVImport{
-			path: rf.ExtractedFiles[0],
-			kind: rf.Type,
+			path:    rf.ExtractedFiles[0],
+			Kind:    rf.Type,
+			ZipName: rf.FileName,
 		})
 	}
 	return out, nil

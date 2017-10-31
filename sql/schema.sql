@@ -1,10 +1,10 @@
 CREATE TABLE history (
-  id        BIGINT PRIMARY KEY UNIQUE NOT NULL,
-  datetime  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  type      TEXT NOT NULL,
-  filename  TEXT NOT NULL,
-  state     BOOL NOT NULL,
-  error     TEXT NULL
+  id         SERIAL PRIMARY KEY,
+  datetime   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  action     TEXT NOT NULL,
+  is_success BOOL NULL,
+  filename   TEXT NULL,
+  msg        TEXT NULL
 );
 
 CREATE TABLE enterprises (

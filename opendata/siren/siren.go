@@ -37,6 +37,18 @@ const (
 	MonthlyType
 )
 
+func FileTypeName(ft FileType) string {
+	switch ft {
+	case StockType:
+		return "stock"
+	case DailyType:
+		return "daily"
+	case MonthlyType:
+		return "monthly"
+	}
+	return "other:"
+}
+
 // RemoteFile is a struct that adds and remove some fields from a Resource
 // struct and actually keep only useful fields
 type RemoteFile struct {
