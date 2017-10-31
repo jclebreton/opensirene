@@ -16,7 +16,11 @@ func GetSiren(c *gin.Context) {
 
 	siren := c.Param("id")
 
-	if database.DB.Find(&es, &models.Enterprise{Siren: siren}).RecordNotFound() {
+	if database.DB.Find(&es, models.Enterprise{Siren: siren}).RecordNotFound() {
+		c.JSON(http.StatusNotFound, gin.H{"status": "not found", "siren": siren})
+		return
+	}
+	if len(es) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"status": "not found", "siren": siren})
 		return
 	}
@@ -28,10 +32,12 @@ func GetSiren(c *gin.Context) {
 // record for a single Siret given in the query
 func GetSiret(c *gin.Context) {
 	var e models.Enterprise
-	siret := c.Param("siret")
 
-	if database.DB.Find(&e, &models.Enterprise{Siret: siret}).RecordNotFound() {
+	siret := c.Param("id")
+
+	if database.DB.Find(&e, models.Enterprise{Siret: siret}).RecordNotFound() {
 		c.JSON(http.StatusNotFound, gin.H{"status": "not found", "siret": siret})
+		return
 	}
 
 	c.JSON(http.StatusOK, e)

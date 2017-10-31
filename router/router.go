@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 
+	"github.com/Depado/ginprom"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -35,6 +36,8 @@ func SetupAndRun() error {
 		cc.AllowOrigins = conf.C.Server.Cors.AllowOrigins
 	}
 	r.Use(cors.New(cc))
+	p := ginprom.New(ginprom.Subsystem(conf.C.Prometheus.Prefix), ginprom.Engine(r))
+	r.Use(p.Instrument())
 
 	// Route setup
 	r.GET("/siret/:id", views.GetSiret)
