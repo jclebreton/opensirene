@@ -16,9 +16,10 @@ environment variables (for most of the configuration fields). Environment
 variables have a higher priority than the configuration file, which means you
 can override almost any value of the configuration file using them. 
 
-```yml
+yml
 ---
 loglevel: debug
+```
 server:
   host: 127.0.0.1
   port: 8080
@@ -46,7 +47,7 @@ prometheus:
 | server.debug                | bool     | Debug mode                                                | `SERVER_DEBUG`       | false        | true         |
 | server.cors.allow_origins   | []string | Array of accepted origins                                 | -                    | -            | -            |
 | server.cors.permissive_mode | bool     | Accept every origin and overrides the allow_origins field | `CORS_PERMISSIVE`    | false        | true         |
-| database.user               | string   | User used to connect to the DB                            | `DB_USER`            | "autopro"    | "autopro"    |
+| database.user               | string   | User used to connect to the DB                            | `DB_USER`            | "sir"        | "sir"        |
 | database.password           | string   | Password associated to the user                           | `DB_PASSWORD`        | -            | -            |
 | database.host               | string   | Host on which the DB listens                              | `DB_HOST`            | "127.0.0.1"  | "127.0.0.1"  |
 | database.port               | int      | Port on which the DB listens                              | `DB_PORT`            | 5432         | 5432         |
