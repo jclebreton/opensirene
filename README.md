@@ -27,6 +27,7 @@ server:
   debug: false
   cors:
     permissive_mode: true
+    enabled: true
 
 database:
   user: xx

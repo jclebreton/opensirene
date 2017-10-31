@@ -56,6 +56,12 @@
   version = "v3.0.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/jasonlvhit/gocron"
+  packages = ["."]
+  revision = "42a5804d37aa0b9239b265e894a16b8edbf52d54"
+
+[[projects]]
   name = "github.com/jinzhu/gorm"
   packages = [".","dialects/postgres"]
   revision = "5174cc5c242a728b435ea2be8a2f7f998e15429b"
@@ -184,6 +190,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "85957b057bcd97367c1deb401f0b1f878e39a3ef68336d9fa393fd6fb2e2e70b"
+  inputs-digest = "680c1536ff12d0667a8a91124a1bc07d6c7190569316aac4e275018769f6f136"
   solver-name = "gps-cdcl"
   solver-version = 1

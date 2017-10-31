@@ -3,6 +3,8 @@ package main
 import (
 	"time"
 
+	"github.com/jasonlvhit/gocron"
+
 	flag "github.com/ogier/pflag"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -10,6 +12,7 @@ import (
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
 	"github.com/jclebreton/opensirene/download"
+	"github.com/jclebreton/opensirene/models"
 	"github.com/jclebreton/opensirene/opendata/siren"
 	"github.com/jclebreton/opensirene/router"
 )
@@ -45,8 +48,36 @@ func main() {
 	}
 	defer database.DB.Close()
 
+	go func() {
+		gocron.Every(3).Hours().Do(Daily)
+		// Execute the update at startup
+		gocron.RunAll()
+		_, t := gocron.NextRun()
+		logrus.WithField("next", t).Info("Started cron background task")
+		<-gocron.Start()
+	}()
+
 	if err = router.SetupAndRun(); err != nil {
 		logrus.WithError(err).Fatal("Could not run the server")
+	}
+}
+
+// Daily is the cron task that runs every few hours to get and apply the latest
+// updates
+func Daily() {
+	var err error
+	var sfs siren.RemoteFiles
+
+	if sfs, err = siren.GrabLatestFull(); err != nil {
+		logrus.WithError(err).Error("Could not download latest")
+		return
+	}
+
+	sfs = sfs.Diff(models.GetSuccessfulUpdateList())
+
+	if err = Import(sfs); err != nil {
+		logrus.WithError(err).Error("Could not download latest")
+		return
 	}
 }
 

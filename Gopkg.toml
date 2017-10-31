@@ -64,3 +64,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/Depado/ginprom"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jasonlvhit/gocron"
