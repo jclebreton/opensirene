@@ -26,10 +26,18 @@ func main() {
 	if err = conf.Load(cnf); err != nil {
 		logrus.WithError(err).Fatal("Couldn't parse configuration")
 	}
+
 	if full {
-		if err = FullImport(); err != nil {
+		s := time.Now()
+		var sfs siren.RemoteFiles
+		if sfs, err = siren.GrabLatestFull(); err != nil {
+			logrus.WithError(err).Fatal("An error is occured during grab")
+		}
+
+		if err = Import(sfs); err != nil {
 			logrus.WithError(err).Fatal("An error is occured during import")
 		}
+		logrus.WithField("import took", time.Since(s)).Info("Done !")
 	}
 
 	if err = database.InitQueryClient(); err != nil {
@@ -42,11 +50,9 @@ func main() {
 	}
 }
 
-func FullImport() error {
+func Import(sfs siren.RemoteFiles) error {
 	var err error
-	var sfs siren.RemoteFiles
 
-	s := time.Now()
 	if err = database.InitImportClient(); err != nil {
 		return errors.Wrap(err, "Couldn't initalize pgx")
 	}
@@ -61,10 +67,6 @@ func FullImport() error {
 		}
 	}()
 
-	if sfs, err = siren.GrabLatestFull(); err != nil {
-		return errors.Wrap(err, "Couldn't grab full")
-	}
-
 	if err = download.Do(sfs, 4); err != nil {
 		return errors.Wrap(err, "Couldn't retrieve files")
 	}
@@ -77,8 +79,6 @@ func FullImport() error {
 	if err = cis.Import(); err != nil {
 		return errors.Wrap(err, "Full import error")
 	}
-
-	logrus.WithField("took", time.Since(s)).Info("Done !")
 
 	return nil
 }
