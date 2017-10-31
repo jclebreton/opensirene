@@ -74,30 +74,8 @@ func FullImport() error {
 		return errors.Wrap(err, "Couldn't convert to CSVImport")
 	}
 
-	for _, ci := range cis {
-		if err = ci.Prepare(); err != nil {
-			if e := database.LogImport(database.ImportClient.Conn, siren.FileTypeName(ci.Kind), err.Error(), ci.ZipName, false); e != nil {
-				return errors.Wrap(err, e.Error())
-			}
-			return errors.Wrap(err, "Couldn't prepare import")
-		}
-		if err = ci.Copy(database.ImportClient.Conn); err != nil {
-			if e := database.LogImport(database.ImportClient.Conn, siren.FileTypeName(ci.Kind), err.Error(), ci.ZipName, false); e != nil {
-				return errors.Wrap(err, e.Error())
-			}
-			return errors.Wrap(err, "Couldn't copy")
-		}
-		if err = ci.Update(database.ImportClient.Conn); err != nil {
-			if e := database.LogImport(database.ImportClient.Conn, siren.FileTypeName(ci.Kind), err.Error(), ci.ZipName, false); e != nil {
-				return errors.Wrap(err, e.Error())
-			}
-			return errors.Wrap(err, "Couldn't apply update")
-		}
-
-		err = database.LogImport(database.ImportClient.Conn, siren.FileTypeName(ci.Kind), "", ci.ZipName, true)
-		if err != nil {
-			return errors.Wrap(err, "Couldn't log")
-		}
+	if err = cis.Import(); err != nil {
+		return errors.Wrap(err, "Full import error")
 	}
 
 	logrus.WithField("took", time.Since(s)).Info("Done !")

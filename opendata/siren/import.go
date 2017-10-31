@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"github.com/sirupsen/logrus"
-
-	"github.com/jackc/pgx"
-	"github.com/pkg/errors"
-
 	"strings"
 
 	"github.com/cheggaaa/pb"
+	"github.com/jackc/pgx"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
+
+	"github.com/jclebreton/opensirene/database"
 )
 
 var cols = []string{
@@ -46,6 +45,40 @@ type CSVImport struct {
 	values  []interface{}
 	err     error
 	ZipName string
+}
+
+// CSVImports is a slice of pointer to CSVImport
+type CSVImports []*CSVImport
+
+// Import will import each CSVImport present in the slice
+func (c CSVImports) Import() error {
+	var err error
+	for _, ci := range c {
+		if err = ci.Prepare(); err != nil {
+			if e := database.LogImport(database.ImportClient.Conn, FileTypeName(ci.Kind), err.Error(), ci.ZipName, false); e != nil {
+				return errors.Wrap(err, e.Error())
+			}
+			return errors.Wrap(err, "Couldn't prepare import")
+		}
+		if err = ci.Copy(database.ImportClient.Conn); err != nil {
+			if e := database.LogImport(database.ImportClient.Conn, FileTypeName(ci.Kind), err.Error(), ci.ZipName, false); e != nil {
+				return errors.Wrap(err, e.Error())
+			}
+			return errors.Wrap(err, "Couldn't copy")
+		}
+		if err = ci.Update(database.ImportClient.Conn); err != nil {
+			if e := database.LogImport(database.ImportClient.Conn, FileTypeName(ci.Kind), err.Error(), ci.ZipName, false); e != nil {
+				return errors.Wrap(err, e.Error())
+			}
+			return errors.Wrap(err, "Couldn't apply update")
+		}
+
+		err = database.LogImport(database.ImportClient.Conn, FileTypeName(ci.Kind), "", ci.ZipName, true)
+		if err != nil {
+			return errors.Wrap(err, "Couldn't log")
+		}
+	}
+	return nil
 }
 
 // Copy actually copies the content of the CSV file to the database

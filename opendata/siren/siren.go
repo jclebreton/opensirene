@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	nafID           = "59593c53a3a7291dcf9c82bf/"
+	nafID           = "59593c53a3a7291dcf9c82bf"
 	sirenID         = "5862206588ee38254d3f4e5e"
 	datasetEndpoint = "https://www.data.gouv.fr/api/1/datasets/"
 )
@@ -37,6 +37,7 @@ const (
 	MonthlyType
 )
 
+// FileTypeName returns the string representation of a FileType
 func FileTypeName(ft FileType) string {
 	switch ft {
 	case StockType:
@@ -45,8 +46,9 @@ func FileTypeName(ft FileType) string {
 		return "daily"
 	case MonthlyType:
 		return "monthly"
+	default:
+		return "other"
 	}
-	return "other:"
 }
 
 // RemoteFile is a struct that adds and remove some fields from a Resource
