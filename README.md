@@ -18,8 +18,9 @@ can override almost any value of the configuration file using them.
 
 yml
 ---
-loglevel: debug
 ```
+loglevel: debug
+
 server:
   host: 127.0.0.1
   port: 8080
