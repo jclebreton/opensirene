@@ -2,6 +2,7 @@ package views
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -12,12 +13,34 @@ import (
 // GetSiren is in charge of querying the database to get the specific records
 // for a single Siren given in the query
 func GetSiren(c *gin.Context) {
+	var err error
 	var es models.Enterprises
-
+	limit := -1
+	offset := -1
 	siren := c.Param("id")
+	lim := c.DefaultQuery("limit", "")
+	off := c.DefaultQuery("offset", "")
 
-	if database.DB.Find(&es, models.Enterprise{Siren: siren}).RecordNotFound() || len(es) == 0 {
+	if lim != "" {
+		if limit, err = strconv.Atoi(lim); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "'limit' query parameter isn't an integer"})
+			return
+		}
+	}
+	if off != "" {
+		if offset, err = strconv.Atoi(off); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "'offset' query parameter isn't an integer"})
+			return
+		}
+	}
+
+	res := database.DB.Limit(limit).Offset(offset).Order("siret ASC").Find(&es, models.Enterprise{Siren: siren})
+	if res.RecordNotFound() || len(es) == 0 {
 		c.Status(http.StatusNotFound)
+		return
+	}
+	if res.Error != nil {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 

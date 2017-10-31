@@ -25,17 +25,19 @@ func SetupAndRun() error {
 	}
 
 	// Setup CORS configuration
-	cc := cors.Config{
-		AllowMethods:  []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},
-		AllowHeaders:  []string{"DNT", "X-CustomHeader", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Content-Range", "Range", "Authorization"},
-		ExposeHeaders: []string{"DNT", "X-CustomHeader", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Content-Range", "Range", "Authorization"},
+	if conf.C.Server.Cors.Enabled {
+		cc := cors.Config{
+			AllowMethods:  []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},
+			AllowHeaders:  []string{"DNT", "X-CustomHeader", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Content-Range", "Range", "Authorization"},
+			ExposeHeaders: []string{"DNT", "X-CustomHeader", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Content-Range", "Range", "Authorization"},
+		}
+		if conf.C.Server.Cors.PermissiveMode {
+			cc.AllowAllOrigins = true
+		} else {
+			cc.AllowOrigins = conf.C.Server.Cors.AllowOrigins
+		}
+		r.Use(cors.New(cc))
 	}
-	if conf.C.Server.Cors.PermissiveMode {
-		cc.AllowAllOrigins = true
-	} else {
-		cc.AllowOrigins = conf.C.Server.Cors.AllowOrigins
-	}
-	r.Use(cors.New(cc))
 	p := ginprom.New(ginprom.Subsystem(conf.C.Prometheus.Prefix), ginprom.Engine(r))
 	r.Use(p.Instrument())
 
