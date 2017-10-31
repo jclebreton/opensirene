@@ -12,10 +12,16 @@ import (
 
 // Conf holds the necessary configuration for the application to work
 type Conf struct {
-	Database     Database `yaml:"database"`
-	Server       Server   `yaml:"server"`
-	LogLevel     string   `yaml:"loglevel" env:"LOGLEVEL" default:"info"`
-	DownloadPath string   `yaml:"download_path" env:"DOWNLOAD_PATH" default:"downloads"`
+	Database     Database   `yaml:"database"`
+	Server       Server     `yaml:"server"`
+	LogLevel     string     `yaml:"loglevel" env:"LOGLEVEL" default:"info"`
+	DownloadPath string     `yaml:"download_path" env:"DOWNLOAD_PATH" default:"downloads"`
+	Prometheus   Prometheus `yaml:"prometheus"`
+}
+
+// Prometheus is a simple struct holding configuration variables for prometheus
+type Prometheus struct {
+	Prefix string `yaml:"prefix" env:"PROMETHEUS_PREFIX" default:"opensirene"`
 }
 
 // C is the main exported configuration
@@ -32,7 +38,10 @@ func (c *Conf) Parse() error {
 		return errors.Wrap(err, "couldn't parse Server struct")
 	}
 	if err = Parse(&c.Server.Cors); err != nil {
-		return errors.Wrap(err, "couldn't parse Server struct")
+		return errors.Wrap(err, "couldn't parse Server.Cors struct")
+	}
+	if err = Parse(&c.Prometheus); err != nil {
+		return errors.Wrap(err, "couldn't parse Prometheus struct")
 	}
 	if err = Parse(c); err != nil {
 		return errors.Wrap(err, "couldn't parse Conf struct")
