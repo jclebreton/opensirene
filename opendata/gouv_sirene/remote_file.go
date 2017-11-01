@@ -49,6 +49,9 @@ func FileTypeName(ft FileType) string {
 	}
 }
 
+// RemoteFiles is a slice of pointers to RemoteFile
+type RemoteFiles []*RemoteFile
+
 // RemoteFile is a struct that adds and remove some fields from a Resource
 // struct and actually keep only useful fields
 type RemoteFile struct {

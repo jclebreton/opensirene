@@ -12,7 +12,7 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 	var err error
 
 	if err = database.InitImportClient(); err != nil {
-		return errors.Wrap(err, "Couldn't initalize pgx")
+		return errors.Wrap(err, "Couldn't initialize pgx")
 	}
 
 	//Lock database for import
@@ -27,11 +27,12 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 		}
 	}()
 
+	//Download an extract
 	if err = gouv_sirene.Do(sfs, 4); err != nil {
 		return errors.Wrap(err, "Couldn't retrieve files")
 	}
 
-	cis, err := sfs.ToCSVImport()
+	cis, err := ToCSVImport(sfs)
 	if err != nil {
 		return errors.Wrap(err, "Couldn't convert to CSVImport")
 	}

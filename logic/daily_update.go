@@ -31,7 +31,7 @@ func Daily() {
 		return
 	}
 
-	sfs = sfs.Diff(GetSuccessfulUpdateList())
+	sfs = Diff(GetSuccessfulUpdateList(), sfs)
 
 	if err = Import(sfs); err != nil {
 		logrus.WithError(err).Error("Could not download latest")

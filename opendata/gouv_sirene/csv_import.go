@@ -37,7 +37,7 @@ var majcols = append(cols, "eve", "dateve", "typcreh", "dreactet", "dreacten", "
 type CSVImport struct {
 	file    *os.File
 	Kind    FileType
-	path    string
+	Path    string
 	bar     *pb.ProgressBar
 	reader  *csv.Reader
 	values  []interface{}
@@ -76,7 +76,7 @@ func (c *CSVImport) Prepare() error {
 	var fd *os.File
 	var fdi os.FileInfo
 
-	if fd, err = os.Open(c.path); err != nil {
+	if fd, err = os.Open(c.Path); err != nil {
 		return err
 	}
 	if fdi, err = fd.Stat(); err != nil {
@@ -91,7 +91,7 @@ func (c *CSVImport) Prepare() error {
 	c.bar.ShowPercent = true
 	c.bar.ShowSpeed = true
 	c.bar.ShowTimeLeft = true
-	c.bar.Prefix("Importing " + c.path)
+	c.bar.Prefix("Importing " + c.Path)
 	c.bar.Start()
 	c.reader.Read() // Skip the header part
 
