@@ -188,6 +188,10 @@ func (c *CSVImport) Update(db *pgx.ConnPool) error {
 
 		// Create transaction to avoid corruptions
 		transaction, err := db.Begin()
+		if err != nil {
+			return errors.Wrap(err, "couldn't begin sql transaction")
+		}
+
 		defer transaction.Rollback()
 
 		// Delete removed (E), exited (O) and modified (I) companies

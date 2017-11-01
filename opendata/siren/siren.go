@@ -21,7 +21,6 @@ import (
 )
 
 const (
-	nafID           = "59593c53a3a7291dcf9c82bf"
 	sirenID         = "5862206588ee38254d3f4e5e"
 	datasetEndpoint = "https://www.data.gouv.fr/api/1/datasets/"
 )
