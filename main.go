@@ -38,7 +38,7 @@ func main() {
 		}
 
 		if err = Import(sfs); err != nil {
-			logrus.WithError(err).Fatal("An error is occured during import")
+			logrus.WithError(err).Fatal("An error is occurred during full import")
 		}
 		logrus.WithField("import took", time.Since(s)).Info("Done !")
 	}
@@ -81,6 +81,7 @@ func Daily() {
 	}
 }
 
+// Import is the way to remote files to database
 func Import(sfs siren.RemoteFiles) error {
 	var err error
 
@@ -108,7 +109,7 @@ func Import(sfs siren.RemoteFiles) error {
 	}
 
 	if err = cis.Import(); err != nil {
-		return errors.Wrap(err, "Full import error")
+		return errors.Wrap(err, "Import error")
 	}
 
 	return nil
