@@ -88,6 +88,7 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 		return errors.Wrap(err, "Couldn't initalize pgx")
 	}
 
+	//Lock database for import
 	dbMutex := logic.NewMutex(database.ImportClient)
 	if err := dbMutex.Lock(); err != nil {
 		return err
@@ -99,7 +100,7 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 		}
 	}()
 
-	if err = logic.Do(sfs, 4); err != nil {
+	if err = gouv_sirene.Do(sfs, 4); err != nil {
 		return errors.Wrap(err, "Couldn't retrieve files")
 	}
 

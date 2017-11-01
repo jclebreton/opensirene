@@ -1,14 +1,13 @@
-package logic
+package gouv_sirene
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/cheggaaa/pb"
-	"github.com/jclebreton/opensirene/opendata/gouv_sirene"
 )
 
-func worker(id int, bar *pb.ProgressBar, jobs <-chan *gouv_sirene.RemoteFile, results chan<- error) {
+func worker(id int, bar *pb.ProgressBar, jobs <-chan *RemoteFile, results chan<- error) {
 	var err error
 	var ok bool
 
@@ -51,12 +50,12 @@ func worker(id int, bar *pb.ProgressBar, jobs <-chan *gouv_sirene.RemoteFile, re
 }
 
 // Do downloads and processes the sirene files
-func Do(sfs gouv_sirene.RemoteFiles, workers int) error {
+func Do(sfs RemoteFiles, workers int) error {
 	var err error
 	var pool *pb.Pool
 
 	size := len(sfs)
-	jobs := make(chan *gouv_sirene.RemoteFile, size)
+	jobs := make(chan *RemoteFile, size)
 	results := make(chan error, size)
 
 	if pool, err = pb.StartPool(); err != nil {
