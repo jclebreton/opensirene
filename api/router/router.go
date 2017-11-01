@@ -44,6 +44,7 @@ func SetupAndRun() error {
 	// Route setup
 	r.GET("/siret/:id", views.GetSiret)
 	r.GET("/siren/:id", views.GetSiren)
+	r.GET("/history", views.GetHistory)
 
 	// Run the server
 	logrus.WithFields(logrus.Fields{"port": conf.C.Server.Port, "host": conf.C.Server.Host}).Info("Starting server")
