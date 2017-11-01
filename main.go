@@ -6,7 +6,6 @@ import (
 	"github.com/jasonlvhit/gocron"
 
 	flag "github.com/ogier/pflag"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/jclebreton/opensirene/api/router"
@@ -36,7 +35,7 @@ func main() {
 			logrus.WithError(err).Fatal("An error is occured during grab")
 		}
 
-		if err = Import(sfs); err != nil {
+		if err = logic.Import(sfs); err != nil {
 			logrus.WithError(err).Fatal("An error is occurred during full import")
 		}
 		logrus.WithField("import took", time.Since(s)).Info("Done !")
@@ -48,7 +47,7 @@ func main() {
 	defer database.DB.Close()
 
 	go func() {
-		gocron.Every(3).Hours().Do(Daily)
+		gocron.Every(3).Hours().Do(logic.Daily)
 		// Execute the update at startup
 		gocron.RunAll()
 		_, t := gocron.NextRun()
@@ -59,60 +58,4 @@ func main() {
 	if err = router.SetupAndRun(); err != nil {
 		logrus.WithError(err).Fatal("Could not run the server")
 	}
-}
-
-// Daily is the cron task that runs every few hours to get and apply the latest
-// updates
-func Daily() {
-	var err error
-	var sfs gouv_sirene.RemoteFiles
-
-	if sfs, err = gouv_sirene.GrabLatestFull(); err != nil {
-		logrus.WithError(err).Error("Could not download latest")
-		return
-	}
-
-	sfs = sfs.Diff(logic.GetSuccessfulUpdateList())
-
-	if err = Import(sfs); err != nil {
-		logrus.WithError(err).Error("Could not download latest")
-		return
-	}
-}
-
-// Import is the way to remote files to database
-func Import(sfs gouv_sirene.RemoteFiles) error {
-	var err error
-
-	if err = database.InitImportClient(); err != nil {
-		return errors.Wrap(err, "Couldn't initalize pgx")
-	}
-
-	//Lock database for import
-	dbMutex := logic.NewMutex(database.ImportClient)
-	if err := dbMutex.Lock(); err != nil {
-		return err
-	}
-	defer func() {
-		err = dbMutex.Unlock()
-		if err != nil {
-			logrus.Warning(err)
-		}
-	}()
-
-	if err = gouv_sirene.Do(sfs, 4); err != nil {
-		return errors.Wrap(err, "Couldn't retrieve files")
-	}
-
-	cis, err := sfs.ToCSVImport()
-	if err != nil {
-		return errors.Wrap(err, "Couldn't convert to CSVImport")
-	}
-
-	tracker := logic.NewTracker(database.ImportClient)
-	if err = cis.Import(tracker); err != nil {
-		return errors.Wrap(err, "Import error")
-	}
-
-	return nil
 }
