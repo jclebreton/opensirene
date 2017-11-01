@@ -78,7 +78,7 @@ type Enterprise struct {
 	ProdPart   string `json:"prodpart" gorm:"column:prodpart"`     // Participation particulière à la production de l'établissement
 	AuxiLt     string `json:"auxilt" gorm:"column:auxilt"`         // Caractère auxiliaire de l'activité de l'établissement
 
-	// Identification de l'entrprise
+	// Identification de l'entreprise
 	NomenLong string `json:"nomen_long" gorm:"column:nomen_long"` // Nom ou raison sociale de l'entreprise
 	Sigle     string `json:"sigle" gorm:"column:sigle"`           // Sigle de l'entreprise
 	Nom       string `json:"nom" gorm:"column:nom"`               // Nom de naissance

@@ -1,10 +1,6 @@
 package models
 
-import (
-	"time"
-
-	"github.com/jclebreton/opensirene/database"
-)
+import "time"
 
 // History is a struct mapping history sql table
 type History struct {
@@ -21,17 +17,4 @@ type Histories []History
 
 func (Histories) TableName() string {
 	return "history"
-}
-
-func GetSuccessfulUpdateList() []string {
-	var sh []History
-	if database.DB.Find(&sh, History{IsSuccess: true}).RecordNotFound() {
-		return []string{}
-	}
-
-	var r []string
-	for _, h := range sh {
-		r = append(r, h.Filename)
-	}
-	return r
 }

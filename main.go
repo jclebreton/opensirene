@@ -9,7 +9,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/jclebreton/opensirene/api/models"
 	"github.com/jclebreton/opensirene/api/router"
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/crontab"
@@ -73,7 +72,7 @@ func Daily() {
 		return
 	}
 
-	sfs = sfs.Diff(models.GetSuccessfulUpdateList())
+	sfs = sfs.Diff(crontab.GetSuccessfulUpdateList())
 
 	if err = Import(sfs); err != nil {
 		logrus.WithError(err).Error("Could not download latest")
