@@ -9,13 +9,32 @@ import (
 	"strings"
 
 	"github.com/jclebreton/opensirene/conf"
-	"github.com/jclebreton/opensirene/opendata"
 	"github.com/pkg/errors"
 )
 
-// NewFromResource takes an opendata.Resource and transforms it to a
+// Resource describes a single resource in the dataset API
+type Resource struct {
+	Checksum     Checksum        `json:"checksum"`
+	CreatedAt    string          `json:"created_at"`
+	Description  *string         `json:"description"`
+	Extras       Extras          `json:"extras"`
+	Filesize     *int            `json:"filesize"`
+	Filetype     string          `json:"filetype"`
+	Format       string          `json:"format"`
+	ID           string          `json:"id"`
+	IsAvailable  bool            `json:"is_available"`
+	LastModified string          `json:"last_modified"`
+	Latest       string          `json:"latest"`
+	Metrics      ResourceMetrics `json:"metrics"`
+	Mime         *string         `json:"mime"`
+	Published    string          `json:"published"`
+	Title        string          `json:"title"`
+	URL          string          `json:"url"`
+}
+
+// NewFromResource takes an Resource and transforms it to a
 // siren.RemoteFile
-func NewFromResource(r opendata.Resource) (*RemoteFile, error) {
+func NewFromResource(r Resource) (*RemoteFile, error) {
 	var err error
 	var u *url.URL
 

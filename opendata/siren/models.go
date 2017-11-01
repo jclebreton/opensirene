@@ -1,4 +1,4 @@
-package opendata
+package siren
 
 // Badge represents a single badge
 type Badge struct {

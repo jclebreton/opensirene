@@ -17,7 +17,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/jclebreton/opensirene/conf"
-	"github.com/jclebreton/opensirene/opendata"
 )
 
 const (
@@ -53,7 +52,7 @@ func FileTypeName(ft FileType) string {
 // RemoteFile is a struct that adds and remove some fields from a Resource
 // struct and actually keep only useful fields
 type RemoteFile struct {
-	Checksum       opendata.Checksum
+	Checksum       Checksum
 	URL            string
 	FileName       string
 	Path           string
@@ -63,9 +62,6 @@ type RemoteFile struct {
 	OnDisk         bool
 	ExtractedFiles []string
 }
-
-// RemoteFiles is a slice of pointers to RemoteFile
-type RemoteFiles []*RemoteFile
 
 // CalculateChecksum generates the checksum of the file using the hasher type
 // as defined in the Checksum.Type field

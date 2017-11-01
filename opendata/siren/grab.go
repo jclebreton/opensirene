@@ -5,21 +5,20 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jclebreton/opensirene/opendata"
 	"github.com/sirupsen/logrus"
 )
 
 var location *time.Location
 
 // Grab can be used to grab the full dataset object
-func Grab() (*opendata.Dataset, error) {
+func Grab() (*Dataset, error) {
 	r, err := http.Get(datasetEndpoint + sirenID)
 	if err != nil {
 		return nil, err
 	}
 	defer r.Body.Close()
 
-	target := new(opendata.Dataset)
+	target := new(Dataset)
 
 	if err = json.NewDecoder(r.Body).Decode(target); err != nil {
 		return target, err
@@ -31,7 +30,7 @@ func Grab() (*opendata.Dataset, error) {
 // applied to the database in inverse order (stock first, then each daily file)
 func GrabLatestFull() (RemoteFiles, error) {
 	var err error
-	var ds *opendata.Dataset
+	var ds *Dataset
 	var rf *RemoteFile
 	var rfs RemoteFiles
 
