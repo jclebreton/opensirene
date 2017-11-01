@@ -9,12 +9,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	"github.com/jclebreton/opensirene/api/models"
+	"github.com/jclebreton/opensirene/api/router"
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
 	"github.com/jclebreton/opensirene/download"
-	"github.com/jclebreton/opensirene/models"
 	"github.com/jclebreton/opensirene/opendata/siren"
-	"github.com/jclebreton/opensirene/router"
 )
 
 func main() {

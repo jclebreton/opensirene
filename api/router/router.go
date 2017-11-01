@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 
+	"github.com/jclebreton/opensirene/api/views"
 	"github.com/jclebreton/opensirene/conf"
-	"github.com/jclebreton/opensirene/views"
 )
 
 // SetupAndRun creates the router and runs it

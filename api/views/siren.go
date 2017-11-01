@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/jclebreton/opensirene/api/models"
 	"github.com/jclebreton/opensirene/database"
-	"github.com/jclebreton/opensirene/models"
 )
 
 // GetSiren is in charge of querying the database to get the specific records
