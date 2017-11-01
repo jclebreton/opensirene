@@ -14,7 +14,7 @@ import (
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/crontab"
 	"github.com/jclebreton/opensirene/database"
-	"github.com/jclebreton/opensirene/opendata/siren"
+	"github.com/jclebreton/opensirene/opendata/gouv_sirene"
 )
 
 func main() {
@@ -32,8 +32,8 @@ func main() {
 
 	if full {
 		s := time.Now()
-		var sfs siren.RemoteFiles
-		if sfs, err = siren.GrabLatestFull(); err != nil {
+		var sfs gouv_sirene.RemoteFiles
+		if sfs, err = gouv_sirene.GrabLatestFull(); err != nil {
 			logrus.WithError(err).Fatal("An error is occured during grab")
 		}
 
@@ -66,9 +66,9 @@ func main() {
 // updates
 func Daily() {
 	var err error
-	var sfs siren.RemoteFiles
+	var sfs gouv_sirene.RemoteFiles
 
-	if sfs, err = siren.GrabLatestFull(); err != nil {
+	if sfs, err = gouv_sirene.GrabLatestFull(); err != nil {
 		logrus.WithError(err).Error("Could not download latest")
 		return
 	}
@@ -82,7 +82,7 @@ func Daily() {
 }
 
 // Import is the way to remote files to database
-func Import(sfs siren.RemoteFiles) error {
+func Import(sfs gouv_sirene.RemoteFiles) error {
 	var err error
 
 	if err = database.InitImportClient(); err != nil {

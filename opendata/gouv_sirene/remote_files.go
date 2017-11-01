@@ -1,4 +1,4 @@
-package siren
+package gouv_sirene
 
 // RemoteFiles is a slice of pointers to RemoteFile
 type RemoteFiles []*RemoteFile

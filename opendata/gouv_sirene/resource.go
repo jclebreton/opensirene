@@ -1,4 +1,4 @@
-package siren
+package gouv_sirene
 
 import (
 	"net/url"
@@ -33,7 +33,7 @@ type Resource struct {
 }
 
 // NewFromResource takes an Resource and transforms it to a
-// siren.RemoteFile
+// gouv_sirene.RemoteFile
 func NewFromResource(r Resource) (*RemoteFile, error) {
 	var err error
 	var u *url.URL

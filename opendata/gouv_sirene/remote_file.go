@@ -1,4 +1,4 @@
-package siren
+package gouv_sirene
 
 import (
 	"archive/zip"
