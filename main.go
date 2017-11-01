@@ -11,8 +11,8 @@ import (
 
 	"github.com/jclebreton/opensirene/api/router"
 	"github.com/jclebreton/opensirene/conf"
-	"github.com/jclebreton/opensirene/crontab"
 	"github.com/jclebreton/opensirene/database"
+	"github.com/jclebreton/opensirene/logic"
 	"github.com/jclebreton/opensirene/opendata/gouv_sirene"
 )
 
@@ -72,7 +72,7 @@ func Daily() {
 		return
 	}
 
-	sfs = sfs.Diff(crontab.GetSuccessfulUpdateList())
+	sfs = sfs.Diff(logic.GetSuccessfulUpdateList())
 
 	if err = Import(sfs); err != nil {
 		logrus.WithError(err).Error("Could not download latest")
@@ -88,7 +88,7 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 		return errors.Wrap(err, "Couldn't initalize pgx")
 	}
 
-	dbMutex := crontab.NewMutex(database.ImportClient)
+	dbMutex := logic.NewMutex(database.ImportClient)
 	if err := dbMutex.Lock(); err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 		}
 	}()
 
-	if err = crontab.Do(sfs, 4); err != nil {
+	if err = logic.Do(sfs, 4); err != nil {
 		return errors.Wrap(err, "Couldn't retrieve files")
 	}
 

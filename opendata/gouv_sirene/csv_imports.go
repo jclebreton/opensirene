@@ -1,8 +1,8 @@
 package gouv_sirene
 
 import (
-	"github.com/jclebreton/opensirene/crontab"
 	"github.com/jclebreton/opensirene/database"
+	"github.com/jclebreton/opensirene/logic"
 	"github.com/pkg/errors"
 )
 
@@ -10,7 +10,7 @@ import (
 type CSVImports []*CSVImport
 
 // Import will import each CSVImport present in the slice
-func (c CSVImports) Import(tracker crontab.Tracker) error {
+func (c CSVImports) Import(tracker logic.Tracker) error {
 	var err error
 	for _, ci := range c {
 		if err = ci.Prepare(); err != nil {
