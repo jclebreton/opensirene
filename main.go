@@ -88,11 +88,12 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 		return errors.Wrap(err, "Couldn't initalize pgx")
 	}
 
-	if err = crontab.TryLock(); err != nil {
+	dbMutex := crontab.NewMutex(database.ImportClient)
+	if err := dbMutex.Lock(); err != nil {
 		return err
 	}
 	defer func() {
-		err = crontab.Unlock()
+		err = dbMutex.Unlock()
 		if err != nil {
 			logrus.Warning(err)
 		}
