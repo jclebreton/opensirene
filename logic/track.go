@@ -35,3 +35,16 @@ func (t *track) Save(action, msg, filename string, isSuccess bool) error {
 
 	return nil
 }
+
+// Truncate will erase all logs
+func (t *track) Truncate() error {
+	var err error
+
+	_, err = t.Database.Conn.Exec("TRUNCATE TABLE history")
+
+	if err != nil {
+		return errors.Wrap(err, "couldn't truncate history table")
+	}
+
+	return nil
+}
