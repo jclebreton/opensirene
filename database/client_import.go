@@ -40,32 +40,11 @@ func NewImportClient() (*PgxClient, error) {
 }
 
 func InitImportClient() error {
-	connectConfig := &pgx.ConnConfig{
-		Database: conf.C.Database.Name,
-		Host:     conf.C.Database.Host,
-		Port:     uint16(conf.C.Database.Port),
-		User:     conf.C.Database.User,
-		Password: conf.C.Database.Password,
-	}
-
-	connPoolConfig := pgx.ConnPoolConfig{
-		ConnConfig:     *connectConfig,
-		MaxConnections: 5,
-		AfterConnect: func(conn *pgx.Conn) error {
-			_, err := conn.Exec("SET CLIENT_ENCODING TO 'UTF-8'")
-			return err
-		},
-	}
-
-	pool, err := pgx.NewConnPool(connPoolConfig)
+	client, err := NewImportClient()
 	if err != nil {
 		return err
 	}
-
-	ImportClient = PgxClient{
-		Conn: pool,
-	}
-
+	ImportClient = *client
 	return nil
 }
 
