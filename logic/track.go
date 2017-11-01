@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Track struct {
+type track struct {
 	Database database.PgxClient
 }
 
@@ -13,12 +13,12 @@ type Tracker interface {
 	Save(action, msg, filename string, isSuccess bool) error
 }
 
-func NewTracker(db database.PgxClient) *mutex {
-	return &mutex{Database: db}
+func NewTracker(db database.PgxClient) *track {
+	return &track{Database: db}
 }
 
 // Save logs to database the milestones
-func (t *Track) Save(action, msg, filename string, isSuccess bool) error {
+func (t *track) Save(action, msg, filename string, isSuccess bool) error {
 	var err error
 
 	_, err = t.Database.Conn.Exec(

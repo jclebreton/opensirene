@@ -109,7 +109,8 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 		return errors.Wrap(err, "Couldn't convert to CSVImport")
 	}
 
-	if err = cis.Import(); err != nil {
+	tracker := logic.NewTracker(database.ImportClient)
+	if err = cis.Import(tracker); err != nil {
 		return errors.Wrap(err, "Import error")
 	}
 
