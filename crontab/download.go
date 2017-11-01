@@ -1,4 +1,4 @@
-package download
+package crontab
 
 import (
 	"fmt"

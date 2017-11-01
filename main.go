@@ -12,8 +12,8 @@ import (
 	"github.com/jclebreton/opensirene/api/models"
 	"github.com/jclebreton/opensirene/api/router"
 	"github.com/jclebreton/opensirene/conf"
+	"github.com/jclebreton/opensirene/crontab"
 	"github.com/jclebreton/opensirene/database"
-	"github.com/jclebreton/opensirene/download"
 	"github.com/jclebreton/opensirene/opendata/siren"
 )
 
@@ -99,7 +99,7 @@ func Import(sfs siren.RemoteFiles) error {
 		}
 	}()
 
-	if err = download.Do(sfs, 4); err != nil {
+	if err = crontab.Do(sfs, 4); err != nil {
 		return errors.Wrap(err, "Couldn't retrieve files")
 	}
 
