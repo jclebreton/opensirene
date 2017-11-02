@@ -25,16 +25,16 @@ func worker(id int, bar *pb.ProgressBar, jobs <-chan *RemoteFile, results chan<-
 				results <- err
 				continue
 			}
+		}
 
-			// Checksum
-			bar.Prefix("[Checksum] " + s.FileName)
-			if ok, err = s.ChecksumMatch(); err != nil {
-				results <- err
-				continue
-			} else if !ok {
-				results <- fmt.Errorf("Checksum did not match for %s", s.FileName)
-				continue
-			}
+		// Checksum
+		bar.Prefix("[Checksum] " + s.FileName)
+		if ok, err = s.ChecksumMatch(); err != nil {
+			results <- err
+			continue
+		} else if !ok {
+			results <- fmt.Errorf("Checksum did not match for %s", s.FileName)
+			continue
 		}
 
 		// Extracting
