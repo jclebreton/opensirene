@@ -45,16 +45,33 @@ func (c *CSVImport) Copy(db *pgx.ConnPool) error {
 	var total int
 
 	// Prepare SQL Copy
-	cf := &database.PgxCopyFrom{Path: c.Path, File: c.File, Bar: c.bar}
+	cf := &database.PgxCopyFrom{
+		Path:            c.Path,
+		File:            c.File,
+		Bar:             c.bar,
+		ConcatenateCols: []int{0, 1}, //Create SIRET field
+		CallBackTriggerOnColName: []string{"DAPET", "DEFET", "DAPEN", "DEFEN", "ESAANN", "DATEMAJ", "AMINTRET", "AMINTREN",
+			"DDEBACT", "DATEESS", "DATEVE", "DREACTET", "DREACTEN", "DCRET", "DCREN"},
+		CallBackFunc: func(colValue string) (interface{}, error) {
+			if colValue != "" {
+				d, err := NewDateSirene(colValue)
+				if err != nil {
+					return nil, errors.Wrap(err, "couldn't convert date")
+				}
+				return d.GetDate(), nil
+			}
+			return nil, nil
+		},
+	}
 	if err = cf.Prepare(); err != nil {
 		return errors.Wrap(err, "Couldn't prepare import")
 	}
 
 	switch c.Kind {
 	case StockType:
-		total, err = c.copyFile(db, "enterprises", cf, false)
+		total, err = c.copyFile(db, "enterprises", cols, cf, false)
 	case DailyType:
-		total, err = c.copyFile(db, "temp_incremental", cf, true)
+		total, err = c.copyFile(db, "temp_incremental", majcols, cf, true)
 	default:
 		return errors.New("couldn't import unknown type file!")
 	}
@@ -70,7 +87,7 @@ func (c *CSVImport) Copy(db *pgx.ConnPool) error {
 
 // Copy actually copies the content of the CSV file to the database
 // Empty table before processing and optimize it after
-func (c *CSVImport) copyFile(db *pgx.ConnPool, tableName string, cf *database.PgxCopyFrom, optimize bool) (int, error) {
+func (c *CSVImport) copyFile(db *pgx.ConnPool, tableName string, cols []string, cf *database.PgxCopyFrom, optimize bool) (int, error) {
 	// Reset table
 	if _, err := db.Exec(fmt.Sprintf("TRUNCATE table %s", tableName)); err != nil {
 		return 0, errors.Wrap(err, fmt.Sprintf("couldn't truncate %s", tableName))

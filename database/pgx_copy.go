@@ -2,9 +2,10 @@ package database
 
 import (
 	"encoding/csv"
-	"fmt"
 	"io"
 	"os"
+
+	"time"
 
 	"github.com/cheggaaa/pb"
 	"golang.org/x/text/encoding/charmap"
@@ -21,6 +22,13 @@ type PgxCopyFrom struct {
 	Path string
 	File *os.File
 	Bar  *pb.ProgressBar
+
+	headers               []string
+	callBackTriggerOnKeys []int
+
+	ConcatenateCols          []int
+	CallBackTriggerOnColName []string
+	CallBackFunc             func(colValue string) (interface{}, error)
 }
 
 // Prepare opens the file and prepares the reader
@@ -46,9 +54,58 @@ func (c *PgxCopyFrom) Prepare() error {
 	c.Bar.ShowTimeLeft = true
 	c.Bar.Prefix("Importing " + c.Path)
 	c.Bar.Start()
-	c.reader.Read() // Skip the header part
+
+	// Save and skip the header part
+	c.headers, err = c.reader.Read()
+	if err != nil {
+		return err
+	}
+
+	//Search columns indexes for callback
+	for _, colTriggerName := range c.CallBackTriggerOnColName {
+		for k, v := range c.headers {
+			if colTriggerName == v {
+				c.callBackTriggerOnKeys = append(c.callBackTriggerOnKeys, k)
+				break
+			}
+		}
+	}
 
 	return nil
+}
+
+func (c *PgxCopyFrom) colHasTrigger(k int) bool {
+	for _, v := range c.callBackTriggerOnKeys {
+		if k == v {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *PgxCopyFrom) callTrigger(values []interface{}, k int, v string) ([]interface{}, error) {
+	if c.colHasTrigger(k) {
+		mixed, err := c.CallBackFunc(v)
+		if err != nil {
+			return nil, err
+		}
+		if t, ok := mixed.(time.Time); ok {
+			values = append(values, t)
+		} else {
+			values = append(values, mixed)
+		}
+	} else {
+		values = append(values, v)
+	}
+	return values, nil
+}
+
+func (c *PgxCopyFrom) addColFromConcatenation(rec []string) string {
+	var result string
+	for _, k := range c.ConcatenateCols {
+		result += rec[k]
+	}
+	return result
 }
 
 // Next returns true if there is another row and makes the next row data
@@ -58,7 +115,6 @@ func (c *PgxCopyFrom) Prepare() error {
 func (c *PgxCopyFrom) Next() bool {
 	var err error
 	var rec []string
-	var siret string
 	var values []interface{}
 
 	if rec, err = c.reader.Read(); err != nil {
@@ -74,15 +130,21 @@ func (c *PgxCopyFrom) Next() bool {
 		return false
 	}
 
-	tot := 0
-	siret = fmt.Sprintf("%s%s", rec[0], rec[1])
-	values = append(values, siret)
-	for _, v := range rec {
-		values = append(values, v)
-		tot += len(v) + 3 // two quotes and the ;
+	if len(c.ConcatenateCols) >= 2 {
+		values = append(values, c.addColFromConcatenation(rec))
 	}
+
+	tot := 0
+	for k, v := range rec {
+		tot += len(v) + 3 // two quotes and the ;
+		if values, err = c.callTrigger(values, k, v); err != nil {
+			c.err = err
+			return false
+		}
+	}
+
 	c.values = values
-	c.Bar.Add(tot - 3)
+	c.Bar.Add(tot - 3) // the last ; and the \n
 
 	return true
 }
