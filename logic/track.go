@@ -1,19 +1,22 @@
 package logic
 
 import (
-	"github.com/jclebreton/opensirene/database"
 	"github.com/pkg/errors"
+
+	"github.com/jclebreton/opensirene/database"
 )
 
 type track struct {
 	Database database.PgxClient
 }
 
+// Tracker is an interface used to track success and errors
 type Tracker interface {
 	Save(action, msg, filename string, isSuccess bool) error
 }
 
-func NewTracker(db database.PgxClient) *track {
+// newTracker returns a new track
+func newTracker(db database.PgxClient) *track {
 	return &track{Database: db}
 }
 

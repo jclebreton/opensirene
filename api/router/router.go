@@ -14,8 +14,6 @@ import (
 
 // SetupAndRun creates the router and runs it
 func SetupAndRun() error {
-	var err error
-
 	// Create the router
 	r := gin.Default()
 
@@ -48,8 +46,5 @@ func SetupAndRun() error {
 
 	// Run the server
 	logrus.WithFields(logrus.Fields{"port": conf.C.Server.Port, "host": conf.C.Server.Host}).Info("Starting server")
-	if err = r.Run(fmt.Sprintf("%s:%d", conf.C.Server.Host, conf.C.Server.Port)); err != nil {
-		return err
-	}
-	return nil
+	return r.Run(fmt.Sprintf("%s:%d", conf.C.Server.Host, conf.C.Server.Port))
 }

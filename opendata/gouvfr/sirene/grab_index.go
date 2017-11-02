@@ -1,24 +1,25 @@
-package gouv_sirene
+package sirene
 
 import (
 	"encoding/json"
 	"net/http"
 	"time"
 
+	"github.com/jclebreton/opensirene/opendata/gouvfr/api"
 	"github.com/sirupsen/logrus"
 )
 
 var location *time.Location
 
 // Grab can be used to grab the full dataset object
-func Grab() (*Dataset, error) {
+func Grab() (*api.Dataset, error) {
 	r, err := http.Get(datasetEndpoint + sirenID)
 	if err != nil {
 		return nil, err
 	}
 	defer r.Body.Close()
 
-	target := new(Dataset)
+	target := new(api.Dataset)
 
 	if err = json.NewDecoder(r.Body).Decode(target); err != nil {
 		return target, err
@@ -30,7 +31,7 @@ func Grab() (*Dataset, error) {
 // applied to the database in inverse order (stock first, then each daily file)
 func GrabLatestFull() (RemoteFiles, error) {
 	var err error
-	var ds *Dataset
+	var ds *api.Dataset
 	var rf *RemoteFile
 	var rfs RemoteFiles
 

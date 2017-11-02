@@ -1,4 +1,4 @@
-package gouv_sirene
+package sirene
 
 import (
 	"archive/zip"
@@ -17,6 +17,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/jclebreton/opensirene/conf"
+	"github.com/jclebreton/opensirene/opendata/gouvfr/api"
 )
 
 const (
@@ -55,7 +56,7 @@ type RemoteFiles []*RemoteFile
 // RemoteFile is a struct that adds and remove some fields from a Resource
 // struct and actually keep only useful fields
 type RemoteFile struct {
-	Checksum       Checksum
+	Checksum       api.Checksum
 	URL            string
 	FileName       string
 	Path           string

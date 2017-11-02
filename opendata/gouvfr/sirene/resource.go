@@ -1,4 +1,4 @@
-package gouv_sirene
+package sirene
 
 import (
 	"net/url"
@@ -8,33 +8,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jclebreton/opensirene/conf"
 	"github.com/pkg/errors"
-)
 
-// Resource describes a single resource in the dataset API
-type Resource struct {
-	Checksum     Checksum        `json:"checksum"`
-	CreatedAt    string          `json:"created_at"`
-	Description  *string         `json:"description"`
-	Extras       Extras          `json:"extras"`
-	Filesize     *int            `json:"filesize"`
-	Filetype     string          `json:"filetype"`
-	Format       string          `json:"format"`
-	ID           string          `json:"id"`
-	IsAvailable  bool            `json:"is_available"`
-	LastModified string          `json:"last_modified"`
-	Latest       string          `json:"latest"`
-	Metrics      ResourceMetrics `json:"metrics"`
-	Mime         *string         `json:"mime"`
-	Published    string          `json:"published"`
-	Title        string          `json:"title"`
-	URL          string          `json:"url"`
-}
+	"github.com/jclebreton/opensirene/conf"
+	"github.com/jclebreton/opensirene/opendata/gouvfr/api"
+)
 
 // NewFromResource takes an Resource and transforms it to a
 // gouv_sirene.RemoteFile
-func NewFromResource(r Resource) (*RemoteFile, error) {
+func NewFromResource(r api.Resource) (*RemoteFile, error) {
 	var err error
 	var u *url.URL
 

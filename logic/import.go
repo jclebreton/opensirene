@@ -1,14 +1,15 @@
 package logic
 
 import (
-	"github.com/jclebreton/opensirene/database"
-	"github.com/jclebreton/opensirene/opendata/gouv_sirene"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/jclebreton/opensirene/database"
+	"github.com/jclebreton/opensirene/opendata/gouvfr/sirene"
 )
 
 // Import is the way to remote files to database
-func Import(sfs gouv_sirene.RemoteFiles) error {
+func Import(sfs sirene.RemoteFiles) error {
 	var err error
 
 	if err = database.InitImportClient(); err != nil {
@@ -16,19 +17,19 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 	}
 
 	//Lock database for import
-	dbMutex := NewMutex(database.ImportClient)
-	if err := dbMutex.Lock(); err != nil {
+	dbMutex := newMutex(database.ImportClient)
+	if err = dbMutex.Lock(); err != nil {
 		return err
 	}
 	defer func() {
-		err = dbMutex.Unlock()
-		if err != nil {
-			logrus.Warning(err)
+		perr := dbMutex.Unlock()
+		if perr != nil {
+			logrus.Warning(perr)
 		}
 	}()
 
 	//Download an extract
-	if err = gouv_sirene.Do(sfs, 4); err != nil {
+	if err = sirene.Do(sfs, 4); err != nil {
 		return errors.Wrap(err, "Couldn't retrieve files")
 	}
 
@@ -37,7 +38,7 @@ func Import(sfs gouv_sirene.RemoteFiles) error {
 		return errors.Wrap(err, "Couldn't convert to CSVImport")
 	}
 
-	tracker := NewTracker(database.ImportClient)
+	tracker := newTracker(database.ImportClient)
 	if err = cis.Import(tracker); err != nil {
 		return errors.Wrap(err, "Import error")
 	}

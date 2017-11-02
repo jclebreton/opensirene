@@ -1,4 +1,4 @@
-package gouv_sirene
+package sirene
 
 import (
 	"encoding/csv"

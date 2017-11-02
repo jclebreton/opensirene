@@ -6,20 +6,23 @@ import (
 	"github.com/jclebreton/opensirene/database"
 )
 
+// mutex is an implementation of the Mutexer interface
 type mutex struct {
 	Database database.PgxClient
 }
 
+// Mutexer is an interface to use the mutex logic in postgreSQL
 type Mutexer interface {
 	Lock() error
 	Unlock() error
 }
 
-func NewMutex(db database.PgxClient) *mutex {
+// newMutex returns a new Mutex
+func newMutex(db database.PgxClient) *mutex {
 	return &mutex{Database: db}
 }
 
-// TryLock set a mutex for database write
+// Lock set a mutex for database write
 func (m *mutex) Lock() error {
 	var result bool
 	err := m.Database.Conn.QueryRow("SELECT pg_try_advisory_lock(42)").Scan(&result)

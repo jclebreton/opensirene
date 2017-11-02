@@ -10,7 +10,7 @@ type Server struct {
 
 // Cors is a simple structure holding the information about CORS configuration
 type Cors struct {
-	Enabled        bool     `yaml:"enabled" env:"CORS_ENABLED"`
 	AllowOrigins   []string `yaml:"allow_origins"`
+	Enabled        bool     `yaml:"enabled" env:"CORS_ENABLED"`
 	PermissiveMode bool     `yaml:"permissive_mode" env:"CORS_PERMISSIVE"`
 }

@@ -1,4 +1,4 @@
-package gouv_sirene
+package api
 
 // Badge represents a single badge
 type Badge struct {

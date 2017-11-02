@@ -12,7 +12,7 @@ import (
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
 	"github.com/jclebreton/opensirene/logic"
-	"github.com/jclebreton/opensirene/opendata/gouv_sirene"
+	"github.com/jclebreton/opensirene/opendata/gouvfr/sirene"
 )
 
 func main() {
@@ -30,8 +30,8 @@ func main() {
 
 	if full {
 		s := time.Now()
-		var sfs gouv_sirene.RemoteFiles
-		if sfs, err = gouv_sirene.GrabLatestFull(); err != nil {
+		var sfs sirene.RemoteFiles
+		if sfs, err = sirene.GrabLatestFull(); err != nil {
 			logrus.WithError(err).Fatal("An error is occured during grab")
 		}
 

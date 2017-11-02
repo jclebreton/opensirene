@@ -6,12 +6,15 @@ import (
 	"github.com/jclebreton/opensirene/conf"
 )
 
+// PgxClient represents a pgx client
 type PgxClient struct {
 	Conn *pgx.ConnPool
 }
 
+// ImportClient is the main exported client
 var ImportClient PgxClient
 
+// NewImportClient creates a new PgxClient from the configuration
 func NewImportClient() (*PgxClient, error) {
 	connectConfig := &pgx.ConnConfig{
 		Database: conf.C.Database.Name,
@@ -38,6 +41,7 @@ func NewImportClient() (*PgxClient, error) {
 	return &PgxClient{Conn: pool}, nil
 }
 
+// InitImportClient intializes the main client
 func InitImportClient() error {
 	client, err := NewImportClient()
 	if err != nil {

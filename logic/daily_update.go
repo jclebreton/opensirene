@@ -1,12 +1,16 @@
 package logic
 
 import (
+	"github.com/sirupsen/logrus"
+
 	"github.com/jclebreton/opensirene/api/models"
 	"github.com/jclebreton/opensirene/database"
-	"github.com/jclebreton/opensirene/opendata/gouv_sirene"
-	"github.com/sirupsen/logrus"
+	"github.com/jclebreton/opensirene/opendata/gouvfr/sirene"
 )
 
+// GetSuccessfulUpdateList lists the last successful updates in the database
+// and returns the slice of filenames which were successfuly imported.
+// Returns an empty slice otherwise.
 func GetSuccessfulUpdateList() []string {
 	var sh []models.History
 	if database.DB.Find(&sh, models.History{IsSuccess: true}).RecordNotFound() {
@@ -24,9 +28,9 @@ func GetSuccessfulUpdateList() []string {
 // updates
 func Daily() {
 	var err error
-	var sfs gouv_sirene.RemoteFiles
+	var sfs sirene.RemoteFiles
 
-	if sfs, err = gouv_sirene.GrabLatestFull(); err != nil {
+	if sfs, err = sirene.GrabLatestFull(); err != nil {
 		logrus.WithError(err).Error("Could not download latest")
 		return
 	}
