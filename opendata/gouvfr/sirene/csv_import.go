@@ -52,9 +52,9 @@ func (c *CSVImport) Copy(db *pgx.ConnPool) error {
 
 	switch c.Kind {
 	case StockType:
-		total, err = c.copyFile(db, "enterprises", cf)
+		total, err = c.copyFile(db, "enterprises", cf, false)
 	case DailyType:
-		total, err = c.copyFile(db, "temp_incremental", cf)
+		total, err = c.copyFile(db, "temp_incremental", cf, true)
 	default:
 		return errors.New("couldn't import unknown type file!")
 	}
@@ -70,7 +70,7 @@ func (c *CSVImport) Copy(db *pgx.ConnPool) error {
 
 // Copy actually copies the content of the CSV file to the database
 // Empty table before processing and optimize it after
-func (c *CSVImport) copyFile(db *pgx.ConnPool, tableName string, cf *database.PgxCopyFrom) (int, error) {
+func (c *CSVImport) copyFile(db *pgx.ConnPool, tableName string, cf *database.PgxCopyFrom, optimize bool) (int, error) {
 	// Reset table
 	if _, err := db.Exec(fmt.Sprintf("TRUNCATE table %s", tableName)); err != nil {
 		return 0, errors.Wrap(err, fmt.Sprintf("couldn't truncate %s", tableName))
@@ -83,8 +83,10 @@ func (c *CSVImport) copyFile(db *pgx.ConnPool, tableName string, cf *database.Pg
 	}
 
 	//Optimize table performance
-	if _, err = db.Exec(fmt.Sprintf("VACUUM ANALYZE %s", tableName)); err != nil {
-		return total, errors.Wrap(err, fmt.Sprintf("couldn't optimize %s", tableName))
+	if optimize {
+		if _, err = db.Exec(fmt.Sprintf("VACUUM ANALYZE %s", tableName)); err != nil {
+			return total, errors.Wrap(err, fmt.Sprintf("couldn't optimize %s", tableName))
+		}
 	}
 
 	return total, nil
