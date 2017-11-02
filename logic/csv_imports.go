@@ -14,18 +14,14 @@ type CSVImports []*sirene.CSVImport
 func (c CSVImports) Import(tracker Tracker) error {
 	var err error
 	for _, ci := range c {
-		if err = ci.Prepare(); err != nil {
-			if e := tracker.Save(sirene.FileTypeName(ci.Kind), err.Error(), ci.ZipName, false); e != nil {
-				return errors.Wrap(err, e.Error())
-			}
-			return errors.Wrap(err, "Couldn't prepare import")
-		}
+
 		if err = ci.Copy(database.ImportClient.Conn); err != nil {
 			if e := tracker.Save(sirene.FileTypeName(ci.Kind), err.Error(), ci.ZipName, false); e != nil {
 				return errors.Wrap(err, e.Error())
 			}
 			return errors.Wrap(err, "Couldn't copy")
 		}
+
 		if err = ci.Update(database.ImportClient.Conn); err != nil {
 			if e := tracker.Save(sirene.FileTypeName(ci.Kind), err.Error(), ci.ZipName, false); e != nil {
 				return errors.Wrap(err, e.Error())
