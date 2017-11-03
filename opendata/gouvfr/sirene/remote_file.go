@@ -139,33 +139,6 @@ func (rf *RemoteFile) DownloadWithProgress(b *pb.ProgressBar) error {
 	return nil
 }
 
-// Download silently downloads the file
-func (rf *RemoteFile) Download() error {
-	var err error
-	var resp *http.Response
-	var dest *os.File
-
-	rf.Path = filepath.Join(conf.C.DownloadPath, rf.FileName)
-	if resp, err = http.Get(rf.URL); err != nil {
-		return errors.Wrapf(err, "couldn't download %s", rf.URL)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("server returned %d for %s", resp.StatusCode, rf.URL)
-	}
-
-	if dest, err = os.Create(rf.Path); err != nil {
-		return errors.Wrapf(err, "couldn't create file %s", rf.Path)
-	}
-
-	if _, err = io.Copy(dest, resp.Body); err != nil {
-		return errors.Wrapf(err, "couldn't io.Copy %s", rf.Path)
-	}
-
-	return nil
-}
-
 // Unzip will un-compress a zip archive moving all files and folders
 // to an output directory
 func (rf *RemoteFile) Unzip() error {
