@@ -141,7 +141,7 @@ func (rf *RemoteFile) DownloadWithProgress(b *pb.ProgressBar) error {
 
 // Unzip will un-compress a zip archive moving all files and folders
 // to an output directory
-func (rf *RemoteFile) Unzip() error {
+func (rf *RemoteFile) Unzip(b *pb.ProgressBar) error {
 	var filenames []string
 
 	r, err := zip.OpenReader(filepath.Join(conf.C.DownloadPath, rf.FileName))
@@ -156,6 +156,8 @@ func (rf *RemoteFile) Unzip() error {
 			return err
 		}
 		defer rc.Close()
+
+		b.Total = int64(f.UncompressedSize64)
 
 		// Store filename/path for returning and using later on
 		fpath := filepath.Join(conf.C.DownloadPath, f.Name)
@@ -180,7 +182,8 @@ func (rf *RemoteFile) Unzip() error {
 			}
 			defer f.Close()
 
-			if _, err = io.Copy(f, rc); err != nil {
+			reader := b.NewProxyReader(rc)
+			if _, err = io.Copy(f, reader); err != nil {
 				return err
 			}
 		}

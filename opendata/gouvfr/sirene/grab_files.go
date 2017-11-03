@@ -39,7 +39,7 @@ func worker(id int, bar *pb.ProgressBar, jobs <-chan *RemoteFile, results chan<-
 
 		// Extracting
 		bar.Prefix("[Unzipping] " + s.FileName)
-		if err = s.Unzip(); err != nil {
+		if err = s.Unzip(bar); err != nil {
 			results <- err
 			continue
 		}
