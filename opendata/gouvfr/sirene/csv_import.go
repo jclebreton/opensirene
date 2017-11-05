@@ -13,7 +13,7 @@ import (
 )
 
 var cols = []string{
-	"siret", "siren", "nic", "l1_normalisee", "l2_normalisee", "l3_normalisee", "l4_normalisee",
+	"siren", "nic", "l1_normalisee", "l2_normalisee", "l3_normalisee", "l4_normalisee",
 	"l5_normalisee", "l6_normalisee", "l7_normalisee", "l1_declaree", "l2_declaree", "l3_declaree", "l4_declaree",
 	"l5_declaree", "l6_declaree", "l7_declaree", "numvoie", "indrep", "typvoie", "libvoie", "codpos", "cedex",
 	"rpet", "libreg", "depet", "arronet", "ctonet", "comet", "libcom", "du", "tu", "uu", "epci", "tcd", "zemet",
@@ -46,10 +46,9 @@ func (c *CSVImport) Copy(db *pgx.ConnPool) error {
 
 	// Prepare SQL Copy
 	cf := &database.PgxCopyFrom{
-		Path:            c.Path,
-		File:            c.File,
-		Bar:             c.bar,
-		ConcatenateCols: []int{0, 1}, //Create SIRET field
+		Path: c.Path,
+		File: c.File,
+		Bar:  c.bar,
 		CallBackTriggerOnColName: []string{"DAPET", "DEFET", "DAPEN", "DEFEN", "ESAANN", "DATEMAJ", "AMINTRET", "AMINTREN",
 			"DDEBACT", "DATEESS", "DATEVE", "DREACTET", "DREACTEN", "DCRET", "DCREN"},
 		CallBackFunc: func(colValue string) (interface{}, error) {

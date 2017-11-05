@@ -26,7 +26,6 @@ type PgxCopyFrom struct {
 	headers               []string
 	callBackTriggerOnKeys []int
 
-	ConcatenateCols          []int
 	CallBackTriggerOnColName []string
 	CallBackFunc             func(colValue string) (interface{}, error)
 }
@@ -100,14 +99,6 @@ func (c *PgxCopyFrom) callTrigger(values []interface{}, k int, v string) ([]inte
 	return values, nil
 }
 
-func (c *PgxCopyFrom) addColFromConcatenation(rec []string) string {
-	var result string
-	for _, k := range c.ConcatenateCols {
-		result += rec[k]
-	}
-	return result
-}
-
 // Next returns true if there is another row and makes the next row data
 // available to Values(). When there are no more rows available or an error
 // has occurred it returns false.
@@ -128,10 +119,6 @@ func (c *PgxCopyFrom) Next() bool {
 		}
 		c.err = err
 		return false
-	}
-
-	if len(c.ConcatenateCols) >= 2 {
-		values = append(values, c.addColFromConcatenation(rec))
 	}
 
 	tot := 0

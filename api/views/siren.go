@@ -34,7 +34,7 @@ func GetSiren(c *gin.Context) {
 		}
 	}
 
-	res := database.DB.Limit(limit).Offset(offset).Order("siret ASC").Find(&es, models.Enterprise{Siren: siren})
+	res := database.DB.Limit(limit).Offset(offset).Order("nic ASC").Find(&es, models.Enterprise{Siren: siren})
 	if res.RecordNotFound() || len(es) == 0 {
 		c.Status(http.StatusNotFound)
 		return
@@ -53,11 +53,17 @@ func GetSiret(c *gin.Context) {
 	var e models.Enterprise
 
 	siret := c.Param("id")
+	if len(siret) != 14 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "not a valid siret: must be 14-digit number"})
+		return
+	}
 
-	if database.DB.Find(&e, models.Enterprise{Siret: siret}).RecordNotFound() {
+	if database.DB.Find(&e, models.Enterprise{Siren: siret[0:9], Nic: siret[9:14]}).RecordNotFound() {
 		c.Status(http.StatusNotFound)
 		return
 	}
+
+	e.Siret = e.Siren + e.Nic
 
 	c.JSON(http.StatusOK, e)
 }

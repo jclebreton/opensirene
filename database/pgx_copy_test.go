@@ -46,10 +46,9 @@ func Test_PgxCopyFrom_Success(t *testing.T) {
 	assert.NoError(t, err)
 
 	rows := &PgxCopyFrom{
-		Path:                     csvPath,
-		File:                     file,
-		Bar:                      &pb.ProgressBar{},
-		ConcatenateCols:          []int{0, 1},
+		Path: csvPath,
+		File: file,
+		Bar:  &pb.ProgressBar{},
 		CallBackTriggerOnColName: []string{"C"},
 		CallBackFunc: func(colValue string) (interface{}, error) {
 			return colValue + "XXX", nil
@@ -68,8 +67,8 @@ func Test_PgxCopyFrom_Success(t *testing.T) {
 	assert.NoError(t, rows.Err())
 
 	inputRows := [][]interface{}{
-		{csvRows[1][0] + csvRows[1][1], csvRows[1][0], csvRows[1][1], csvRows[1][2] + "XXX"},
-		{csvRows[2][0] + csvRows[2][1], csvRows[2][0], csvRows[2][1], csvRows[2][2] + "XXX"},
+		{csvRows[1][0], csvRows[1][1], csvRows[1][2] + "XXX"},
+		{csvRows[2][0], csvRows[2][1], csvRows[2][2] + "XXX"},
 	}
 
 	if !reflect.DeepEqual(inputRows, outputRows) {

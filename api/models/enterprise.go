@@ -6,9 +6,9 @@ import "time"
 // entry in the database
 type Enterprise struct {
 	// Identification
-	Siret string `json:"siret" gorm:"primary_key,column:siret"` // Combinaison du SIREN + NIC
-	Siren string `json:"siren" gorm:"column:siren"`             // Identifiant de l'entreprise
-	Nic   string `json:"nic" gorm:"column:nic"`                 // Numéro interne de classement de l’établissement
+	Siret string `json:"siret"`                     // Combinaison du SIREN + NIC
+	Siren string `json:"siren" gorm:"column:siren"` // Identifiant de l'entreprise
+	Nic   string `json:"nic" gorm:"column:nic"`     // Numéro interne de classement de l’établissement
 
 	// Adressage Normalisé
 	L1Normalisee string `json:"l1_normalisee" gorm:"column:l1_normalisee"`

@@ -8,7 +8,6 @@ CREATE TABLE history (
 );
 
 CREATE TABLE enterprises (
-  siret          TEXT UNIQUE NULL,
   siren          TEXT NULL,
   nic            TEXT NULL,
   l1_normalisee  TEXT NULL,
@@ -109,14 +108,12 @@ CREATE TABLE enterprises (
   vmaj2          TEXT NULL,
   vmaj3          TEXT NULL,
   datemaj        TIMESTAMPTZ NULL,
-  CONSTRAINT siret_pk PRIMARY KEY (siret)
+  CONSTRAINT siret_pk PRIMARY KEY (siren ,nic)
 );
 
 CREATE INDEX ON enterprises (siren, nic);
-CREATE INDEX ON enterprises (siret);
 
 CREATE TABLE temp_incremental (
-  siret          TEXT NULL,
   siren          TEXT NULL,
   nic            TEXT NULL,
   l1_normalisee  TEXT NULL,
@@ -238,5 +235,4 @@ CREATE TABLE temp_incremental (
 );
 
 CREATE INDEX ON temp_incremental (siren, nic) WHERE vmaj IN ('E', 'O', 'I');
-CREATE INDEX ON temp_incremental (siret) WHERE vmaj IN ('E', 'O', 'I');
 CREATE INDEX ON temp_incremental (vmaj) WHERE vmaj IN ('C', 'D', 'F');
