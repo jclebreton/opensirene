@@ -6,6 +6,7 @@ import (
 	"github.com/Depado/ginprom"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 
 	"github.com/jclebreton/opensirene/api/views"
@@ -13,7 +14,7 @@ import (
 )
 
 // SetupAndRun creates the router and runs it
-func SetupAndRun() error {
+func SetupAndRun(gormClient *gorm.DB) error {
 	// Create the router
 	r := gin.Default()
 
@@ -40,6 +41,7 @@ func SetupAndRun() error {
 	r.Use(p.Instrument())
 
 	// Route setup
+	views := &views.ViewsContext{GormClient: gormClient}
 	r.GET("/siret/:id", views.GetSiret)
 	r.GET("/siren/:id", views.GetSiren)
 	r.GET("/history", views.GetHistory)

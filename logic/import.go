@@ -9,15 +9,11 @@ import (
 )
 
 // Import is the way to remote files to database
-func Import(sfs sirene.RemoteFiles) error {
+func Import(pgxClient *database.PgxClient, remoteFiles sirene.RemoteFiles) error {
 	var err error
 
-	if err = database.InitImportClient(); err != nil {
-		return errors.Wrap(err, "Couldn't initialize pgx")
-	}
-
 	//Lock database for import
-	dbMutex := newMutex(database.ImportClient)
+	dbMutex := newMutex(pgxClient)
 	if err = dbMutex.Lock(); err != nil {
 		return err
 	}
@@ -29,17 +25,19 @@ func Import(sfs sirene.RemoteFiles) error {
 	}()
 
 	//Download an extract
-	if err = sirene.Do(sfs, 4); err != nil {
+	if err = sirene.Do(remoteFiles, 4); err != nil {
 		return errors.Wrap(err, "Couldn't retrieve files")
 	}
 
-	cis, err := ToCSVImport(sfs)
+	// Convert them
+	cis, err := ToCSVImport(remoteFiles)
 	if err != nil {
 		return errors.Wrap(err, "Couldn't convert to CSVImport")
 	}
 
-	tracker := newTracker(database.ImportClient)
-	if err = cis.Import(tracker); err != nil {
+	//Import
+	tracker := newTracker(pgxClient)
+	if err = cis.Import(pgxClient, tracker); err != nil {
 		return errors.Wrap(err, "Import error")
 	}
 

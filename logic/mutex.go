@@ -8,7 +8,7 @@ import (
 
 // mutex is an implementation of the Mutexer interface
 type mutex struct {
-	Database database.PgxClient
+	Database *database.PgxClient
 }
 
 // Mutexer is an interface to use the mutex logic in postgreSQL
@@ -18,7 +18,7 @@ type Mutexer interface {
 }
 
 // newMutex returns a new Mutex
-func newMutex(db database.PgxClient) *mutex {
+func newMutex(db *database.PgxClient) *mutex {
 	return &mutex{Database: db}
 }
 

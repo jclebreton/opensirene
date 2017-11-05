@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/jasonlvhit/gocron"
+	"github.com/jinzhu/gorm"
 
 	flag "github.com/ogier/pflag"
 	"github.com/sirupsen/logrus"
@@ -17,37 +18,47 @@ import (
 
 func main() {
 	var err error
-	var cnf string
-	var full bool
+	var config string
+	var fullImport bool
+	var pgxClient *database.PgxClient
+	var gormClient *gorm.DB
 
-	flag.StringVarP(&cnf, "conf", "c", "conf.yml", "Path to the configuration file")
-	flag.BoolVarP(&full, "full-import", "", false, "Get a full import from the last stock file")
+	// Configuration
+	flag.StringVarP(&config, "conf", "c", "conf.yml", "Path to the configuration file")
+	flag.BoolVarP(&fullImport, "full-import", "", false, "Get a full import from the last stock file")
 	flag.Parse()
-
-	if err = conf.Load(cnf); err != nil {
+	if err = conf.Load(config); err != nil {
 		logrus.WithError(err).Fatal("Couldn't parse configuration")
 	}
 
-	if full {
+	// Init PGX database client
+	if pgxClient, err = database.NewImportClient(); err != nil {
+		logrus.WithError(err).Fatal("Couldn't initialize PGX client")
+	}
+
+	// Full import
+	if fullImport {
 		s := time.Now()
 		var sfs sirene.RemoteFiles
 		if sfs, err = sirene.GrabLatestFull(); err != nil {
 			logrus.WithError(err).Fatal("An error is occured during grab")
 		}
 
-		if err = logic.Import(sfs); err != nil {
+		if err = logic.Import(pgxClient, sfs); err != nil {
 			logrus.WithError(err).Fatal("An error is occurred during full import")
 		}
 		logrus.WithField("import took", time.Since(s)).Info("Done !")
 	}
 
-	if err = database.InitQueryClient(); err != nil {
+	// Init GORM database client
+	if gormClient, err = database.NewGORMClient(); err != nil {
 		logrus.WithError(err).Fatal("Couldn't initialize GORM")
 	}
-	defer database.DB.Close()
+	defer gormClient.Close()
 
+	//Enable update as crontab
 	go func() {
-		gocron.Every(3).Hours().Do(logic.Daily)
+		gocron.Every(3).Hours().Do(logic.Daily, pgxClient)
 		// Execute the update at startup
 		gocron.RunAll()
 		_, t := gocron.NextRun()
@@ -55,7 +66,8 @@ func main() {
 		<-gocron.Start()
 	}()
 
-	if err = router.SetupAndRun(); err != nil {
+	//Start API
+	if err = router.SetupAndRun(gormClient); err != nil {
 		logrus.WithError(err).Fatal("Could not run the server")
 	}
 }

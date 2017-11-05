@@ -7,7 +7,7 @@ import (
 )
 
 type track struct {
-	Database database.PgxClient
+	Database *database.PgxClient
 }
 
 // Tracker is an interface used to track success and errors
@@ -16,8 +16,8 @@ type Tracker interface {
 }
 
 // newTracker returns a new track
-func newTracker(db database.PgxClient) *track {
-	return &track{Database: db}
+func newTracker(pgxClient *database.PgxClient) *track {
+	return &track{Database: pgxClient}
 }
 
 // Save logs to database the milestones

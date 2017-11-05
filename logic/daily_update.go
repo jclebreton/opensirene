@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 
 	"github.com/jclebreton/opensirene/api/models"
@@ -11,9 +12,9 @@ import (
 // GetSuccessfulUpdateList lists the last successful updates in the database
 // and returns the slice of filenames which were successfuly imported.
 // Returns an empty slice otherwise.
-func GetSuccessfulUpdateList() []string {
+func GetSuccessfulUpdateList(gormClient *gorm.DB) []string {
 	var sh []models.History
-	if database.DB.Find(&sh, models.History{IsSuccess: true}).RecordNotFound() {
+	if gormClient.Find(&sh, models.History{IsSuccess: true}).RecordNotFound() {
 		return []string{}
 	}
 
@@ -26,7 +27,7 @@ func GetSuccessfulUpdateList() []string {
 
 // Daily is the cron task that runs every few hours to get and apply the latest
 // updates
-func Daily() {
+func Daily(pgxClient *database.PgxClient, gormClient *gorm.DB) {
 	var err error
 	var sfs sirene.RemoteFiles
 
@@ -35,9 +36,9 @@ func Daily() {
 		return
 	}
 
-	sfs = Diff(GetSuccessfulUpdateList(), sfs)
+	sfs = Diff(GetSuccessfulUpdateList(gormClient), sfs)
 
-	if err = Import(sfs); err != nil {
+	if err = Import(pgxClient, sfs); err != nil {
 		logrus.WithError(err).Error("Could not download latest")
 		return
 	}

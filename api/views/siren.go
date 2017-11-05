@@ -7,12 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/jclebreton/opensirene/api/models"
-	"github.com/jclebreton/opensirene/database"
 )
 
 // GetSiren is in charge of querying the database to get the specific records
 // for a single Siren given in the query
-func GetSiren(c *gin.Context) {
+func (v *ViewsContext) GetSiren(c *gin.Context) {
 	var err error
 	var es models.Enterprises
 	limit := -1
@@ -34,7 +33,7 @@ func GetSiren(c *gin.Context) {
 		}
 	}
 
-	res := database.DB.Limit(limit).Offset(offset).Order("nic ASC").Find(&es, models.Enterprise{Siren: siren})
+	res := v.GormClient.Limit(limit).Offset(offset).Order("nic ASC").Find(&es, models.Enterprise{Siren: siren})
 	if res.RecordNotFound() || len(es) == 0 {
 		c.Status(http.StatusNotFound)
 		return
@@ -49,7 +48,7 @@ func GetSiren(c *gin.Context) {
 
 // GetSiret is in charge of querying the database to get the specific enterprise
 // record for a single Siret given in the query
-func GetSiret(c *gin.Context) {
+func (v *ViewsContext) GetSiret(c *gin.Context) {
 	var e models.Enterprise
 
 	siret := c.Param("id")
@@ -58,7 +57,7 @@ func GetSiret(c *gin.Context) {
 		return
 	}
 
-	if database.DB.Find(&e, models.Enterprise{Siren: siret[0:9], Nic: siret[9:14]}).RecordNotFound() {
+	if v.GormClient.Find(&e, models.Enterprise{Siren: siret[0:9], Nic: siret[9:14]}).RecordNotFound() {
 		c.Status(http.StatusNotFound)
 		return
 	}
