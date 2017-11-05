@@ -8,7 +8,15 @@ import (
 	"github.com/jclebreton/opensirene/opendata/gouvfr/sirene"
 )
 
-// Import is the way to remote files to database
+// ResetDatabase truncates all database tables
+func ResetDatabase(pgxClient *database.PgxClient) error {
+	if _, err := pgxClient.Conn.Exec("TRUNCATE table history, enterprises, temp_incremental"); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ImportRemoteFiles is the way to remote files to database
 func ImportRemoteFiles(pgxClient *database.PgxClient, remoteFiles sirene.RemoteFiles) error {
 	var err error
 

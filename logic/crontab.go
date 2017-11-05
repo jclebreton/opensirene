@@ -59,23 +59,25 @@ func (ct *Crontab) isAlreadyImported(localFiles []string, remoteFile string) boo
 // updates
 func (ct *Crontab) startUpdate() {
 	var err error
-	var allRemoteFiles sirene.RemoteFiles
-	var dbFilesStatus []string
+	var remoteFiles sirene.RemoteFiles
+	var localFiles []string
 
-	if allRemoteFiles, err = sirene.GrabLatestFull(); err != nil {
+	if remoteFiles, err = sirene.GrabLatestFull(); err != nil {
 		logrus.WithError(err).Error("Could not grab latest index from gov")
 		return
 	}
-	logrus.WithField("sfs", allRemoteFiles).Debug("crontab: latest index from gov")
 
-	if dbFilesStatus, err = ct.getDatabaseStatus(); err != nil {
+	if localFiles, err = ct.getDatabaseStatus(); err != nil {
 		logrus.WithError(err).Error("Could not retrieve current database status")
 		return
 	}
-	logrus.WithField("dbFilesStatus", dbFilesStatus).Debug("crontab: database status")
 
-	toDownload := ct.getFilesToImport(dbFilesStatus, allRemoteFiles)
-	logrus.WithField("toDownload", toDownload).Info("crontab: diff")
+	toDownload := ct.getFilesToImport(localFiles, remoteFiles)
+
+	logrus.
+		WithField("remoteFiles", remoteFiles).
+		WithField("localFiles", localFiles).
+		WithField("toDownload", toDownload).Info("Crontab status")
 
 	if err = ImportRemoteFiles(ct.PgxClient, toDownload); err != nil {
 		logrus.WithError(err).Error("Could not update database with latest files")

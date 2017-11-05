@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"github.com/jinzhu/gorm"
 
 	flag "github.com/ogier/pflag"
@@ -12,7 +10,6 @@ import (
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
 	"github.com/jclebreton/opensirene/logic"
-	"github.com/jclebreton/opensirene/opendata/gouvfr/sirene"
 )
 
 func main() {
@@ -37,23 +34,17 @@ func main() {
 
 	// Full import
 	if fullImport {
-		s := time.Now()
-		var sfs sirene.RemoteFiles
-		if sfs, err = sirene.GrabLatestFull(); err != nil {
-			logrus.WithError(err).Fatal("An error is occured during grab")
+		if err := logic.ResetDatabase(pgxClient); err != nil {
+			logrus.WithError(err).Fatal("Couldn't reset database")
 		}
-
-		if err = logic.ImportRemoteFiles(pgxClient, sfs); err != nil {
-			logrus.WithError(err).Fatal("An error is occurred during full import")
-		}
-		logrus.WithField("import took", time.Since(s)).Info("Done !")
+		logrus.Info("Database has been reset to trigger automatic update")
 	}
 
-	//Start automatic updates
+	// Start automatic updates
 	crontab := &logic.Crontab{PgxClient: pgxClient}
 	go crontab.Start()
 
-	//Start API
+	// Start API
 	var gormClient *gorm.DB
 	if gormClient, err = database.NewGORMClient(); err != nil {
 		logrus.WithError(err).Fatal("Couldn't initialize GORM")
