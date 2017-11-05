@@ -3,7 +3,6 @@ package main
 import (
 	"time"
 
-	"github.com/jasonlvhit/gocron"
 	"github.com/jinzhu/gorm"
 
 	flag "github.com/ogier/pflag"
@@ -20,8 +19,6 @@ func main() {
 	var err error
 	var config string
 	var fullImport bool
-	var pgxClient *database.PgxClient
-	var gormClient *gorm.DB
 
 	// Configuration
 	flag.StringVarP(&config, "conf", "c", "conf.yml", "Path to the configuration file")
@@ -32,9 +29,11 @@ func main() {
 	}
 
 	// Init PGX database client
+	var pgxClient *database.PgxClient
 	if pgxClient, err = database.NewImportClient(); err != nil {
 		logrus.WithError(err).Fatal("Couldn't initialize PGX client")
 	}
+	defer pgxClient.Conn.Close()
 
 	// Full import
 	if fullImport {
@@ -44,30 +43,23 @@ func main() {
 			logrus.WithError(err).Fatal("An error is occured during grab")
 		}
 
-		if err = logic.Import(pgxClient, sfs); err != nil {
+		if err = logic.ImportRemoteFiles(pgxClient, sfs); err != nil {
 			logrus.WithError(err).Fatal("An error is occurred during full import")
 		}
 		logrus.WithField("import took", time.Since(s)).Info("Done !")
 	}
 
-	// Init GORM database client
+	//Start automatic updates
+	crontab := &logic.Crontab{PgxClient: pgxClient}
+	go crontab.Start()
+
+	//Start API
+	var gormClient *gorm.DB
 	if gormClient, err = database.NewGORMClient(); err != nil {
 		logrus.WithError(err).Fatal("Couldn't initialize GORM")
 	}
 	defer gormClient.Close()
-
-	//Enable update as crontab
-	go func() {
-		gocron.Every(3).Hours().Do(logic.Daily, pgxClient)
-		// Execute the update at startup
-		gocron.RunAll()
-		_, t := gocron.NextRun()
-		logrus.WithField("next", t).Info("Started cron background task")
-		<-gocron.Start()
-	}()
-
-	//Start API
 	if err = router.SetupAndRun(gormClient); err != nil {
-		logrus.WithError(err).Fatal("Could not run the server")
+		logrus.WithError(err).Fatal("Could not setup and run API")
 	}
 }

@@ -5,11 +5,10 @@ import "time"
 // History is a struct mapping history sql table
 type History struct {
 	ID        int32     `gorm:"primary_key,column:id"`
-	IsSuccess bool      `gorm:"column:is_success"`
-	Action    string    `gorm:"column:action"`
-	Filename  string    `gorm:"column:filename"`
-	Msg       string    `gorm:"column:msg"`
 	Datetime  time.Time `gorm:"column:datetime"`
+	Filename  string    `gorm:"column:filename"`
+	IsSuccess bool      `gorm:"column:is_success"`
+	Err       string    `gorm:"column:err"`
 }
 
 // Histories is a slice of History

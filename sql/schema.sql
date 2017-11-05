@@ -1,10 +1,9 @@
 CREATE TABLE history (
   id         SERIAL PRIMARY KEY,
   datetime   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  action     TEXT NOT NULL,
-  is_success BOOL NULL,
   filename   TEXT NULL,
-  msg        TEXT NULL
+  is_success BOOL NULL,
+  err        TEXT NULL
 );
 
 CREATE TABLE enterprises (

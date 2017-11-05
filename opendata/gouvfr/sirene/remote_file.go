@@ -53,6 +53,14 @@ func FileTypeName(ft FileType) string {
 // RemoteFiles is a slice of pointers to RemoteFile
 type RemoteFiles []*RemoteFile
 
+func (r RemoteFiles) String() string {
+	var files []string
+	for _, f := range r {
+		files = append(files, f.FileName)
+	}
+	return strings.Join(files, ", ")
+}
+
 // RemoteFile is a struct that adds and remove some fields from a Resource
 // struct and actually keep only useful fields
 type RemoteFile struct {
