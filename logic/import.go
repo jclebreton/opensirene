@@ -20,7 +20,7 @@ func ResetDatabase(pgxClient *database.PgxClient) error {
 func ImportRemoteFiles(pgxClient *database.PgxClient, remoteFiles sirene.RemoteFiles, dPath string) error {
 	var err error
 
-	//Lock database for import
+	//Lock database during import
 	dbMutex := database.NewPgxMutex(pgxClient)
 	if err = dbMutex.Lock(); err != nil {
 		return err
