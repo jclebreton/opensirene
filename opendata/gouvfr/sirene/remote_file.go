@@ -16,7 +16,6 @@ import (
 	"github.com/cheggaaa/pb"
 	"github.com/pkg/errors"
 
-	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/opendata/gouvfr/api"
 )
 
@@ -112,13 +111,13 @@ func (rf *RemoteFile) ChecksumMatch() (bool, error) {
 }
 
 // DownloadWithProgress will download the file and update the given progress bar
-func (rf *RemoteFile) DownloadWithProgress(b *pb.ProgressBar) error {
+func (rf *RemoteFile) DownloadWithProgress(b *pb.ProgressBar, dPath string) error {
 	var err error
 	var size int
 	var resp *http.Response
 	var dest *os.File
 
-	rf.Path = filepath.Join(conf.C.DownloadPath, rf.FileName)
+	rf.Path = filepath.Join(dPath, rf.FileName)
 
 	if resp, err = http.Get(rf.URL); err != nil {
 		return errors.Wrapf(err, "couldn't download %s", rf.URL)
@@ -149,10 +148,10 @@ func (rf *RemoteFile) DownloadWithProgress(b *pb.ProgressBar) error {
 
 // Unzip will un-compress a zip archive moving all files and folders
 // to an output directory
-func (rf *RemoteFile) Unzip(b *pb.ProgressBar) error {
+func (rf *RemoteFile) Unzip(b *pb.ProgressBar, dPath string) error {
 	var filenames []string
 
-	r, err := zip.OpenReader(filepath.Join(conf.C.DownloadPath, rf.FileName))
+	r, err := zip.OpenReader(filepath.Join(dPath, rf.FileName))
 	if err != nil {
 		return err
 	}
@@ -168,7 +167,7 @@ func (rf *RemoteFile) Unzip(b *pb.ProgressBar) error {
 		b.Total = int64(f.UncompressedSize64)
 
 		// Store filename/path for returning and using later on
-		fpath := filepath.Join(conf.C.DownloadPath, f.Name)
+		fpath := filepath.Join(dPath, f.Name)
 		filenames = append(filenames, fpath)
 
 		if f.FileInfo().IsDir() {

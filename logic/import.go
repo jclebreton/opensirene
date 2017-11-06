@@ -17,7 +17,7 @@ func ResetDatabase(pgxClient *database.PgxClient) error {
 }
 
 // ImportRemoteFiles is the way to remote files to database
-func ImportRemoteFiles(pgxClient *database.PgxClient, remoteFiles sirene.RemoteFiles) error {
+func ImportRemoteFiles(pgxClient *database.PgxClient, remoteFiles sirene.RemoteFiles, dPath string) error {
 	var err error
 
 	//Lock database for import
@@ -32,7 +32,7 @@ func ImportRemoteFiles(pgxClient *database.PgxClient, remoteFiles sirene.RemoteF
 	}()
 
 	//Download an extract
-	if err = sirene.Do(remoteFiles, 4); err != nil {
+	if err = sirene.Do(remoteFiles, 4, dPath); err != nil {
 		return errors.Wrap(err, "Couldn't retrieve files")
 	}
 

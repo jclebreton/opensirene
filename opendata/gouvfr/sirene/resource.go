@@ -10,13 +10,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/opendata/gouvfr/api"
 )
 
 // NewFromResource takes an Resource and transforms it to a
 // gouv_sirene.RemoteFile
-func NewFromResource(r api.Resource) (*RemoteFile, error) {
+func NewFromResource(r api.Resource, dPath string) (*RemoteFile, error) {
 	var err error
 	var u *url.URL
 
@@ -31,7 +30,7 @@ func NewFromResource(r api.Resource) (*RemoteFile, error) {
 
 	base := path.Base(u.Path)
 	sf.FileName = base
-	sf.Path = filepath.Join(conf.C.DownloadPath, sf.FileName)
+	sf.Path = filepath.Join(dPath, sf.FileName)
 	bits := strings.SplitN(base, "_", 3)
 	if len(bits) < 3 {
 		sf.Type = OtherType

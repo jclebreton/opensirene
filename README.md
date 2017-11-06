@@ -38,6 +38,11 @@ database:
 
 prometheus:
   prefix: opensirene
+  
+crontab:
+  download_path: "downloads"
+  every_x_hours: 3
+
 ```
 
 
@@ -56,3 +61,5 @@ prometheus:
 | database.name               | string   | Database name to use                                      | `DB_NAME`            | "opensirene" | "opensirene" |
 | database.sslmode            | string   | Use the SSL mode                                          | `DB_SSL_MODE`        | "disable"    | "disable"    |
 | prometheus.prefix           | string   | Prefix the prometheus metrics                             | `PROMETHEUS_PREFIX`  | "opensirene" | "opensirene" |
+| crontab.download_path       | string   | Downloads path                                            | `DOWNLOAD_PATH`      | "downloads"  | "/tmp"       |
+| crontab.every_x_hours       | uint64   | Crontab interval (in hours)                               | `EVERY_X_HOURS`      | 3            | 1            |

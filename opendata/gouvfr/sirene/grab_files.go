@@ -7,7 +7,7 @@ import (
 	"github.com/cheggaaa/pb"
 )
 
-func worker(id int, bar *pb.ProgressBar, jobs <-chan *RemoteFile, results chan<- error) {
+func worker(id int, bar *pb.ProgressBar, jobs <-chan *RemoteFile, results chan<- error, dPath string) {
 	var err error
 	var ok bool
 
@@ -21,7 +21,7 @@ func worker(id int, bar *pb.ProgressBar, jobs <-chan *RemoteFile, results chan<-
 		if !s.OnDisk {
 			// Download
 			bar.Prefix("[Downloading] " + s.FileName)
-			if err = s.DownloadWithProgress(bar); err != nil {
+			if err = s.DownloadWithProgress(bar, dPath); err != nil {
 				results <- err
 				continue
 			}
@@ -39,7 +39,7 @@ func worker(id int, bar *pb.ProgressBar, jobs <-chan *RemoteFile, results chan<-
 
 		// Extracting
 		bar.Prefix("[Unzipping] " + s.FileName)
-		if err = s.Unzip(bar); err != nil {
+		if err = s.Unzip(bar, dPath); err != nil {
 			results <- err
 			continue
 		}
@@ -50,7 +50,7 @@ func worker(id int, bar *pb.ProgressBar, jobs <-chan *RemoteFile, results chan<-
 }
 
 // Do downloads and processes the sirene files
-func Do(sfs RemoteFiles, workers int) error {
+func Do(sfs RemoteFiles, workers int, dPath string) error {
 	var err error
 	var pool *pb.Pool
 
@@ -66,7 +66,7 @@ func Do(sfs RemoteFiles, workers int) error {
 	for w := 1; w <= workers; w++ {
 		bar := pb.New(0).SetUnits(pb.U_BYTES).SetRefreshRate(time.Millisecond * 10)
 		pool.Add(bar)
-		go worker(w, bar, jobs, results)
+		go worker(w, bar, jobs, results, dPath)
 	}
 	for _, s := range sfs {
 		jobs <- s

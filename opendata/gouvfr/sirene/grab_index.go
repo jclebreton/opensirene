@@ -29,7 +29,7 @@ func Grab() (*api.Dataset, error) {
 
 // GrabLatestFull retrieves all the files that needs to be downloaded and
 // applied to the database in inverse order (stock first, then each daily file)
-func GrabLatestFull() (RemoteFiles, error) {
+func GrabLatestFull(dPath string) (RemoteFiles, error) {
 	var err error
 	var ds *api.Dataset
 	var rf *RemoteFile
@@ -43,7 +43,7 @@ func GrabLatestFull() (RemoteFiles, error) {
 	first := time.Date(y, m, 1, 0, 0, 0, 0, location).YearDay()
 
 	for _, r := range ds.Resources {
-		if rf, err = NewFromResource(r); err != nil {
+		if rf, err = NewFromResource(r, dPath); err != nil {
 			logrus.WithError(err).Warn("Unprocessable entity")
 			continue
 		}

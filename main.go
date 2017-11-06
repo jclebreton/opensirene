@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// Start automatic updates
-	crontab := &logic.Crontab{PgxClient: pgxClient}
+	crontab := &logic.Crontab{PgxClient: pgxClient, Config: conf.C.Crontab}
 	go crontab.Start()
 
 	// Start API

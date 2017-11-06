@@ -27,18 +27,22 @@ func Test_Parse_success(t *testing.T) {
 		Debug: true,
 		Cors:  cors,
 	}
-	conf := &Conf{
-		Database:     db,
-		Server:       server,
-		LogLevel:     "fatal",
+	crontab := Crontab{
 		DownloadPath: "downloads",
+		EveryXHours:  3,
+	}
+	conf := &Conf{
+		Database: db,
+		Server:   server,
+		LogLevel: "fatal",
+		Crontab:  crontab,
 	}
 
 	err := conf.Parse()
 	assert.NoError(t, err)
 	assert.Equal(t, conf.LogLevel, logrus.GetLevel().String())
 
-	stat, err := os.Stat(conf.DownloadPath)
+	stat, err := os.Stat(conf.Crontab.DownloadPath)
 	assert.NoError(t, err)
 	assert.True(t, stat.IsDir())
 }

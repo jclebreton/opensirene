@@ -4,12 +4,14 @@ import (
 	"github.com/jasonlvhit/gocron"
 	"github.com/sirupsen/logrus"
 
+	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
 	"github.com/jclebreton/opensirene/opendata/gouvfr/sirene"
 )
 
 type Crontab struct {
 	PgxClient *database.PgxClient
+	Config    conf.Crontab
 }
 
 // getDatabaseStatus lists the last successful updates in the database
@@ -62,7 +64,7 @@ func (ct *Crontab) startUpdate() {
 	var remoteFiles sirene.RemoteFiles
 	var localFiles []string
 
-	if remoteFiles, err = sirene.GrabLatestFull(); err != nil {
+	if remoteFiles, err = sirene.GrabLatestFull(ct.Config.DownloadPath); err != nil {
 		logrus.WithError(err).Error("Could not grab latest index from gov")
 		return
 	}
@@ -79,7 +81,7 @@ func (ct *Crontab) startUpdate() {
 		WithField("localFiles", localFiles).
 		WithField("toDownload", toDownload).Info("Crontab status")
 
-	if err = ImportRemoteFiles(ct.PgxClient, toDownload); err != nil {
+	if err = ImportRemoteFiles(ct.PgxClient, toDownload, ct.Config.DownloadPath); err != nil {
 		logrus.WithError(err).Error("Could not update database with latest files")
 		return
 	}
@@ -87,7 +89,7 @@ func (ct *Crontab) startUpdate() {
 
 // StartCrontab run Daily function every few hours
 func (ct *Crontab) Start() {
-	gocron.Every(3).Hours().Do(ct.startUpdate)
+	gocron.Every(ct.Config.EveryXHours).Hours().Do(ct.startUpdate)
 	gocron.RunAll() // Execute the task at startup
 	_, t := gocron.NextRun()
 	logrus.WithField("next", t).Info("Started cron background task")

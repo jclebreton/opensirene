@@ -12,16 +12,22 @@ import (
 
 // Conf holds the necessary configuration for the application to work
 type Conf struct {
-	Database     Database   `yaml:"database"`
-	Server       Server     `yaml:"server"`
-	LogLevel     string     `yaml:"loglevel" env:"LOGLEVEL" default:"info"`
-	DownloadPath string     `yaml:"download_path" env:"DOWNLOAD_PATH" default:"downloads"`
-	Prometheus   Prometheus `yaml:"prometheus"`
+	Database   Database   `yaml:"database"`
+	Server     Server     `yaml:"server"`
+	LogLevel   string     `yaml:"loglevel" env:"LOGLEVEL" default:"info"`
+	Prometheus Prometheus `yaml:"prometheus"`
+	Crontab    Crontab    `yaml:"crontab"`
 }
 
 // Prometheus is a simple struct holding configuration variables for prometheus
 type Prometheus struct {
 	Prefix string `yaml:"prefix" env:"PROMETHEUS_PREFIX" default:"opensirene"`
+}
+
+// Prometheus is a simple struct holding configuration variables for prometheus
+type Crontab struct {
+	DownloadPath string `yaml:"download_path" env:"DOWNLOAD_PATH" default:"downloads"`
+	EveryXHours  uint64 `yaml:"every_x_hours" env:"EVERY_X_HOURS" default:"3"`
 }
 
 // C is the main exported configuration
@@ -43,6 +49,9 @@ func (c *Conf) Parse() error {
 	if err = Parse(&c.Prometheus); err != nil {
 		return errors.Wrap(err, "couldn't parse Prometheus struct")
 	}
+	if err = Parse(&c.Crontab); err != nil {
+		return errors.Wrap(err, "couldn't parse Crontab struct")
+	}
 	if err = Parse(c); err != nil {
 		return errors.Wrap(err, "couldn't parse Conf struct")
 	}
@@ -62,8 +71,8 @@ func (c *Conf) Parse() error {
 	default:
 		logrus.WithField("provided", c.LogLevel).Warn("Invalid log level, fallback to Info level")
 	}
-	if _, err = os.Stat(c.DownloadPath); os.IsNotExist(err) {
-		os.MkdirAll(c.DownloadPath, os.ModePerm)
+	if _, err = os.Stat(c.Crontab.DownloadPath); os.IsNotExist(err) {
+		os.MkdirAll(c.Crontab.DownloadPath, os.ModePerm)
 	}
 	return Parse(c)
 }
