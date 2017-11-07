@@ -1,0 +1,23 @@
+loglevel: debug
+
+server:
+  host: 127.0.0.1
+  port: 8080
+  debug: false
+  cors:
+    permissive_mode: true
+    enabled: true
+
+database:
+  user: xx
+  password: xx
+  name: opensirenedb
+  host: 127.0.0.1
+  port: 5432
+
+prometheus:
+  prefix: opensirene
+
+crontab:
+  download_path: "downloads"
+  every_x_hours: 3

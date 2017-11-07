@@ -38,7 +38,7 @@ database:
 
 prometheus:
   prefix: opensirene
-  
+
 crontab:
   download_path: "downloads"
   every_x_hours: 3
@@ -46,20 +46,20 @@ crontab:
 ```
 
 
-| Field                       | Type     | Description                                               | Environment Variable | Default      | Example      |
-|-----------------------------|----------|-----------------------------------------------------------|----------------------|--------------|--------------|
-| loglevel                    | string   | Global log level                                          | `LOGLEVEL`           | "info"       | "debug"      |
-| server.host                 | string   | Host on which the server will listen                      | `SERVER_HOST`        | "127.0.0.1"  | "127.0.0.1"  |
-| server.port                 | int      | Port on which the server will listen                      | `SERVER_PORT`        | 8080         | 8080         |
-| server.debug                | bool     | Debug mode                                                | `SERVER_DEBUG`       | false        | true         |
-| server.cors.allow_origins   | []string | Array of accepted origins                                 | -                    | -            | -            |
-| server.cors.permissive_mode | bool     | Accept every origin and overrides the allow_origins field | `CORS_PERMISSIVE`    | false        | true         |
-| database.user               | string   | User used to connect to the DB                            | `DB_USER`            | "sir"        | "sir"        |
-| database.password           | string   | Password associated to the user                           | `DB_PASSWORD`        | -            | -            |
-| database.host               | string   | Host on which the DB listens                              | `DB_HOST`            | "127.0.0.1"  | "127.0.0.1"  |
-| database.port               | int      | Port on which the DB listens                              | `DB_PORT`            | 5432         | 5432         |
-| database.name               | string   | Database name to use                                      | `DB_NAME`            | "opensirene" | "opensirene" |
-| database.sslmode            | string   | Use the SSL mode                                          | `DB_SSL_MODE`        | "disable"    | "disable"    |
-| prometheus.prefix           | string   | Prefix the prometheus metrics                             | `PROMETHEUS_PREFIX`  | "opensirene" | "opensirene" |
-| crontab.download_path       | string   | Downloads path                                            | `DOWNLOAD_PATH`      | "downloads"  | "/tmp"       |
-| crontab.every_x_hours       | uint64   | Crontab interval (in hours)                               | `EVERY_X_HOURS`      | 3            | 1            |
+| Field                       | Type     | Description                                               | Environment Variable | Default        | Example        |
+|-----------------------------|----------|-----------------------------------------------------------|----------------------|----------------|----------------|
+| loglevel                    | string   | Global log level                                          | `LOGLEVEL`           | "info"         | "debug"        |
+| server.host                 | string   | Host on which the server will listen                      | `SERVER_HOST`        | "127.0.0.1"    | "127.0.0.1"    |
+| server.port                 | int      | Port on which the server will listen                      | `SERVER_PORT`        | 8080           | 8080           |
+| server.debug                | bool     | Debug mode                                                | `SERVER_DEBUG`       | false          | true           |
+| server.cors.allow_origins   | []string | Array of accepted origins                                 | -                    | -              | -              |
+| server.cors.permissive_mode | bool     | Accept every origin and overrides the allow_origins field | `CORS_PERMISSIVE`    | false          | true           |
+| database.user               | string   | User used to connect to the DB                            | `DB_USER`            | "sir"          | "sir"          |
+| database.password           | string   | Password associated to the user                           | `DB_PASSWORD`        | -              | -              |
+| database.host               | string   | Host on which the DB listens                              | `DB_HOST`            | "127.0.0.1"    | "127.0.0.1"    |
+| database.port               | int      | Port on which the DB listens                              | `DB_PORT`            | 5432           | 5432           |
+| database.name               | string   | Database name to use                                      | `DB_NAME`            | "opensirenedb" | "opensirenedb" |
+| database.sslmode            | string   | Use the SSL mode                                          | `DB_SSL_MODE`        | "disable"      | "disable"      |
+| prometheus.prefix           | string   | Prefix the prometheus metrics                             | `PROMETHEUS_PREFIX`  | "opensirene"   | "opensirene"   |
+| crontab.download_path       | string   | Downloads path                                            | `DOWNLOAD_PATH`      | "downloads"    | "/tmp"         |
+| crontab.every_x_hours       | uint64   | Crontab interval (in hours)                               | `EVERY_X_HOURS`      | 3              | 1              |
