@@ -22,4 +22,5 @@ docker build -t fpm -f fpm.Dockerfile .
 docker run -ti -v $PWD:/packaging fpm fpm --verbose -s dir -t deb -n opensirene -v $deb_version \
   --description "French company database based on French government open data" \
   opensirene=/usr/bin/opensirene \
-  conf-example.yml=/usr/share/opensirene/conf-example.yml
+  conf-example.yml=/usr/share/opensirene/conf-example.yml \
+  systemd.service=/lib/systemd/system/opensirene.service
