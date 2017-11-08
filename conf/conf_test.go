@@ -31,16 +31,20 @@ func Test_Parse_success(t *testing.T) {
 		DownloadPath: "downloads",
 		EveryXHours:  3,
 	}
+	logger := Logger{
+		Level:  "info",
+		Format: "text",
+	}
 	conf := &Conf{
 		Database: db,
 		Server:   server,
-		LogLevel: "fatal",
 		Crontab:  crontab,
+		Logger:   logger,
 	}
 
 	err := conf.Parse()
 	assert.NoError(t, err)
-	assert.Equal(t, conf.LogLevel, logrus.GetLevel().String())
+	assert.Equal(t, logger.Level, logrus.GetLevel().String())
 
 	stat, err := os.Stat(conf.Crontab.DownloadPath)
 	assert.NoError(t, err)
@@ -56,8 +60,10 @@ func TestSetLogLevel(t *testing.T) {
 		lvl      string
 		expected logrus.Level
 	}{
-		{"must set to warning", "warn", logrus.WarnLevel},
+		{"must set to debug", "debug", logrus.DebugLevel},
 		{"must set to info", "info", logrus.InfoLevel},
+		{"must set to warning", "warn", logrus.WarnLevel},
+		{"must set to error", "error", logrus.ErrorLevel},
 		{"must not fail and fallback", "random", logrus.InfoLevel},
 	}
 	for _, tt := range tests {

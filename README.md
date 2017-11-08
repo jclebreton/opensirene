@@ -19,7 +19,9 @@ can override almost any value of the configuration file using them.
 yml
 ---
 ```
-loglevel: debug
+logger:
+  level: debug
+  format: text
 
 server:
   host: 127.0.0.1
@@ -48,7 +50,8 @@ crontab:
 
 | Field                       | Type     | Description                                               | Environment Variable | Default        | Example        |
 |-----------------------------|----------|-----------------------------------------------------------|----------------------|----------------|----------------|
-| loglevel                    | string   | Global log level                                          | `LOGLEVEL`           | "info"         | "debug"        |
+| logger.level                | string   | Global log level                                          | `LOGLEVEL`           | "info"         | "debug"        |
+| logger.format               | string   | Log format (text, json)                                   | `LOGFORMAT`          | "text"         | "json"         |
 | server.host                 | string   | Host on which the server will listen                      | `SERVER_HOST`        | "127.0.0.1"    | "127.0.0.1"    |
 | server.port                 | int      | Port on which the server will listen                      | `SERVER_PORT`        | 8080           | 8080           |
 | server.debug                | bool     | Debug mode                                                | `SERVER_DEBUG`       | false          | true           |
