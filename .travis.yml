@@ -25,7 +25,9 @@ deploy:
   api_key:
     secure: WH9iVLyQXimoAmsco/k04ylAjBadMdn4ZS3qcKp6pEPqbi6kXNASx3VCvd9JAgt2xw5evKE8Kuzile5A1H8Ul6Bzn1TOboB59vxtrjySfEahjJ/yUtJQAwj0UpuBy8Zqjmp4621aoCKqx/pI5LVxg1Ar1fnmdUeJGkObsFgszVk2Of7UViSD9KZpfMt6A1fjwCRQja5lMj5+bcUIlTgy23+2Uog1VQCIqnc+qLuoynULk+VI2C8LI8rdOmJjpgTyf1z/UIfuu46MGgACCEdoEScrgoXzLX+sILrrUE++rezCJIfZuywnjzJjVZTSsr/FDH7g81rbj3MRm81OsFBU/kA8eXGbp04gZLuSV9LeuB9eqPA5Efuiq6Ls1esDnQnRQvQDMwOEkm/doCkQMpmq8eMh21Wp6Z4n6VKeoImJJ7Ij9UsLy5wgsUqYIsosO7dRZulyDXereKdDh0JBCYz6PPzlLfaSzKJR3aDmiFXsQ3r3uHgDbyGpY6xFvdfDV3uBsxgIcNcvg15W0BPLqFsogNedxDxKeVb+Z6iitWrHH9odlmZXIz1OcDInjhSYj4tildQDdW//jF5+3qI2YBNHKY4E+IWlZ4oeipD1nOryogeAGC+KYTH1JP8A6KzpCBAA7FkyVpFMiqm4GhZECxUDamzbtsMWrWRuLlwpCHjXJXU=
   file_glob: true
-  file: "*.deb"
+  file:
+    - "*.deb"
+    - "*SUMS"
   skip_cleanup: true
   on:
     tags: true
