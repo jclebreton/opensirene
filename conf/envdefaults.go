@@ -65,57 +65,52 @@ func set(field reflect.Value, refType reflect.StructField, value string) error {
 	return nil
 }
 
+func isZero(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Func, reflect.Map, reflect.Slice:
+		return v.IsNil()
+	case reflect.Array:
+		z := true
+		for i := 0; i < v.Len(); i++ {
+			z = z && isZero(v.Index(i))
+		}
+		return z
+	case reflect.Struct:
+		z := true
+		for i := 0; i < v.NumField(); i++ {
+			z = z && isZero(v.Field(i))
+		}
+		return z
+	}
+	z := reflect.Zero(v.Type())
+	return v.Interface() == z.Interface()
+}
+
 // Parse parses the function
 func Parse(in interface{}) error {
-	ptrRef := reflect.ValueOf(in)
-	ref := ptrRef.Elem()
+	ref := reflect.ValueOf(in).Elem()
 	refType := ref.Type()
+
+	// Iterate over the struct fields
 	for i := 0; i < refType.NumField(); i++ {
 		f := ref.Field(i)
 		ff := refType.Field(i)
 		summary := fmt.Sprintf("%s.%s", refType.Name(), ff.Name)
-		if p, ok := os.LookupEnv(ff.Tag.Get(envtag)); ok {
-			if err := set(f, ff, p); err != nil {
-				return err
+
+		// Check for environment
+		if e := ff.Tag.Get(envtag); e != "" {
+			if p, ok := os.LookupEnv(e); ok {
+				if err := set(f, ff, p); err != nil {
+					return err
+				}
 			}
 		}
-		if d := ff.Tag.Get(defaulttag); d != "" {
-			switch f.Kind() {
-			case reflect.Int:
-				if f.Int() == 0 {
-					logrus.WithFields(logrus.Fields{"field": summary, "default": d}).Warn("No configured value, using default")
-					if err := set(f, ff, d); err != nil {
-						return err
-					}
-				}
-			case reflect.Int64:
-				if f.Int() == 0 {
-					logrus.WithFields(logrus.Fields{"field": summary, "default": d}).Warn("No configured value, using default")
-					if err := set(f, ff, d); err != nil {
-						return err
-					}
-				}
-			case reflect.Float64:
-				if f.Float() == 0 {
-					logrus.WithFields(logrus.Fields{"field": summary, "default": d}).Warn("No configured value, using default")
-					if err := set(f, ff, d); err != nil {
-						return err
-					}
-				}
-			case reflect.String:
-				if f.String() == "" {
-					logrus.WithFields(logrus.Fields{"field": summary, "default": d}).Warn("No configured value, using default")
-					if err := set(f, ff, d); err != nil {
-						return err
-					}
-				}
-			case reflect.Bool:
-				if !f.Bool() {
-					logrus.WithFields(logrus.Fields{"field": summary, "default": d}).Warn("No configured value, using default")
-					if err := set(f, ff, d); err != nil {
-						return err
-					}
-				}
+
+		// Check for default
+		if d := ff.Tag.Get(defaulttag); d != "" && isZero(f) {
+			logrus.WithFields(logrus.Fields{"field": summary, "default": d}).Warn("No configured value, using default")
+			if err := set(f, ff, d); err != nil {
+				return err
 			}
 		}
 	}

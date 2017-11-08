@@ -46,3 +46,24 @@ func Test_Parse_success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, stat.IsDir())
 }
+
+func TestSetLogLevel(t *testing.T) {
+	type args struct {
+		lvl string
+	}
+	tests := []struct {
+		name     string
+		lvl      string
+		expected logrus.Level
+	}{
+		{"must set to warning", "warn", logrus.WarnLevel},
+		{"must set to info", "info", logrus.InfoLevel},
+		{"must not fail and fallback", "random", logrus.InfoLevel},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SetLogLevel(tt.lvl)
+			assert.Equal(t, logrus.GetLevel(), tt.expected)
+		})
+	}
+}
