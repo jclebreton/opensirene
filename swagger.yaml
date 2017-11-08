@@ -35,6 +35,7 @@ paths:
           required: true
       responses:
         '200':
+          description: The list of Company
           schema:
             $ref: '#/definitions/Companies'
         '404':
@@ -44,16 +45,12 @@ paths:
 
   '/history':
     get:
-      summary: Retrieve the list of update's files stored in database.
-      parameters:
-        - name: siren_id
-          in: path
-          type: string
-          required: true
+      summary: Retrieve the list of update files stored in database.
       responses:
         '200':
+          description: The list of update files stored in database
           schema:
-            $ref: '#/definitions/histories'
+            $ref: '#/definitions/Histories'
         '404':
           $ref: '#/responses/NotFound'
         '504':
@@ -70,10 +67,6 @@ definitions:
     type: object
     description: Contains informations about a device.
     properties:
-  Company:
-    type: object
-    description: Contains informations about a device.
-    properties:
       siret:
         description: Combinaison du SIREN + NIC
         type: string
@@ -84,33 +77,33 @@ definitions:
         description: Numéro interne de classement de l’établissement
         type: string
       L1Normalisee:
-        type:string
+        type: string
       L2Normalisee:
-        type:string
+        type: string
       L3Normalisee:
-        type:string
+        type: string
       L4Normalisee:
-        type:string
+        type: string
       L5Normalisee:
-        type:string
+        type: string
       L6Normalisee:
-        type:string
+        type: string
       L7Normalisee:
-        type:string
+        type: string
       L1Declaree:
-        type:string
+        type: string
       L2Declaree:
-        type:string
+        type: string
       L3Declaree:
-        type:string
+        type: string
       L4Declaree:
-        type:string
+        type: string
       L5Declaree:
-        type:string
+        type: string
       L6Declaree:
-        type:string
+        type: string
       L7Declaree:
-        type:string
+        type: string
       numvoie:
         description: Numéro dans la voie
         type: string
