@@ -1,0 +1,377 @@
+swagger: '2.0'
+info:
+  title: OpenSirene API
+  description: The API for retrieve French companies data.
+  version: 1.0.0
+produces:
+  - application/json
+
+paths:
+  '/siret/{siret_id}':
+    get:
+      summary: Retrieve one company from their SIRET identifier.
+      parameters:
+        - name: siret_id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: The requested company
+          schema:
+            $ref: '#/definitions/Company'
+        '404':
+          $ref: '#/responses/NotFound'
+        '504':
+          $ref: '#/responses/DatabaseError'
+
+  '/siren/{siren_id}':
+    get:
+      summary: Retrieve the list of subsidiaries of a company from its SIREN identifier.
+      parameters:
+        - name: siren_id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/Companies'
+        '404':
+          $ref: '#/responses/NotFound'
+        '504':
+          $ref: '#/responses/DatabaseError'
+
+  '/history':
+    get:
+      summary: Retrieve the list of update's files stored in database.
+      parameters:
+        - name: siren_id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/histories'
+        '404':
+          $ref: '#/responses/NotFound'
+        '504':
+          $ref: '#/responses/DatabaseError'
+
+responses:
+  DatabaseError:
+    description: The remote database did not respond properly.
+  NotFound:
+    description: No companies were found.
+
+definitions:
+  Company:
+    type: object
+    description: Contains informations about a device.
+    properties:
+  Company:
+    type: object
+    description: Contains informations about a device.
+    properties:
+      siret:
+        description: Combinaison du SIREN + NIC
+        type: string
+      siren:
+        description: Identifiant de l'entreprise
+        type: string
+      nic:
+        description: Numéro interne de classement de l’établissement
+        type: string
+      L1Normalisee:
+        type:string
+      L2Normalisee:
+        type:string
+      L3Normalisee:
+        type:string
+      L4Normalisee:
+        type:string
+      L5Normalisee:
+        type:string
+      L6Normalisee:
+        type:string
+      L7Normalisee:
+        type:string
+      L1Declaree:
+        type:string
+      L2Declaree:
+        type:string
+      L3Declaree:
+        type:string
+      L4Declaree:
+        type:string
+      L5Declaree:
+        type:string
+      L6Declaree:
+        type:string
+      L7Declaree:
+        type:string
+      numvoie:
+        description: Numéro dans la voie
+        type: string
+      indrep:
+        description: Indice de répétition
+        type: string
+      typvoie:
+        description: Type de la voie
+        type: string
+      libvoie:
+        description: Libellé de la voie
+        type: string
+      codepos:
+        description: Code postal
+        type: string
+      cedex:
+        description: Code Cedex
+        type: string
+      rpet:
+        description: Région de localisation
+        type: string
+      libreg:
+        description: Libellé de la région
+        type: string
+      depet:
+        description: Département
+        type: string
+      arronet:
+        description: Arrondissement
+        type: string
+      ctonet:
+        description: Canton
+        type: string
+      comet:
+        description: Commune
+        type: string
+      libcom:
+        description: Libellé de la commune de localisation
+        type: string
+      du:
+        description: Département de l'unité urbaine de la localisation
+        type: string
+      tu:
+        description: Taille de l'unité urbaine
+        type: string
+      uu:
+        description: Numéro de l'unité urbaine
+        type: string
+      epci:
+        description: Localisation dans un établissement public de coopération intercommunale
+        type: string
+      tcd:
+        description: Tranche de commune détaillée
+        type: string
+      zem_et:
+        description: Zone d'emploi
+        type: string
+      siege:
+        description: Qualité de siège ou non de l'établissement
+        type: string
+      enseigne:
+        description: Enseigne ou nom de l'exploitation
+        type: string
+      ind_publipo:
+        description: Indicateur du champ du publipostage
+        type: string
+      diffcom:
+        description: Statut de diffusion de l'établissement
+        type: string
+      amintret:
+        description: Année et mois d'introduction de l'établissement dans la base de diffusion
+        type: string
+      natetab:
+        description: Nature de l'établissement d'un entrepreneur individuel
+        type: string
+      libnatetab:
+        description: Libellé de la nature de l'établissement
+        type: string
+      apet700:
+        description: Activité principale de l'établissement
+        type: string
+      libapet:
+        description: Libellé de l'activité principale de l'établissement
+        type: string
+      dapet:
+        description: Année de validité de l'activité principale de l'établissement
+        type: string
+      tefet:
+        description: Tranche d'effectif salarié de l'établissement
+        type: string
+      libtefet:
+        description: Libellé de la tranche d'effectif de l'établissement
+        type: string
+      efetcent:
+        description: Effectif salarié de l'établissement à la centaine près
+        type: string
+      defet:
+        description: Année de validité de l'effectif salarié de l'établissement
+        type: string
+      origine:
+        description: Origine de la création de l'établissement
+        type: string
+      dcret:
+        description: Année et mois de création de l'établissement
+        type: string
+      ddebact:
+        description: Date de début d’activité
+        type: string
+      activnat:
+        description: Nature de l'activité de l'établissement
+        type: string
+      lieu_act:
+        description: Lieu de l'activité de l'établissement
+        type: string
+      actisurf:
+        description: Type de magasin
+        type: string
+      saisonat:
+        description: Caractère saisonnier ou non de l'activité de l'établissement
+        type: string
+      modet:
+        description: Modalité de l'activité principale de l'établissement
+        type: string
+      prodet:
+        description: Caractère productif de l'établissement
+        type: string
+      prodpart:
+        description: Participation particulière à la production de l'établissement
+        type: string
+      auxilt:
+        description: Caractère auxiliaire de l'activité de l'établissement
+        type: string
+      nomen_long:
+        description: Nom ou raison sociale de l'entreprise
+        type: string
+      sigle:
+        description: Sigle de l'entreprise
+        type: string
+      nom:
+        description: Nom de naissance
+        type: string
+      prenom:
+        description: Prénom
+        type: string
+      civilite:
+        description: Civilité des entrepreneurs individuels
+        type: string
+      rna:
+        description: Numéro d’identification au répertoire national des associations
+        type: string
+      nicsiege:
+        description: Numéro interne de classement de l'établissement siège
+        type: string
+      rpen:
+        description: Région de localisation du siège de l'entreprise
+        type: string
+      depcomen:
+        description: épartement et commune de localisation du siège de l'entreprise
+        type: string
+      adr_mail:
+        description: Adresse mail
+        type: string
+      nj:
+        description: Nature juridique de l'entreprise
+        type: string
+      libnj:
+        description: Libellé de la nature juridique
+        type: string
+      apen700:
+        description: Activité principale de l'entreprise
+        type: string
+      libapen:
+        description: Libellé de l'activité principale de l'entreprise
+        type: string
+      dapen:
+        description: Année de validité de l'activité principale de l'entreprise
+        type: string
+      aprm:
+        description: Activité principale au registre des métiers
+        type: string
+      ess:
+        description: Appartenance au champ de l’économie sociale et solidaire
+        type: string
+      tefen:
+        description: Tranche d'effectif salarié de l'entreprise
+        type: string
+      libtefen:
+        description: Libellé de la tranche d'effectif de l'entreprise
+        type: string
+      efencent:
+        description: Effectif salarié de l'entreprise à la centaine près
+        type: string
+      defen:
+        description: Année de validité de l'effectif salarié de l'entreprise
+        type: string
+      categorie:
+        description: Catégorie d'entreprise
+        type: string
+      dcren:
+        description: Année et mois de création de l'entreprise
+        type: string
+      amintren:
+        description: Année et mois d'introduction de l'entreprise dans la base de diffusion
+        type: string
+      monoact:
+        description: Indice de monoactivité de l'entreprise
+        type: string
+      moden:
+        description: Modalité de l'activité principale de l'entreprise
+        type: string
+      proden:
+        description: Caractère productif de l'entreprise
+        type: string
+      esaann:
+        description: Année de validité des rubriques de niveau entreprise en provenance de l'ESA*
+        type: string
+      tca:
+        description: Tranche de chiffre d'affaires pour les entreprises enquêtées par l'ESA*
+        type: string
+      esaapen:
+        description: Activité principale de l'entreprise issue de l'ESA*
+        type: string
+      esasec1n:
+        description: Première activité secondaire déclarée dans l'ESA*
+        type: string
+      esasec2n:
+        description: Deuxième activité secondaire déclarée dans l'ESA*
+        type: string
+      esasec3n:
+        description: Troisième activité secondaire déclarée dans l'ESA*
+        type: string
+      esasec4n:
+        description: Quatrième activité secondaire déclarée dans l'ESA*
+        type: string
+      vmaj:
+        description: Nature de la mise à jour (création, suppression, modification)
+        type: string
+      vmaj1:
+        description: Indicateur de mise à jour n°1
+        type: string
+      vmaj2:
+        description: Indicateur de mise à jour n°2
+        type: string
+      vmaj3:
+        description: Indicateur de mise à jour n°3
+        type: string
+      datemaj:
+        description: Date de traitement de la mise à jour
+        type: string
+  Companies:
+    description: The list of Company
+    type: array
+    items:
+      $ref: '#/definitions/History'
+  History:
+    description: The representation of an update file stored in database
+    type: array
+    items:
+      type: string
+  Histories:
+    description: The list of update files stored in database
+    type: array
+    items:
+      $ref: '#/definitions/History'
