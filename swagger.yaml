@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: OpenSirene API
-  description: The API for retrieve French companies data.
+  description: The API to retrieve French companies data.
   version: 1.0.0
 produces:
   - application/json
@@ -12,7 +12,7 @@ host: 127.0.0.1:8080
 paths:
   '/siret/{siret_id}':
     get:
-      summary: Retrieve one company from their SIRET identifier.
+      summary: Retrieve one company from its SIRET identifier.
       parameters:
         - name: siret_id
           in: path
@@ -30,7 +30,7 @@ paths:
 
   '/siren/{siren_id}':
     get:
-      summary: Retrieve the list of subsidiaries of a company from its SIREN identifier.
+      summary: Retrieve the list of establishments of a company from its SIREN identifier.
       parameters:
         - name: siren_id
           in: path
@@ -38,7 +38,7 @@ paths:
           required: true
       responses:
         '200':
-          description: The list of Company
+          description: The list of establishments
           schema:
             $ref: '#/definitions/Companies'
         '404':
@@ -68,7 +68,7 @@ responses:
 definitions:
   Company:
     type: object
-    description: Contains informations about a device.
+    description: Contains information about an establishment of a company.
     properties:
       siret:
         description: Combinaison du SIREN + NIC
@@ -357,10 +357,10 @@ definitions:
         description: Date de traitement de la mise à jour
         type: string
   Companies:
-    description: The list of Company
+    description: A list of Establishments 
     type: array
     items:
-      $ref: '#/definitions/History'
+      $ref: '#/definitions/Company'
   History:
     description: The representation of an update file stored in database
     type: array
