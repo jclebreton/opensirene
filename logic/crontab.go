@@ -1,12 +1,7 @@
 package logic
 
 import (
-	"io/ioutil"
-	"os"
-	"regexp"
-
 	"github.com/jasonlvhit/gocron"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/jclebreton/opensirene/conf"
@@ -62,43 +57,6 @@ func (ct *Crontab) isAlreadyImported(localFiles []string, remoteFile string) boo
 	return false
 }
 
-//// removeUselessFiles removes from disk old update files
-func (ct *Crontab) removeUselessFiles(keepList []string) error {
-	var files []os.FileInfo
-	var result []string
-	var err error
-	var keepIt bool
-
-	if files, err = ioutil.ReadDir(ct.Config.DownloadPath); err != nil {
-		return errors.Wrap(err, "couldn't remove useless files")
-	}
-
-	for _, f := range files {
-		for _, keepFile := range keepList {
-			keepIt = true
-			match, err := regexp.MatchString("/\\.(zip|csv)$/", f.Name())
-			if f.Name() != keepFile && err == nil && match {
-				keepIt = false
-				break
-			}
-		}
-		if !keepIt {
-			f := ct.Config.DownloadPath + "/" + f.Name()
-			result = append(result, f)
-			if err = os.Remove(f); err != nil {
-				return errors.Wrap(err, "couldn't remove useless files")
-			}
-
-		}
-	}
-
-	if len(result) > 0 {
-		logrus.WithField("files", result).Info("Some useless files has been removed")
-	}
-
-	return nil
-}
-
 // Daily is the cron task that runs every few hours to get and apply the latest
 // updates
 func (ct *Crontab) startUpdate() {
@@ -110,13 +68,6 @@ func (ct *Crontab) startUpdate() {
 	if dbFiles, err = ct.getDatabaseStatus(); err != nil {
 		logrus.WithError(err).Error("Could not retrieve current database status")
 		return
-	}
-
-	// Remove other ZIP and CSV files
-	if err = ct.removeUselessFiles(dbFiles); err != nil {
-		logrus.WithError(err).Error("Could not remove useless files")
-		return
-
 	}
 
 	// Search updates
