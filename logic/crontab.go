@@ -3,6 +3,7 @@ package logic
 import (
 	"io/ioutil"
 	"os"
+	"regexp"
 
 	"github.com/jasonlvhit/gocron"
 	"github.com/pkg/errors"
@@ -74,9 +75,10 @@ func (ct *Crontab) removeUselessFiles(keepList []string) error {
 
 	for _, f := range files {
 		for _, keepFile := range keepList {
-			keepIt = false
-			if f.Name() == keepFile {
-				keepIt = true
+			keepIt = true
+			match, err := regexp.MatchString("/\\.(zip|csv)$/", f.Name())
+			if f.Name() != keepFile && err == nil && match {
+				keepIt = false
 				break
 			}
 		}
@@ -104,21 +106,26 @@ func (ct *Crontab) startUpdate() {
 	var remoteFiles sirene.RemoteFiles
 	var dbFiles []string
 
-	if remoteFiles, err = sirene.GrabLatestFull(ct.Config.DownloadPath); err != nil {
-		logrus.WithError(err).Error("Could not grab latest index from gov")
-		return
-	}
-
+	// Retrieve the list of update files stored in database
 	if dbFiles, err = ct.getDatabaseStatus(); err != nil {
 		logrus.WithError(err).Error("Could not retrieve current database status")
 		return
 	}
 
+	// Remove other ZIP and CSV files
 	if err = ct.removeUselessFiles(dbFiles); err != nil {
 		logrus.WithError(err).Error("Could not remove useless files")
 		return
 
 	}
+
+	// Search updates
+	if remoteFiles, err = sirene.GrabLatestFull(ct.Config.DownloadPath); err != nil {
+		logrus.WithError(err).Error("Could not grab latest index from gov")
+		return
+	}
+
+	// Files to grab
 	toDownload := ct.getFilesToImport(dbFiles, remoteFiles)
 
 	logrus.
@@ -126,6 +133,7 @@ func (ct *Crontab) startUpdate() {
 		WithField("dbFiles", dbFiles).
 		WithField("toDownload", toDownload).Info("Crontab status")
 
+	// Start upgrade
 	if err = ImportRemoteFiles(ct.PgxClient, toDownload, ct.Config.DownloadPath); err != nil {
 		logrus.WithError(err).Error("Could not update database with latest files")
 		return
