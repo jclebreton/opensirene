@@ -24,3 +24,6 @@ docker run -ti -v $PWD:/packaging fpm fpm --verbose -s dir -t deb -n opensirene 
   opensirene=/usr/bin/opensirene \
   conf-example.yml=/usr/share/opensirene/conf-example.yml \
   systemd.service=/lib/systemd/system/opensirene.service
+
+sha256sum *.deb > SHA256SUMS
+md5sum *.deb > MD5SUMS

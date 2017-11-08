@@ -4,3 +4,4 @@ opensirene
 vendor
 coverage.txt
 *.deb
+*SUMS
