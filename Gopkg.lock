@@ -9,6 +9,24 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/alecthomas/assert"
+  packages = ["."]
+  revision = "405dbfeb8e38effee6e723317226e93fff912d06"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/alecthomas/colour"
+  packages = ["."]
+  revision = "60882d9e27213e8552dcff6328914fe4c2b44bc9"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/alecthomas/repr"
+  packages = ["."]
+  revision = "37578405c47fe4f23cb672045b825fa4145a0816"
+
+[[projects]]
+  branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
@@ -140,6 +158,12 @@
   revision = "a6e9df898b1336106c743392c48ee0b71f5c4efa"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/sergi/go-diff"
+  packages = ["diffmatchpatch"]
+  revision = "2fc9cd33b5f86077aa3e0f442fa0476a9fa9a1dc"
+
+[[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
@@ -190,6 +214,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fda7c1a8f96b33042e5f19f1fb181f587c0530a9bf9a23c0589e7348055caf77"
+  inputs-digest = "689b5de903afdf322aa7ac650e6618156df5a906e4ac4dba610f3abf2703f0bb"
   solver-name = "gps-cdcl"
   solver-version = 1
