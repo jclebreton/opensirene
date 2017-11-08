@@ -4,8 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -14,7 +12,7 @@ import (
 type Conf struct {
 	Database   Database   `yaml:"database"`
 	Server     Server     `yaml:"server"`
-	LogLevel   string     `yaml:"loglevel" env:"LOGLEVEL" default:"info"`
+	Logger     Logger     `yaml:"logger"`
 	Prometheus Prometheus `yaml:"prometheus"`
 	Crontab    Crontab    `yaml:"crontab"`
 }
@@ -53,25 +51,21 @@ func (c *Conf) Parse() error {
 	if err = Parse(&c.Crontab); err != nil {
 		return errors.Wrap(err, "couldn't parse Crontab struct")
 	}
+	if err = Parse(&c.Logger); err != nil {
+		return errors.Wrap(err, "couldn't parse Logger struct")
+	}
 	if err = Parse(c); err != nil {
 		return errors.Wrap(err, "couldn't parse Conf struct")
 	}
-	SetLogLevel(c.LogLevel)
+
+	//Log
+	ConfigureLogger(c.Logger)
+
+	// Create download path
 	if _, err = os.Stat(c.Crontab.DownloadPath); os.IsNotExist(err) {
 		os.MkdirAll(c.Crontab.DownloadPath, os.ModePerm)
 	}
 	return Parse(c)
-}
-
-// SetLogLevel sets the logging level when possible, otherwise it fallbacks to
-// the default logrus level and logs a warning
-func SetLogLevel(lvl string) {
-	l, err := logrus.ParseLevel(lvl)
-	if err != nil {
-		logrus.WithField("provided", lvl).Warn("Invalid log level, fallback to Info level")
-	} else {
-		logrus.SetLevel(l)
-	}
 }
 
 // Load loads the configuration file into C
