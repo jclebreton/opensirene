@@ -5,6 +5,9 @@ info:
   version: 1.0.0
 produces:
   - application/json
+schemes:
+  - http
+host: 127.0.0.1:8080
 
 paths:
   '/siret/{siret_id}':
