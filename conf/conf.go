@@ -24,7 +24,8 @@ type Prometheus struct {
 	Prefix string `yaml:"prefix" env:"PROMETHEUS_PREFIX" default:"opensirene"`
 }
 
-// Prometheus is a simple struct holding configuration variables for prometheus
+// Crontab is a simple struct holding configuration variables for the periodic
+// task to be executed
 type Crontab struct {
 	DownloadPath string `yaml:"download_path" env:"DOWNLOAD_PATH" default:"downloads"`
 	EveryXHours  uint64 `yaml:"every_x_hours" env:"EVERY_X_HOURS" default:"3"`
@@ -55,26 +56,22 @@ func (c *Conf) Parse() error {
 	if err = Parse(c); err != nil {
 		return errors.Wrap(err, "couldn't parse Conf struct")
 	}
-	switch c.LogLevel {
-	case "panic":
-		logrus.SetLevel(logrus.PanicLevel)
-	case "fatal":
-		logrus.SetLevel(logrus.FatalLevel)
-	case "error":
-		logrus.SetLevel(logrus.ErrorLevel)
-	case "warn":
-		logrus.SetLevel(logrus.WarnLevel)
-	case "info":
-		logrus.SetLevel(logrus.InfoLevel)
-	case "debug":
-		logrus.SetLevel(logrus.DebugLevel)
-	default:
-		logrus.WithField("provided", c.LogLevel).Warn("Invalid log level, fallback to Info level")
-	}
+	SetLogLevel(c.LogLevel)
 	if _, err = os.Stat(c.Crontab.DownloadPath); os.IsNotExist(err) {
 		os.MkdirAll(c.Crontab.DownloadPath, os.ModePerm)
 	}
 	return Parse(c)
+}
+
+// SetLogLevel sets the logging level when possible, otherwise it fallbacks to
+// the default logrus level and logs a warning
+func SetLogLevel(lvl string) {
+	l, err := logrus.ParseLevel(lvl)
+	if err != nil {
+		logrus.WithField("provided", lvl).Warn("Invalid log level, fallback to Info level")
+	} else {
+		logrus.SetLevel(l)
+	}
 }
 
 // Load loads the configuration file into C
