@@ -1,0 +1,14 @@
+[Unit]
+Description=opensirene
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/opensirene --config=/etc/opensirene/conf.yaml
+Restart=on-failure
+User=nobody
+Group=nogroup
+LimitNOFILE=512000
+
+[Install]
+WantedBy=multi-user.target
