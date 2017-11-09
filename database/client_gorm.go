@@ -11,3 +11,7 @@ import (
 func NewGORMClient() (*gorm.DB, error) {
 	return gorm.Open("postgres", conf.C.Database.ConnectionString())
 }
+
+func NewGORMClientFromString(connexionString string) (*gorm.DB, error) {
+	return gorm.Open("postgres", connexionString)
+}

@@ -14,3 +14,15 @@ type Cors struct {
 	Enabled        bool     `yaml:"enabled" env:"CORS_ENABLED"`
 	PermissiveMode bool     `yaml:"permissive_mode" env:"CORS_PERMISSIVE"`
 }
+
+func (sc Server) CorsEnabled() bool {
+	return sc.Cors.Enabled
+}
+
+func (sc Server) CorsPermissive() bool {
+	return sc.Cors.PermissiveMode
+}
+
+func (sc Server) DebugMode() bool {
+	return sc.Debug
+}
