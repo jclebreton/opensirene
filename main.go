@@ -18,8 +18,8 @@ func main() {
 	var fullImport bool
 
 	// Configuration
-	flag.StringVarP(&config, "conf", "c", "conf.yml", "Path to the configuration file")
-	flag.BoolVarP(&fullImport, "full-import", "", false, "Get a full import from the last stock file")
+	flag.StringVarP(&config, "config", "c", "conf.yml", "Path to the configuration file")
+	flag.BoolVarP(&fullImport, "drop", "", false, "Truncate database and run a full import")
 	flag.Parse()
 	if err = conf.Load(config); err != nil {
 		logrus.WithError(err).Fatal("Couldn't parse configuration")
