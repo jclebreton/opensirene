@@ -1,8 +1,6 @@
 package conf
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Database is the structure that holds all the mandatory information
 // about the database connection
