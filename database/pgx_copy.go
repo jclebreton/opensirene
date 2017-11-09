@@ -7,7 +7,7 @@ import (
 
 	"time"
 
-	"github.com/cheggaaa/pb"
+	"github.com/jclebreton/opensirene/progress"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/transform"
 )
@@ -21,7 +21,6 @@ type PgxCopyFrom struct {
 
 	Path string
 	File *os.File
-	Bar  *pb.ProgressBar
 
 	headers               []string
 	callBackTriggerOnKeys []int
@@ -42,17 +41,13 @@ func (c *PgxCopyFrom) Prepare() error {
 	if fdi, err = fd.Stat(); err != nil {
 		return err
 	}
-	c.File = fd
-	c.reader = csv.NewReader(transform.NewReader(fd, charmap.Windows1252.NewDecoder()))
-	c.reader.Comma = ';'
 
-	c.Bar = pb.New64(fdi.Size()).SetUnits(pb.U_BYTES)
-	c.Bar.ShowCounters = true
-	c.Bar.ShowPercent = true
-	c.Bar.ShowSpeed = true
-	c.Bar.ShowTimeLeft = true
-	c.Bar.Prefix("Importing " + c.Path)
-	c.Bar.Start()
+	r := transform.NewReader(fd, charmap.Windows1252.NewDecoder())
+	reader := progress.NewProgressReader(r, fdi.Name(), "copy", uint64(fdi.Size()))
+
+	c.File = fd
+	c.reader = csv.NewReader(reader)
+	c.reader.Comma = ';'
 
 	// Save and skip the header part
 	c.headers, err = c.reader.Read()
@@ -113,7 +108,6 @@ func (c *PgxCopyFrom) Next() bool {
 			return c.Next()
 		}
 		defer c.File.Close()
-		defer c.Bar.Finish()
 		if err == io.EOF {
 			return false
 		}
@@ -121,9 +115,7 @@ func (c *PgxCopyFrom) Next() bool {
 		return false
 	}
 
-	tot := 0
 	for k, v := range rec {
-		tot += len(v) + 3 // two quotes and the ;
 		if values, err = c.callTrigger(values, k, v); err != nil {
 			c.err = err
 			return false
@@ -131,7 +123,6 @@ func (c *PgxCopyFrom) Next() bool {
 	}
 
 	c.values = values
-	c.Bar.Add(tot - 3) // the last ; and the \n
 
 	return true
 }
