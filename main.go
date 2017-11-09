@@ -34,7 +34,7 @@ func main() {
 
 	// Full import
 	if fullImport {
-		if err := logic.ResetDatabase(pgxClient); err != nil {
+		if err = logic.ResetDatabase(pgxClient); err != nil {
 			logrus.WithError(err).Fatal("Couldn't reset database")
 		}
 		logrus.Info("Database has been reset to trigger automatic update")
@@ -49,7 +49,10 @@ func main() {
 	if gormClient, err = database.NewGORMClient(); err != nil {
 		logrus.WithError(err).Fatal("Couldn't initialize GORM")
 	}
-	defer gormClient.Close()
+	defer func() {
+		err = gormClient.Close()
+		logrus.WithError(err).Fatal("Couldn't close GORM")
+	}()
 	if err = router.SetupAndRun(gormClient); err != nil {
 		logrus.WithError(err).Fatal("Could not setup and run API")
 	}
