@@ -18,3 +18,8 @@ func (v *ViewsContext) GetHistory(c *gin.Context) {
 
 	c.JSON(http.StatusOK, h)
 }
+
+// GetPing is a monitoring endpoint
+func (v *ViewsContext) GetPing(c *gin.Context) {
+	c.String(http.StatusOK, "pong")
+}
