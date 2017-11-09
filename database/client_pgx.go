@@ -12,17 +12,15 @@ type PgxClient struct {
 }
 
 // NewImportClient creates a new PgxClient from the configuration
-func NewImportClient() (*PgxClient, error) {
-	connectConfig := &pgx.ConnConfig{
-		Database: conf.C.Database.Name,
-		Host:     conf.C.Database.Host,
-		Port:     uint16(conf.C.Database.Port),
-		User:     conf.C.Database.User,
-		Password: conf.C.Database.Password,
-	}
-
+func NewPgxClientClient() (*pgx.ConnPool, error) {
 	connPoolConfig := pgx.ConnPoolConfig{
-		ConnConfig:     *connectConfig,
+		ConnConfig: pgx.ConnConfig{
+			Database: conf.C.Database.Name,
+			Host:     conf.C.Database.Host,
+			Port:     uint16(conf.C.Database.Port),
+			User:     conf.C.Database.User,
+			Password: conf.C.Database.Password,
+		},
 		MaxConnections: 5,
 		AfterConnect: func(conn *pgx.Conn) error {
 			_, err := conn.Exec("SET CLIENT_ENCODING TO 'UTF-8'")
@@ -30,10 +28,5 @@ func NewImportClient() (*PgxClient, error) {
 		},
 	}
 
-	pool, err := pgx.NewConnPool(connPoolConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	return &PgxClient{Conn: pool}, nil
+	return pgx.NewConnPool(connPoolConfig)
 }

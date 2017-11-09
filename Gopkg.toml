@@ -22,8 +22,12 @@
 
 
 [[constraint]]
-  name = "github.com/cheggaaa/pb"
   branch = "master"
+  name = "github.com/Depado/ginprom"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/alecthomas/assert"
 
 [[constraint]]
   name = "github.com/gin-contrib/cors"
@@ -34,8 +38,16 @@
   version = "1.2.0"
 
 [[constraint]]
+  name = "github.com/go-test/deep"
+  version = "1.0.0"
+
+[[constraint]]
   name = "github.com/jackc/pgx"
   version = "3.0.1"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jasonlvhit/gocron"
 
 [[constraint]]
   name = "github.com/jinzhu/gorm"
@@ -54,17 +66,13 @@
   version = "1.0.3"
 
 [[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "1.1.4"
+
+[[constraint]]
   branch = "master"
   name = "golang.org/x/text"
 
 [[constraint]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/Depado/ginprom"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/jasonlvhit/gocron"

@@ -21,3 +21,23 @@ type Prefix struct {
 	Api   string `yaml:"api"`
 	Admin string `yaml:"admin"`
 }
+
+func (sc Server) DebugMode() bool {
+	return sc.Debug
+}
+
+func (sc Server) GetPort() int {
+	return sc.Port
+}
+
+func (sc Server) GetHost() string {
+	return sc.Host
+}
+
+func (sc Server) GetAdminPrefix() string {
+	return sc.Prefix.Admin
+}
+
+func (sc Server) GetApiPrefix() string {
+	return sc.Prefix.Api
+}

@@ -2,61 +2,74 @@ package main
 
 import (
 	"github.com/jinzhu/gorm"
-
 	flag "github.com/ogier/pflag"
-	"github.com/sirupsen/logrus"
 
-	"github.com/jclebreton/opensirene/api/router"
+	"github.com/jackc/pgx"
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
-	"github.com/jclebreton/opensirene/logic"
+	http "github.com/jclebreton/opensirene/interfaces/http"
+	cors "github.com/jclebreton/opensirene/interfaces/http/cors"
+	"github.com/jclebreton/opensirene/interfaces/http/monitoring"
+	"github.com/jclebreton/opensirene/interfaces/json"
+	"github.com/jclebreton/opensirene/interfaces/storage/db_status"
+	"github.com/jclebreton/opensirene/interfaces/storage/establishments"
+	"github.com/jclebreton/opensirene/usecases"
+	"github.com/sirupsen/logrus"
 )
 
-// This variable is overridden at compile time when using script/build.sh
-var version = "dev"
-
 func main() {
+	loadConf()
+
+	gormClient, err := database.NewGORMClientFromString(conf.C.Database.ConnectionString())
+	if err != nil {
+		logrus.WithError(err).Fatal("Couldn't initialize GORM")
+	}
+	defer func() {
+		err := gormClient.Close()
+		logrus.WithError(err).Fatal("Couldn't close GORM")
+	}()
+
+	pgxClient, err := database.NewPgxClientClient()
+	if err != nil {
+		logrus.WithError(err).Fatal("Couldn't initialize Pgx")
+	}
+	defer pgxClient.Close()
+
+	server := setupServer(gormClient, pgxClient)
+	if err := server.Start(conf.C.Server); err != nil {
+		logrus.WithError(err).Fatal("Could not setup and run API")
+	}
+}
+
+func loadConf() {
 	var err error
 	var config string
 	var fullImport bool
 
-	// Configuration
 	flag.StringVarP(&config, "config", "c", "conf.yml", "Path to the configuration file")
 	flag.BoolVarP(&fullImport, "drop", "", false, "Truncate database and run a full import")
 	flag.Parse()
 	if err = conf.Load(config); err != nil {
 		logrus.WithError(err).Fatal("Couldn't parse configuration")
 	}
+}
 
-	// Init PGX database client
-	var pgxClient *database.PgxClient
-	if pgxClient, err = database.NewImportClient(); err != nil {
-		logrus.WithError(err).Fatal("Couldn't initialize PGX client")
+func setupServer(gormClient *gorm.DB, pgxClient *pgx.ConnPool) http.Server {
+	server := http.NewServer(conf.C.Server)
+	server.SetupRouter()
+	server.StartMonitoring(monitoring.NewPrometheus(conf.C.Prometheus.Prefix, server.GinEngine))
+	server.SetupRoutes(http.NewHttpGateway(setInteractor(gormClient, pgxClient)), conf.C.Server.Prefix)
+	if conf.C.Server.Cors.Enabled {
+		server.SetupCors(cors.NewStandardCors(conf.C.Server.Cors.PermissiveMode, conf.C.Server.Cors.AllowOrigins))
 	}
-	defer pgxClient.Conn.Close()
+	return server
+}
 
-	// Full import
-	if fullImport {
-		if err = logic.ResetDatabase(pgxClient); err != nil {
-			logrus.WithError(err).Fatal("Couldn't reset database")
-		}
-		logrus.Info("Database has been reset to trigger automatic update")
-	}
-
-	// Start automatic updates
-	crontab := &logic.Crontab{PgxClient: pgxClient, Config: conf.C.Crontab}
-	go crontab.Start()
-
-	// Start API
-	var gormClient *gorm.DB
-	if gormClient, err = database.NewGORMClient(); err != nil {
-		logrus.WithError(err).Fatal("Couldn't initialize GORM")
-	}
-	defer func() {
-		err = gormClient.Close()
-		logrus.WithError(err).Fatal("Couldn't close GORM")
-	}()
-	if err = router.SetupAndRun(gormClient, version); err != nil {
-		logrus.WithError(err).Fatal("Could not setup and run API")
-	}
+// set here the structs you want to implement the interfaces
+func setInteractor(gormClient *gorm.DB, pgxClient *pgx.ConnPool) usecases.Interactor {
+	return usecases.NewInteractor(
+		&db_status.RW{PgxClient: pgxClient},
+		&establishments.RW{GormClient: gormClient, PgxClient: pgxClient},
+		&json.JSONwriterStd{},
+	)
 }
