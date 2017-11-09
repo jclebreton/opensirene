@@ -41,7 +41,7 @@ prometheus:
   
 crontab:
   download_path: "downloads"
-  every_x_hours: 3
+  every_x_hours: 2
 
 ```
 
