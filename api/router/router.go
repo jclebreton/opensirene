@@ -15,13 +15,13 @@ import (
 
 // SetupAndRun creates the router and runs it
 func SetupAndRun(gormClient *gorm.DB) error {
-	// Create the router
-	r := gin.Default()
-
 	// Setup debug mode or not in Gin
 	if !conf.C.Server.Debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	// Create the router
+	r := gin.Default()
 
 	// Setup CORS configuration
 	if conf.C.Server.Cors.Enabled {
