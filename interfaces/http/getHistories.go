@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jclebreton/opensirene/interfaces/json"
 )
 
 func (h HttpGateway) GetHistories(c *gin.Context) {
@@ -14,6 +13,6 @@ func (h HttpGateway) GetHistories(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, json.GetHistoriesRespFormatFormat(hh))
+	c.JSON(http.StatusOK, h.i.JsonW.FormatGetHistoriesResp(hh))
 	return
 }
