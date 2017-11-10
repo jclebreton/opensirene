@@ -19,7 +19,7 @@ type History struct {
 type Histories []History
 
 // TableName overrides the table name calculated by gorm
-func (Histories) TableName() string {
+func (History) TableName() string {
 	return "history"
 }
 
