@@ -32,9 +32,10 @@ func ImportRemoteFiles(pgxClient *database.PgxClient, remoteFiles sirene.RemoteF
 		}
 	}()
 
-	percent := progress.NewPercent()
-	go percent.CatchProgress(progress.DefaultProgressChan)
+	percent := progress.NewPercent("download", "checksum", "unzip", "copy", "update")
+	go percent.CatchProgress(progress.DefaultChan)
 	go percent.Start()
+	defer percent.Stop()
 
 	//Download an extract
 	if err = sirene.Do(remoteFiles, 4, dPath); err != nil {

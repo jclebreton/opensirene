@@ -15,7 +15,7 @@ func NewProgressReader(rc io.Reader, name, step string, total uint64) *Reader {
 			Name:         name,
 			Step:         step,
 			Total:        total,
-			ProgressChan: DefaultProgressChan,
+			ProgressChan: DefaultChan,
 		},
 	}
 	return reader
