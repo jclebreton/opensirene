@@ -80,9 +80,9 @@ func (ct *Crontab) startUpdate() {
 	toDownload := ct.getFilesToImport(dbFiles, remoteFiles)
 
 	logrus.
-		WithField("remoteFiles", remoteFiles).
-		WithField("dbFiles", dbFiles).
-		WithField("toDownload", toDownload).Info("Crontab status")
+		WithField("available on server", remoteFiles).
+		WithField("already in database", dbFiles).
+		WithField("to Download", toDownload).Info("Update status")
 
 	// Start upgrade
 	if err = ImportRemoteFiles(ct.PgxClient, toDownload, ct.Config.DownloadPath); err != nil {
