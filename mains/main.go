@@ -1,12 +1,15 @@
 package main
 
 import (
+	"github.com/jinzhu/gorm"
 	flag "github.com/ogier/pflag"
 
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
 	http "github.com/jclebreton/opensirene/interfaces/http"
+	"github.com/jclebreton/opensirene/interfaces/json"
 	"github.com/jclebreton/opensirene/interfaces/storage/history"
+	"github.com/jclebreton/opensirene/usecases"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,11 +27,19 @@ func main() {
 
 	server := http.NewServer(conf.C.Server)
 	server.SetupRouter()
-	server.SetupRoutes(http.NewHttpGateway(history.RW{GormClient: gormClient}))
+	server.SetupRoutes(http.NewHttpGateway(setInteractor(gormClient)))
 
 	if err := server.Start(); err != nil {
 		logrus.WithError(err).Fatal("Could not setup and run API")
 	}
+}
+
+// set here the structs you want to implement the interfaces
+func setInteractor(db *gorm.DB) usecases.Interactor {
+	return usecases.NewInteractor(
+		history.RW{GormClient: db},
+		json.JSONwriterStd{},
+	)
 }
 
 func loadConf() {
