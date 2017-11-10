@@ -15,7 +15,7 @@ func worker(id int, jobs <-chan *RemoteFile, results chan<- error, dPath string)
 		// If file is already present on disk, skip the download part
 		if !s.OnDisk {
 			// Download
-			logrus.WithField("file", s.FileName).Info("Start grabbing")
+			logrus.WithField("file", s.FileName).Info("Download")
 			if err = s.Download(dPath); err != nil {
 				results <- err
 				continue
@@ -23,7 +23,7 @@ func worker(id int, jobs <-chan *RemoteFile, results chan<- error, dPath string)
 		}
 
 		// Checksum
-		logrus.WithField("file", s.FileName).Info("Start checksum")
+		logrus.WithField("file", s.FileName).Info("Checksum")
 		if ok, err = s.ChecksumMatch(); err != nil {
 			results <- err
 			continue
@@ -33,13 +33,12 @@ func worker(id int, jobs <-chan *RemoteFile, results chan<- error, dPath string)
 		}
 
 		// Extracting
-		logrus.WithField("file", s.FileName).Info("Start unzipping")
+		logrus.WithField("file", s.FileName).Info("Unzip")
 		if err = s.Unzip(dPath); err != nil {
 			results <- err
 			continue
 		}
 
-		logrus.WithField("file", s.FileName).Info("Grabbing done")
 		results <- nil
 	}
 }
