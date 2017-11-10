@@ -2,10 +2,14 @@ package progress
 
 import "github.com/sirupsen/logrus"
 
-var DefaultProgressChan chan *Progress
+var DefaultChan chan *Progress
+
+// DefaultChanBufferSize defines the number of progress events which can be buffered.
+// If the buffer is full the next progress event will be dropped
+const DefaultChanBufferSize = 50000
 
 func init() {
-	DefaultProgressChan = make(chan *Progress)
+	DefaultChan = make(chan *Progress, DefaultChanBufferSize)
 }
 
 type Progress struct {
@@ -21,7 +25,7 @@ func (p *Progress) Add(n int64) {
 	select {
 	case p.ProgressChan <- p:
 	default:
-		logrus.Error("Unable to send progress")
+		logrus.Error("buffer is full. Progress event has been dropped")
 	}
 }
 
