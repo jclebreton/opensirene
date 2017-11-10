@@ -64,6 +64,8 @@ func (ct *Crontab) startUpdate() {
 	var remoteFiles sirene.RemoteFiles
 	var dbFiles []string
 
+	logrus.Info("Starting update")
+
 	// Retrieve the list of update files stored in database
 	if dbFiles, err = ct.getDatabaseStatus(); err != nil {
 		logrus.WithError(err).Error("Could not retrieve current database status")
@@ -80,15 +82,17 @@ func (ct *Crontab) startUpdate() {
 	toDownload := ct.getFilesToImport(dbFiles, remoteFiles)
 
 	logrus.
-		WithField("available on server", remoteFiles).
-		WithField("already in database", dbFiles).
-		WithField("to Download", toDownload).Info("Update status")
+		WithField("available_on_server", remoteFiles).
+		WithField("already_in_database", dbFiles).
+		WithField("to_download", toDownload).Info("Update status")
 
 	// Start upgrade
 	if err = ImportRemoteFiles(ct.PgxClient, toDownload, ct.Config.DownloadPath); err != nil {
 		logrus.WithError(err).Error("Could not update database with latest files")
 		return
 	}
+
+	logrus.Info("Update done")
 }
 
 // StartCrontab run Daily function every few hours
