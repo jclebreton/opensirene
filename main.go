@@ -9,7 +9,6 @@ import (
 	"github.com/jclebreton/opensirene/api/router"
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
-	"github.com/jclebreton/opensirene/logic"
 )
 
 func main() {
@@ -25,24 +24,24 @@ func main() {
 		logrus.WithError(err).Fatal("Couldn't parse configuration")
 	}
 
-	// Init PGX database client
-	var pgxClient *database.PgxClient
-	if pgxClient, err = database.NewImportClient(); err != nil {
-		logrus.WithError(err).Fatal("Couldn't initialize PGX client")
-	}
-	defer pgxClient.Conn.Close()
-
-	// Full import
-	if fullImport {
-		if err = logic.ResetDatabase(pgxClient); err != nil {
-			logrus.WithError(err).Fatal("Couldn't reset database")
-		}
-		logrus.Info("Database has been reset to trigger automatic update")
-	}
-
-	// Start automatic updates
-	crontab := &logic.Crontab{PgxClient: pgxClient, Config: conf.C.Crontab}
-	go crontab.Start()
+	//// Init PGX database client
+	//var pgxClient *database.PgxClient
+	//if pgxClient, err = database.NewImportClient(); err != nil {
+	//	logrus.WithError(err).Fatal("Couldn't initialize PGX client")
+	//}
+	//defer pgxClient.Conn.Close()
+	//
+	//// Full import
+	//if fullImport {
+	//	if err = logic.ResetDatabase(pgxClient); err != nil {
+	//		logrus.WithError(err).Fatal("Couldn't reset database")
+	//	}
+	//	logrus.Info("Database has been reset to trigger automatic update")
+	//}
+	//
+	//// Start automatic updates
+	//crontab := &logic.Crontab{PgxClient: pgxClient, Config: conf.C.Crontab}
+	//go crontab.Start()
 
 	// Start API
 	var gormClient *gorm.DB
