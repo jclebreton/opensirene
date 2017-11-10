@@ -30,7 +30,7 @@ func TestFindHistories(t *testing.T) {
 	returned, err := rw.FindHistories()
 
 	assert.NoError(t, err, "findHistory failed")
-	assert.NoError(t, tH.CompareHistorySlices(exp, returned), "woops")
+	assert.NoError(t, tH.CompareHistorySlices(exp, returned), "slices are different")
 
 }
 
