@@ -7,6 +7,8 @@ import (
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
 	http "github.com/jclebreton/opensirene/interfaces/http"
+	cors "github.com/jclebreton/opensirene/interfaces/http/cors"
+	"github.com/jclebreton/opensirene/interfaces/http/monitoring"
 	"github.com/jclebreton/opensirene/interfaces/json"
 	"github.com/jclebreton/opensirene/interfaces/storage/history"
 	"github.com/jclebreton/opensirene/usecases"
@@ -25,13 +27,34 @@ func main() {
 		logrus.WithError(err).Fatal("Couldn't close GORM")
 	}()
 
-	server := http.NewServer(conf.C.Server)
-	server.SetupRouter()
-	server.SetupRoutes(http.NewHttpGateway(setInteractor(gormClient)))
-
-	if err := server.Start(); err != nil {
+	server := setupServer(gormClient)
+	if err := server.Start(conf.C.Server); err != nil {
 		logrus.WithError(err).Fatal("Could not setup and run API")
 	}
+}
+
+func loadConf() {
+	var err error
+	var config string
+	var fullImport bool
+
+	flag.StringVarP(&config, "config", "c", "conf.yml", "Path to the configuration file")
+	flag.BoolVarP(&fullImport, "drop", "", false, "Truncate database and run a full import")
+	flag.Parse()
+	if err = conf.Load(config); err != nil {
+		logrus.WithError(err).Fatal("Couldn't parse configuration")
+	}
+}
+
+func setupServer(gormClient *gorm.DB) http.Server {
+	server := http.NewServer(conf.C.Server)
+	server.SetupRouter()
+	server.StartMonitoring(monitoring.NewPrometheus(conf.C.Prometheus.Prefix, server.GinEngine))
+	server.SetupRoutes(http.NewHttpGateway(setInteractor(gormClient)))
+	if conf.C.Server.Cors.Enabled {
+		server.SetupCors(cors.NewStandardCors(conf.C.Server.Cors.PermissiveMode, conf.C.Server.Cors.AllowOrigins))
+	}
+	return server
 }
 
 // set here the structs you want to implement the interfaces
@@ -40,18 +63,4 @@ func setInteractor(db *gorm.DB) usecases.Interactor {
 		history.RW{GormClient: db},
 		json.JSONwriterStd{},
 	)
-}
-
-func loadConf() {
-	var err error
-	var config string
-	var fullImport bool
-
-	// Configuration
-	flag.StringVarP(&config, "config", "c", "conf.yml", "Path to the configuration file")
-	flag.BoolVarP(&fullImport, "drop", "", false, "Truncate database and run a full import")
-	flag.Parse()
-	if err = conf.Load(config); err != nil {
-		logrus.WithError(err).Fatal("Couldn't parse configuration")
-	}
 }

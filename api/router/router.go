@@ -37,8 +37,8 @@ func SetupAndRun(gormClient *gorm.DB) error {
 		}
 		r.Use(cors.New(cc))
 	}
-	p := ginprom.New(ginprom.Subsystem(conf.C.Prometheus.Prefix), ginprom.Engine(r))
-	r.Use(p.Instrument())
+	//p := ginprom.New(ginprom.Subsystem(conf.C.Prometheus.Prefix), ginprom.Engine(r))
+	r.Use(ginprom.New(ginprom.Subsystem(conf.C.Prometheus.Prefix), ginprom.Engine(r)).Instrument())
 
 	// Route setup
 	views := &views.ViewsContext{GormClient: gormClient}
