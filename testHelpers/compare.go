@@ -14,7 +14,7 @@ func CompareHistorySlices(sl1, sl2 []domain.History) error {
 	for _, v1 := range sl1 {
 		found := false
 		for _, v2 := range sl2 {
-			if v2 == v1 {
+			if v2.ID == v1.ID {
 				found = true
 				break
 			}
