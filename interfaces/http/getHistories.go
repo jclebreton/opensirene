@@ -4,10 +4,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jclebreton/opensirene/usecases"
 )
 
 func (h HttpGateway) GetHistories(c *gin.Context) {
-	hh, err := h.i.FindHistories()
+	// here you'd setup everything so the interactor method just has to deal with abstract (domain/usecases) objects
+
+	hh, err := h.i.GetHistories(usecases.GetHistoriesRequest{})
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
