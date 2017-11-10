@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cheggaaa/pb"
+	"github.com/jclebreton/opensirene/progress"
 	"github.com/pkg/errors"
 
 	"github.com/jclebreton/opensirene/opendata/gouvfr/api"
@@ -69,9 +69,9 @@ type RemoteFile struct {
 	Path           string
 	Type           FileType
 	YearDay        int
-	Size           int64
 	OnDisk         bool
 	ExtractedFiles []string
+	ProgressChan   chan *progress.Progress
 }
 
 // CalculateChecksum generates the checksum of the file using the hasher type
@@ -93,7 +93,13 @@ func (rf *RemoteFile) CalculateChecksum() (string, error) {
 	}
 	defer f.Close()
 
-	if _, err = io.Copy(hasher, f); err != nil {
+	fStat, err := f.Stat()
+	if err != nil {
+		return "", err
+	}
+
+	reader := progress.NewProgressReader(f, rf.FileName, "checksum", uint64(fStat.Size()))
+	if _, err = io.Copy(hasher, reader); err != nil {
 		return "", err
 	}
 
@@ -110,8 +116,8 @@ func (rf *RemoteFile) ChecksumMatch() (bool, error) {
 	return sum == rf.Checksum.Value, nil
 }
 
-// DownloadWithProgress will download the file and update the given progress bar
-func (rf *RemoteFile) DownloadWithProgress(b *pb.ProgressBar, dPath string) error {
+// Download will download the file
+func (rf *RemoteFile) Download(dPath string) error {
 	var err error
 	var size int
 	var resp *http.Response
@@ -131,14 +137,12 @@ func (rf *RemoteFile) DownloadWithProgress(b *pb.ProgressBar, dPath string) erro
 	if size, err = strconv.Atoi(resp.Header.Get("Content-Length")); err != nil {
 		return errors.Wrap(err, "can't find size")
 	}
-	rf.Size = int64(size)
-	b.Total = rf.Size
 
 	if dest, err = os.Create(rf.Path); err != nil {
 		return errors.Wrapf(err, "couldn't create file %s", rf.Path)
 	}
-	reader := b.NewProxyReader(resp.Body)
 
+	reader := progress.NewProgressReader(resp.Body, rf.FileName, "download", uint64(size))
 	if _, err = io.Copy(dest, reader); err != nil {
 		return errors.Wrapf(err, "couldn't io.Copy %s", rf.Path)
 	}
@@ -148,7 +152,7 @@ func (rf *RemoteFile) DownloadWithProgress(b *pb.ProgressBar, dPath string) erro
 
 // Unzip will un-compress a zip archive moving all files and folders
 // to an output directory
-func (rf *RemoteFile) Unzip(b *pb.ProgressBar, dPath string) error {
+func (rf *RemoteFile) Unzip(dPath string) error {
 	var filenames []string
 
 	r, err := zip.OpenReader(filepath.Join(dPath, rf.FileName))
@@ -164,12 +168,11 @@ func (rf *RemoteFile) Unzip(b *pb.ProgressBar, dPath string) error {
 		}
 		defer rc.Close()
 
-		b.Total = int64(f.UncompressedSize64)
-
 		// Store filename/path for returning and using later on
 		fpath := filepath.Join(dPath, f.Name)
 		filenames = append(filenames, fpath)
 
+		totalSize := f.UncompressedSize64
 		if f.FileInfo().IsDir() {
 			os.MkdirAll(fpath, os.ModePerm)
 		} else {
@@ -189,7 +192,7 @@ func (rf *RemoteFile) Unzip(b *pb.ProgressBar, dPath string) error {
 			}
 			defer f.Close()
 
-			reader := b.NewProxyReader(rc)
+			reader := progress.NewProgressReader(rc, rf.FileName, "unzip", totalSize)
 			if _, err = io.Copy(f, reader); err != nil {
 				return err
 			}

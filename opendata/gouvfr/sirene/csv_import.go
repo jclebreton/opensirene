@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cheggaaa/pb"
 	"github.com/jackc/pgx"
 	"github.com/jclebreton/opensirene/database"
+	"github.com/jclebreton/opensirene/progress"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -32,11 +32,11 @@ var majcols = append(cols, "eve", "dateve", "typcreh", "dreactet", "dreacten", "
 // CSVImport is a struct helper to import a CSV file to the database
 // It implementes the pgx.Copy interface
 type CSVImport struct {
-	Path    string
-	File    *os.File
-	Kind    FileType
-	ZipName string
-	bar     *pb.ProgressBar
+	Path         string
+	File         *os.File
+	Kind         FileType
+	ZipName      string
+	ProgressChan chan *progress.Progress
 }
 
 // Copy actually copies the content of the CSV file to the database
@@ -48,7 +48,6 @@ func (c *CSVImport) Copy(db *pgx.ConnPool) error {
 	cf := &database.PgxCopyFrom{
 		Path: c.Path,
 		File: c.File,
-		Bar:  c.bar,
 		CallBackTriggerOnColName: []string{"DAPET", "DEFET", "DAPEN", "DEFEN", "ESAANN", "DATEMAJ", "AMINTRET", "AMINTREN",
 			"DDEBACT", "DATEESS", "DATEVE", "DREACTET", "DREACTEN", "DCRET", "DCREN"},
 		CallBackFunc: func(colValue string) (interface{}, error) {

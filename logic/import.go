@@ -6,6 +6,7 @@ import (
 
 	"github.com/jclebreton/opensirene/database"
 	"github.com/jclebreton/opensirene/opendata/gouvfr/sirene"
+	"github.com/jclebreton/opensirene/progress"
 )
 
 // ResetDatabase truncates all database tables
@@ -30,6 +31,10 @@ func ImportRemoteFiles(pgxClient *database.PgxClient, remoteFiles sirene.RemoteF
 			logrus.WithError(err).Warning("Couldn't freeze database mutex")
 		}
 	}()
+
+	percent := progress.NewPercent()
+	go percent.CatchProgress(progress.DefaultProgressChan)
+	go percent.Start()
 
 	//Download an extract
 	if err = sirene.Do(remoteFiles, 4, dPath); err != nil {

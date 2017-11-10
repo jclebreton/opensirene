@@ -10,7 +10,6 @@ import (
 
 	"time"
 
-	"github.com/cheggaaa/pb"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
@@ -48,7 +47,6 @@ func Test_PgxCopyFrom_Success(t *testing.T) {
 	rows := &PgxCopyFrom{
 		Path: csvPath,
 		File: file,
-		Bar:  &pb.ProgressBar{},
 		CallBackTriggerOnColName: []string{"C"},
 		CallBackFunc: func(colValue string) (interface{}, error) {
 			return colValue + "XXX", nil
