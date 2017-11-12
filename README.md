@@ -1,12 +1,72 @@
-# opensirene [![Build Status](https://travis-ci.org/jclebreton/opensirene.svg?branch=v2)](https://travis-ci.org/jclebreton/opensirene) [![codecov](https://codecov.io/gh/jclebreton/opensirene/branch/master/graph/badge.svg)](https://codecov.io/gh/jclebreton/opensirene)
-French company database based on French government open data
+# OpenSirene [![Build Status](https://travis-ci.org/jclebreton/opensirene.svg?branch=v2)](https://travis-ci.org/jclebreton/opensirene) [![codecov](https://codecov.io/gh/jclebreton/opensirene/branch/master/graph/badge.svg)](https://codecov.io/gh/jclebreton/opensirene)
 
-### Run
+OpenSirene  is a REST micro-service to build and access a database of French companies
+provided by the [French government's open data](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/).
 
-## With Docker
+This micro service will run a crontab to downloads automatically update files
+and save them to a `PostgreSQL` database.
 
+## API contract 
+
+API endpoints are defined using a [Swagger file](swagger.yaml) at the root of
+the Git repository.
+
+* Search endpoints:
+    * GET /siret/{siret_id}
+        * Retrieve one company from its SIRET identifier
+    * GET /siren/{siren_id}
+        * Retrieve the list of establishments of a company from its SIREN identifier
+* Monitoring endpoints:
+    * GET /ping
+        * For monitoring purpose
+    * GET /history
+        * Retrieve the list of update files stored in database
+
+
+## Setup
+The micro service needs 10Gb of free space to manipulates update files and
+the database server approximately the same to store them.
+
+### With Docker Compose
+
+For development only, it will start two containers: the database (PostgresSQL)
+and the micro-service.
 ```
 $ docker-compose up
+$ curl localhost:8080/ping
+```
+
+### With Debian package (for production environment)
+
+```sh
+# Download and install
+$ LATEST_VERSION="1.2.1"
+$ wget https://github.com/jclebreton/opensirene/releases/download/${LATEST_VERSION}/opensirene_${LATEST_VERSION}_amd64.deb
+$ wget https://github.com/jclebreton/opensirene/releases/download/${LATEST_VERSION}/SHA256SUMS
+$ sha256sum -c SHA256SUMS
+$ dpkg -i opensirene_${LATEST_VERSION}_amd64.deb
+
+
+# Create the configuration file and edit it with your own configuration
+$ mkdir /etc/opensirene/
+$ cp /usr/share/opensirene/conf-example.yml /etc/opensirene/conf.yml
+$ vi /etc/opensirene/conf.yml
+
+# Start service
+$ systemctl start opensirene
+$ systemctl daemon-reload # if needed
+
+# Check if the service is up
+$ systemctl status opensirene
+$ curl 127.0.0.1:8080/ping
+```
+
+### Build and run
+
+```sh
+$ go get -u github.com/golang/dep/cmd/dep
+$ dep ensure
+$ go run main.go --config=conf-example.yml
 ```
 
 ### Configuration
@@ -16,15 +76,7 @@ environment variables (for most of the configuration fields). Environment
 variables have a higher priority than the configuration file, which means you
 can override almost any value of the configuration file using them. 
 
-cli
----
-
-```
-$ ./opensirene --config conf-example.yml
-```
-
-yml
----
+#### Example
 ```
 logger:
   level: debug
@@ -55,6 +107,7 @@ crontab:
 
 ```
 
+#### Description
 
 | Field                       | Type     | Description                                               | Environment Variable | Default        | Example        |
 |-----------------------------|----------|-----------------------------------------------------------|----------------------|----------------|----------------|
