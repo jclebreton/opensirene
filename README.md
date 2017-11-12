@@ -46,7 +46,6 @@ $ wget https://github.com/jclebreton/opensirene/releases/download/${LATEST_VERSI
 $ sha256sum -c SHA256SUMS
 $ dpkg -i opensirene_${LATEST_VERSION}_amd64.deb
 
-
 # Create the configuration file and edit it with your own configuration
 $ mkdir /etc/opensirene/
 $ cp /usr/share/opensirene/conf-example.yml /etc/opensirene/conf.yml
@@ -59,6 +58,13 @@ $ systemctl daemon-reload # if needed
 # Check if the service is up
 $ systemctl status opensirene
 $ curl 127.0.0.1:8080/ping
+```
+
+To redirect logs to syslog, edit `/lib/systemd/system/opensirene.service` and add those lines to the end:
+```bash
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=opensirene
 ```
 
 ### Build and run
