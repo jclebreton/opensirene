@@ -1,34 +1,13 @@
-# Multi-stage : Part 1
-# Build Stage
-FROM golang:alpine AS build
-
+FROM golang:1.9 AS build
 RUN mkdir -p $GOPATH/src/github.com/jclebreton/opensirene
-RUN mkdir /output
 ADD . $GOPATH/src/github.com/jclebreton/opensirene
 WORKDIR $GOPATH/src/github.com/jclebreton/opensirene
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o opensirene
-RUN cp opensirene /output/
+RUN go get -u github.com/golang/dep/cmd/dep
+RUN dep ensure
+RUN go build -o opensirene
+RUN cp opensirene /
 
-# Multi-stage : Part 2
-# Final Stage
-FROM alpine
-
-# Base packages
-RUN apk update
-RUN apk upgrade
-RUN apk add ca-certificates && update-ca-certificates
-RUN apk add --update tzdata
-RUN rm -rf /var/cache/apk/*
-
-# Copy binary
-COPY --from=build /output/opensirene /home/
-
-# Define timezone
-ENV TZ=Europe/Paris
-
-# Define the ENTRYPOINT
-WORKDIR /home
-ENTRYPOINT ./opensirene
-
-# Document that the service listens on port 8080.
+FROM golang:1.9
+COPY --from=build /opensirene /usr/bin/
+ENTRYPOINT ["/usr/bin/opensirene"]
 EXPOSE 8080

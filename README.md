@@ -1,20 +1,27 @@
 # opensirene [![Build Status](https://travis-ci.org/jclebreton/opensirene.svg?branch=v2)](https://travis-ci.org/jclebreton/opensirene) [![codecov](https://codecov.io/gh/jclebreton/opensirene/branch/master/graph/badge.svg)](https://codecov.io/gh/jclebreton/opensirene)
 French company database based on French government open data
 
-## Getting Started
+### Run
 
-### Build
+## With Docker
+
 ```
-$ dep ensure
-$ go run main.go
+$ docker-compose up
 ```
 
-## Configuration
+### Configuration
 
 This project can be configured using both a yaml configuration file and
 environment variables (for most of the configuration fields). Environment
 variables have a higher priority than the configuration file, which means you
 can override almost any value of the configuration file using them. 
+
+cli
+---
+
+```
+$ ./opensirene --config conf-example.yml
+```
 
 yml
 ---

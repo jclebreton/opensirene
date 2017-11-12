@@ -1,16 +1,30 @@
-version: '2'
+version: '2.1'
 
 services:
-  opensirenedb:
+
+  database:
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     build:
       dockerfile: db.Dockerfile
       context: .
-    hostname: 127.0.0.1
     ports:
       - 5432:5432
-    network_mode: "host"
 
-  metabase:
-    image: metabase/metabase
-    hostname: 127.0.0.1
-    network_mode: "host"
+  opensirene:
+    depends_on:
+      database:
+        condition: service_healthy
+    build:
+      dockerfile: Dockerfile
+      context: .
+    links:
+      - database
+    volumes:
+      - .:/home
+    entrypoint: /usr/bin/opensirene --config=/home/conf-example.yml
+    expose: 
+      - 8080
