@@ -10,7 +10,7 @@ schemes:
 host: 127.0.0.1:8080
 
 paths:
-  '/siret/{siret_id}':
+  '/api/siret/{siret_id}':
     get:
       summary: Retrieve one company from its SIRET identifier.
       parameters:
@@ -28,7 +28,7 @@ paths:
         '504':
           $ref: '#/responses/DatabaseError'
 
-  '/siren/{siren_id}':
+  '/api/siren/{siren_id}':
     get:
       summary: Retrieve the list of establishments of a company from its SIREN identifier.
       parameters:

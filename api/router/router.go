@@ -42,8 +42,8 @@ func SetupAndRun(gormClient *gorm.DB) error {
 
 	// Route setup
 	views := &views.ViewsContext{GormClient: gormClient}
-	r.GET("/siret/:id", views.GetSiret)
-	r.GET("/siren/:id", views.GetSiren)
+	r.GET("/api/siret/:id", views.GetSiret)
+	r.GET("/api/siren/:id", views.GetSiren)
 	r.GET("/history", views.GetHistory)
 	r.GET("/ping", views.GetPing)
 

@@ -12,9 +12,9 @@ API endpoints are defined using a [Swagger file](swagger.yaml) at the root of
 the Git repository.
 
 * Search endpoints:
-    * GET /siret/{siret_id}
+    * GET /api/siret/{siret_id}
         * Retrieve one company from its SIRET identifier
-    * GET /siren/{siren_id}
+    * GET /api/siren/{siren_id}
         * Retrieve the list of establishments of a company from its SIREN identifier
 * Monitoring endpoints:
     * GET /ping
