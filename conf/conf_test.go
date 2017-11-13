@@ -22,10 +22,11 @@ func Test_Parse_success(t *testing.T) {
 		PermissiveMode: true,
 	}
 	server := Server{
-		Host:  "127.0.0.1",
-		Port:  8080,
-		Debug: true,
-		Cors:  cors,
+		Host:   "127.0.0.1",
+		Port:   8080,
+		Debug:  true,
+		Cors:   cors,
+		Prefix: Prefix{Api: "/v1", Admin: "/admin"},
 	}
 	crontab := Crontab{
 		DownloadPath: "downloads",

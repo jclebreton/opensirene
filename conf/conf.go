@@ -45,6 +45,9 @@ func (c *Conf) Parse() error {
 	if err = Parse(&c.Server.Cors); err != nil {
 		return errors.Wrap(err, "couldn't parse Server.Cors struct")
 	}
+	if err = Parse(&c.Server.Prefix); err != nil {
+		return errors.Wrap(err, "couldn't parse Server.Prefix struct")
+	}
 	if err = Parse(&c.Prometheus); err != nil {
 		return errors.Wrap(err, "couldn't parse Prometheus struct")
 	}

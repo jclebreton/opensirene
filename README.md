@@ -12,14 +12,14 @@ API endpoints are defined using a [Swagger file](swagger.yaml) at the root of
 the Git repository.
 
 * Search endpoints:
-    * GET /api/siret/{siret_id}
+    * GET /api/v1/siret/{siret_id}
         * Retrieve one company from its SIRET identifier
-    * GET /api/siren/{siren_id}
+    * GET /api/v1/siren/{siren_id}
         * Retrieve the list of establishments of a company from its SIREN identifier
 * Monitoring endpoints:
-    * GET /ping
+    * GET /admin/ping
         * For monitoring purpose
-    * GET /history
+    * GET /admin/history
         * Retrieve the list of update files stored in database
 
 
@@ -95,6 +95,9 @@ server:
   cors:
     permissive_mode: true
     enabled: true
+  prefix:
+    api: "/api/v1"
+    admin: "/admin"
 
 database:
   user: xx
@@ -124,6 +127,8 @@ crontab:
 | server.debug                | bool     | Debug mode                                                | `SERVER_DEBUG`       | false          | true           |
 | server.cors.allow_origins   | []string | Array of accepted origins                                 | -                    | -              | -              |
 | server.cors.permissive_mode | bool     | Accept every origin and overrides the allow_origins field | `CORS_PERMISSIVE`    | false          | true           |
+| server.prefix.api           | string   | API prefix URL for clients                                | -                    | "/api/v1/"     | "/api/v1/"     |
+| server.prefix.admin         | string   | API prefix URL for monitoring purpose                     | -                    | "/admin/"      | "/admin/"      |
 | database.user               | string   | User used to connect to the DB                            | `DB_USER`            | "sir"          | "sir"          |
 | database.password           | string   | Password associated to the user                           | `DB_PASSWORD`        | -              | -              |
 | database.host               | string   | Host on which the DB listens                              | `DB_HOST`            | "127.0.0.1"    | "127.0.0.1"    |

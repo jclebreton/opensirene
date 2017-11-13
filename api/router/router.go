@@ -39,14 +39,13 @@ func SetupAndRun(gormClient *gorm.DB, version string) error {
 	}
 	p := ginprom.New(ginprom.Subsystem(conf.C.Prometheus.Prefix), ginprom.Engine(r))
 	r.Use(p.Instrument())
-
 	// Route setup
 	views := &views.ViewsContext{GormClient: gormClient, Version: version}
-	r.GET("/api/siret/:id", views.GetSiret)
-	r.GET("/api/siren/:id", views.GetSiren)
-	r.GET("/history", views.GetHistory)
-	r.GET("/health", views.GetHealth)
-	r.GET("/ping", views.GetPing)
+	r.GET(conf.C.Server.Prefix.Api+"/siret/:id", views.GetSiret)
+	r.GET(conf.C.Server.Prefix.Api+"/siren/:id", views.GetSiren)
+	r.GET(conf.C.Server.Prefix.Admin+"/history", views.GetHistory)
+	r.GET(conf.C.Server.Prefix.Admin+"/health", views.GetHealth)
+	r.GET(conf.C.Server.Prefix.Admin+"/ping", views.GetPing)
 
 	// Run the server
 	logrus.WithFields(logrus.Fields{"port": conf.C.Server.Port, "host": conf.C.Server.Host}).Info("Starting server")

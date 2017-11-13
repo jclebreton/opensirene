@@ -9,6 +9,9 @@ server:
   cors:
     enabled: false
     permissive_mode: true
+  prefix:
+    api: "/api/v1"
+    admin: "/admin"
 
 database:
   user: sir
