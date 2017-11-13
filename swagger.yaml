@@ -10,7 +10,7 @@ schemes:
 host: 127.0.0.1:8080
 
 paths:
-  '/api/siret/{siret_id}':
+  '/api/v1/siret/{siret_id}':
     get:
       summary: Retrieve one company from its SIRET identifier.
       parameters:
@@ -28,7 +28,7 @@ paths:
         '504':
           $ref: '#/responses/DatabaseError'
 
-  '/api/siren/{siren_id}':
+  '/api/v1/siren/{siren_id}':
     get:
       summary: Retrieve the list of establishments of a company from its SIREN identifier.
       parameters:
@@ -46,7 +46,7 @@ paths:
         '504':
           $ref: '#/responses/DatabaseError'
 
-  '/history':
+  '/admin/history':
     get:
       summary: Retrieve the list of update files stored in database.
       responses:
@@ -59,7 +59,7 @@ paths:
         '504':
           $ref: '#/responses/DatabaseError'
 
-  '/ping':
+  '/admin/ping':
     get:
       summary: For monitoring purpose.
       produces:
@@ -67,6 +67,13 @@ paths:
       responses:
         '200':
           description: pong
+
+  '/admin/health':
+    get:
+      summary: For monitoring purpose.
+      responses:
+        '200':
+          description: API name and version.
 
 responses:
   DatabaseError:
