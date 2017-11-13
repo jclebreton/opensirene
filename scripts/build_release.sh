@@ -1,23 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-BASE_PATH=$(git rev-parse --show-toplevel)
+# Version
+source ./scripts/version.sh
+deb_version=$(getVersionFromGitTag)
 
-cd $BASE_PATH
+# Build binary
+./scripts/build.sh
 
-latest_tag=$(git describe --abbrev=0)
-commits_since=$(git rev-list --count HEAD "^${latest_tag}")
-
-if git describe --exact-match >/dev/null 2>&1; then
-    deb_version=${latest_tag}
-else
-    # Increment tag and add a ~dev
-    major="${latest_tag%.*}"
-    patch="${latest_tag##*.}"
-    deb_version=${major}.$((patch+1))~dev-${commits_since}
-fi
-
-go build
-
+# Build Debian package
 docker build -t fpm -f fpm.Dockerfile .
 docker run -ti -v $PWD:/packaging fpm fpm --verbose -s dir -t deb -n opensirene -v $deb_version \
   --description "French company database based on French government open data" \
@@ -25,5 +15,6 @@ docker run -ti -v $PWD:/packaging fpm fpm --verbose -s dir -t deb -n opensirene 
   conf-example.yml=/usr/share/opensirene/conf-example.yml \
   systemd.service=/lib/systemd/system/opensirene.service
 
+# Create shasums files
 sha256sum *.deb > SHA256SUMS
 md5sum *.deb > MD5SUMS

@@ -23,3 +23,9 @@ func (v *ViewsContext) GetHistory(c *gin.Context) {
 func (v *ViewsContext) GetPing(c *gin.Context) {
 	c.String(http.StatusOK, "pong")
 }
+
+// GetHealth is a monitoring endpoint
+func (v *ViewsContext) GetHealth(c *gin.Context) {
+	h := models.Health{Name: "opensirene", Version: v.Version}
+	c.JSON(http.StatusOK, h)
+}

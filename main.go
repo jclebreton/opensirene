@@ -12,6 +12,9 @@ import (
 	"github.com/jclebreton/opensirene/logic"
 )
 
+// This variable is overridden at compile time when using script/build.sh
+var version = "dev"
+
 func main() {
 	var err error
 	var config string
@@ -53,7 +56,7 @@ func main() {
 		err = gormClient.Close()
 		logrus.WithError(err).Fatal("Couldn't close GORM")
 	}()
-	if err = router.SetupAndRun(gormClient); err != nil {
+	if err = router.SetupAndRun(gormClient, version); err != nil {
 		logrus.WithError(err).Fatal("Could not setup and run API")
 	}
 }
