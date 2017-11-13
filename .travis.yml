@@ -18,7 +18,7 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - go build
-  - "./scripts/build_deb.sh"
+  - "./scripts/release.sh"
 
 deploy:
   provider: releases
