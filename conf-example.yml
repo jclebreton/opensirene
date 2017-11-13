@@ -16,7 +16,6 @@ database:
   name: opensirenedb
   host: 127.0.0.1
   port: 5432
-  sslmode: disable
 
 prometheus:
   prefix: opensirene

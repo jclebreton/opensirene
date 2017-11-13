@@ -59,15 +59,6 @@ paths:
         '504':
           $ref: '#/responses/DatabaseError'
 
-  '/ping':
-    get:
-      summary: For monitoring purpose.
-      produces:
-        - text/plain
-      responses:
-        '200':
-          description: pong
-
 responses:
   DatabaseError:
     description: The remote database did not respond properly.

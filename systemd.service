@@ -9,7 +9,6 @@ Restart=on-failure
 User=nobody
 Group=nogroup
 LimitNOFILE=512000
-EnvironmentFile=/etc/environment
 
 [Install]
 WantedBy=multi-user.target
