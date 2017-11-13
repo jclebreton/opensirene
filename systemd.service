@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/opensirene --config=/etc/opensirene/conf.yaml
+ExecStart=/usr/bin/opensirene --config=/etc/opensirene/conf.yml
 Restart=on-failure
 User=nobody
 Group=nogroup

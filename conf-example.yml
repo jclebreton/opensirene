@@ -11,10 +11,10 @@ server:
     permissive_mode: true
 
 database:
-  user: xx
-  password: xx
+  user: sir
+  password: sirensiren
   name: opensirenedb
-  host: 127.0.0.1
+  host: database
   port: 5432
 
 prometheus:
