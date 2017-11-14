@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/Depado/ginprom"
 	"github.com/gin-contrib/cors"
@@ -39,6 +40,11 @@ func SetupAndRun(gormClient *gorm.DB, version string) error {
 	}
 	p := ginprom.New(ginprom.Subsystem(conf.C.Prometheus.Prefix), ginprom.Engine(r))
 	r.Use(p.Instrument())
+
+	// Static and template loading
+	r.Static("/static/", "./assets")
+	r.LoadHTMLGlob("./api/templates/*.tmpl")
+
 	// Route setup
 	views := &views.ViewsContext{GormClient: gormClient, Version: version}
 	r.GET(conf.C.Server.Prefix.Api+"/siret/:id", views.GetSiret)
@@ -46,6 +52,11 @@ func SetupAndRun(gormClient *gorm.DB, version string) error {
 	r.GET(conf.C.Server.Prefix.Admin+"/history", views.GetHistory)
 	r.GET(conf.C.Server.Prefix.Admin+"/health", views.GetHealth)
 	r.GET(conf.C.Server.Prefix.Admin+"/ping", views.GetPing)
+
+	// Route to access the UI
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
+	})
 
 	// Run the server
 	logrus.WithFields(logrus.Fields{"port": conf.C.Server.Port, "host": conf.C.Server.Host}).Info("Starting server")

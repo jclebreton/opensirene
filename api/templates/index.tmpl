@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>OpenSirene UI</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="/static/material.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <!-- Header -->
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <span class="mdl-layout-title">OpenSirene UI</span>
+            </div>
+        </header>
+        <!-- Main Content -->
+        <main class="mdl-layout__content">
+            <div id="loader" style="width:100%; display: none;" class="mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>
+            <div class="page-content">
+                <div class="mdl-grid">
+                    <div class="mdl-cell mdl-cell--3-col">
+                        <div class="mdl-card mdl-shadow--2dp" style="width:100%;">
+                            <div class="mdl-card__title">
+                                <h2 class="mdl-card__title-text">Welcome to OpenSirene UI</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                <p>
+                                    This UI aims to provide a simple UI to query the OpenSirene API.
+                                    Simply enter a Siren or Siret in the field and hit enter or click on
+                                    the button to query the API.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-cell mdl-cell--9-col" id="app">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input @keyup.enter="find" v-model="search" class="mdl-textfield__input" type="text" id="search">
+                            <label class="mdl-textfield__label" for="search">Siren or Siret</label>
+                        </div>
+                        <button @click="find" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect">
+                            <i class="material-icons">search</i>
+                        </button>
+                        <div id="results">
+                            <div v-for="e in results" class="mdl-card mdl-shadow--2dp" style="width:100%;">
+                                <div class="mdl-card__title">
+                                    <h2 class="mdl-card__title-text">Enterprise #${e.siret}</h2>
+                                </div>
+                                <div class="mdl-card__supporting-text">
+                                    <p>
+                                        Siret: ${e.siret}<br />
+                                        Siren: ${e.siren}<br />
+                                        NIC: ${e.nic}<br />
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="toast" class="mdl-js-snackbar mdl-snackbar">
+                            <div class="mdl-snackbar__text"></div>
+                            <button class="mdl-snackbar__action" type="button"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/static/material.min.js"></script>
+    <script src="/static/vue.min.js"></script>
+    <script src="/static/vue-resource.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
