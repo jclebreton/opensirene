@@ -43,6 +43,10 @@ func (v *ViewsContext) GetSiren(c *gin.Context) {
 		return
 	}
 
+	for k, e := range es {
+		es[k].Siret = e.Siren + e.Nic
+	}
+
 	c.JSON(http.StatusOK, es)
 }
 
