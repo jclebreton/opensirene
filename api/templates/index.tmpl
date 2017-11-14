@@ -8,6 +8,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="stylesheet" href="/static/material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        body {
+            background-image: url("/static/bg.png");
+            background-repeat: repeat;
+        }
+    </style>
 </head>
 
 <body>
@@ -23,9 +29,9 @@
             <div id="loader" style="width:100%; display: none;" class="mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>
             <div class="page-content">
                 <div class="mdl-grid">
-                    <div class="mdl-cell mdl-cell--3-col">
+                    <div class="mdl-cell mdl-cell--3-col mdl-cell--6-col-tablet mdl-cell--12-col-phone">
                         <div class="mdl-card mdl-shadow--2dp" style="width:100%;">
-                            <div class="mdl-card__title">
+                            <div class="mdl-card__title mdl-color--indigo mdl-color-text--grey-100">
                                 <h2 class="mdl-card__title-text">Welcome to OpenSirene UI</h2>
                             </div>
                             <div class="mdl-card__supporting-text">
@@ -34,20 +40,43 @@
                                     Simply enter a Siren or Siret in the field and hit enter or click on
                                     the button to query the API.
                                 </p>
+                                <p>
+                                    The siren is an identifer for an enterprise, an organism or an association.
+                                    It contains 9 number, for example, 552100554 is the siren of Peugeot SA.
+                                </p>
+                                <p>
+                                    The siret is an identifer for the establishments of an enterprise, organism or association.
+                                    It contains 14 numbers, and is composed of the siren of the enterprise plus an unique identifier for the establishment (called NIC).
+                                </p>
                             </div>
                         </div>
                     </div>
-                    <div class="mdl-cell mdl-cell--9-col" id="app">
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input @keyup.enter="find" v-model="search" class="mdl-textfield__input" type="text" id="search">
-                            <label class="mdl-textfield__label" for="search">Siren or Siret</label>
+                    <div class="mdl-cell mdl-cell--9-col mdl-cell--6-col-tablet mdl-cell--12-col-phone" id="app">
+                        <div class="mdl-card mdl-shadow--2dp" style="width:100%;">
+                            <div class="mdl-card__title mdl-color--indigo mdl-color-text--grey-100">
+                                <h2 class="mdl-card__title-text">Search</h2>
+                            </div>
+                            <div class="mdl-card__supporting-text">
+                                <div class="mdl-grid">
+                                    <div class="mdl-layout-spacer"></div>
+                                    <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet mdl-cell--12-col-phone">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:100%;">
+                                            <input @keyup.enter="find" v-model="search" class="mdl-textfield__input" type="text" id="search">
+                                            <label class="mdl-textfield__label" for="search">Siren or Siret</label>
+                                        </div>
+                                        <br />
+                                        <button @click="find" class="mdl-button mdl-js-button" style="width:100%;">
+                                            <i class="material-icons">search</i>
+                                        </button>
+                                    </div>
+                                    <div class="mdl-layout-spacer"></div>
+                                </div>
+                            </div>
                         </div>
-                        <button @click="find" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect">
-                            <i class="material-icons">search</i>
-                        </button>
-                        <div id="results">
-                            <div v-for="e in results" class="mdl-card mdl-shadow--2dp" style="width:100%;">
-                                <div class="mdl-card__title">
+                        <br />
+                        <div v-for="e in results">
+                            <div class="mdl-card mdl-shadow--2dp" style="width:100%;">
+                                <div class="mdl-card__title mdl-color--indigo mdl-color-text--grey-100">
                                     <h2 class="mdl-card__title-text">Enterprise #${e.siret}</h2>
                                 </div>
                                 <div class="mdl-card__supporting-text">
@@ -58,6 +87,7 @@
                                     </p>
                                 </div>
                             </div>
+                            <br />
                         </div>
                         <div id="toast" class="mdl-js-snackbar mdl-snackbar">
                             <div class="mdl-snackbar__text"></div>
