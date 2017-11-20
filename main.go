@@ -53,8 +53,9 @@ func main() {
 		logrus.WithError(err).Fatal("Couldn't initialize GORM")
 	}
 	defer func() {
-		err = gormClient.Close()
-		logrus.WithError(err).Fatal("Couldn't close GORM")
+		if err = gormClient.Close(); err != nil {
+			logrus.WithError(err).Fatal("Couldn't close GORM")
+		}
 	}()
 	if err = router.SetupAndRun(gormClient, version); err != nil {
 		logrus.WithError(err).Fatal("Could not setup and run API")

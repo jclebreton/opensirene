@@ -2,7 +2,6 @@ package router
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/Depado/ginprom"
 	"github.com/gin-contrib/cors"
@@ -54,9 +53,8 @@ func SetupAndRun(gormClient *gorm.DB, version string) error {
 	r.GET(conf.C.Server.Prefix.Admin+"/ping", views.GetPing)
 
 	// Route to access the UI
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
-	})
+	r.GET("/ui/", views.GetUI)
+	r.GET("/ui/:data", views.GetUIData)
 
 	// Run the server
 	logrus.WithFields(logrus.Fields{"port": conf.C.Server.Port, "host": conf.C.Server.Host}).Info("Starting server")
