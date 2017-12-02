@@ -1,13 +1,18 @@
 package gin
 
-import "github.com/jclebreton/opensirene/usecases"
+import (
+	"github.com/jclebreton/opensirene/usecases"
+	"github.com/jclebreton/opensirene/usecases/monitoring"
+)
 
 type HttpGateway struct {
-	i usecases.Interactor
+	public usecases.Interactor
+	admin  monitoring.Interactor
 }
 
-func NewHttpGateway(i usecases.Interactor) HttpGateway {
+func NewHttpGateway(public usecases.Interactor, monitoring monitoring.Interactor) HttpGateway {
 	return HttpGateway{
-		i,
+		public,
+		monitoring,
 	}
 }

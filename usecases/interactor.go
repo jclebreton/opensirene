@@ -4,12 +4,14 @@ type Interactor struct {
 	DBStatusRW
 	EnterprisesRW
 	JsonW
+	SireneR
 }
 
-func NewInteractor(hRW DBStatusRW, eRW EnterprisesRW, jW JsonW) Interactor {
+func NewInteractor(d DBStatusRW, e EnterprisesRW, j JsonW, s SireneR) Interactor {
 	return Interactor{
-		DBStatusRW:    hRW,
-		EnterprisesRW: eRW,
-		JsonW:         jW,
+		DBStatusRW:    d,
+		EnterprisesRW: e,
+		JsonW:         j,
+		SireneR:       s,
 	}
 }

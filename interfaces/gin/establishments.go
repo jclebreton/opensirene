@@ -35,6 +35,6 @@ func (h HttpGateway) GetEnterpriseFromSiret(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, h.i.JsonW.FormatGetEnterpriseFromSiretResp(*e))
+	c.JSON(http.StatusOK, h.i.JsonW.FormatGetEnterpriseFromSiretResp(e))
 	return
 }

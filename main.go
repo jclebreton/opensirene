@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/jclebreton/opensirene/interfaces/gouvfr"
 	"github.com/jinzhu/gorm"
 	flag "github.com/ogier/pflag"
 
@@ -11,11 +12,16 @@ import (
 	"github.com/jclebreton/opensirene/interfaces/gin/cors"
 	"github.com/jclebreton/opensirene/interfaces/gin/monitoring"
 	"github.com/jclebreton/opensirene/interfaces/json"
+	imonitoring "github.com/jclebreton/opensirene/interfaces/monitoring"
+	umonitoring "github.com/jclebreton/opensirene/usecases/monitoring"
+
 	"github.com/jclebreton/opensirene/interfaces/storage/db_status"
 	"github.com/jclebreton/opensirene/interfaces/storage/establishments"
 	"github.com/jclebreton/opensirene/usecases"
 	"github.com/sirupsen/logrus"
 )
+
+var Version = "dev"
 
 func main() {
 	loadConf()
@@ -58,7 +64,11 @@ func setupServer(gormClient *gorm.DB, pgxClient *pgx.ConnPool) gin.Server {
 	server := gin.NewServer(conf.C.Server)
 	server.SetupRouter()
 	server.StartMonitoring(monitoring.NewPrometheus(conf.C.Prometheus.Prefix, server.GinEngine))
-	server.SetupRoutes(gin.NewHttpGateway(setInteractor(gormClient, pgxClient)), conf.C.Server.Prefix)
+	gateway := gin.NewHttpGateway(
+		setPublicInteractor(gormClient, pgxClient),
+		setAdminInteractor(Version, pgxClient),
+	)
+	server.SetupRoutes(gateway, conf.C.Server.Prefix)
 	if conf.C.Server.Cors.Enabled {
 		server.SetupCors(cors.NewStandardCors(conf.C.Server.Cors.PermissiveMode, conf.C.Server.Cors.AllowOrigins))
 	}
@@ -66,10 +76,16 @@ func setupServer(gormClient *gorm.DB, pgxClient *pgx.ConnPool) gin.Server {
 }
 
 // set here the structs you want to implement the interfaces
-func setInteractor(gormClient *gorm.DB, pgxClient *pgx.ConnPool) usecases.Interactor {
+func setPublicInteractor(gormClient *gorm.DB, pgxClient *pgx.ConnPool) usecases.Interactor {
 	return usecases.NewInteractor(
 		&db_status.RW{PgxClient: pgxClient},
 		&establishments.RW{GormClient: gormClient, PgxClient: pgxClient},
 		&json.JSONwriterStd{},
+		&gouvfr.SireneR{},
 	)
+}
+
+// set here the structs you want to implement the interfaces
+func setAdminInteractor(version string, pgxClient *pgx.ConnPool) umonitoring.Interactor {
+	return umonitoring.NewMonitoringInteractor(version, &imonitoring.MonitoringRW{pgxClient, Version})
 }

@@ -53,33 +53,33 @@ type Establishment struct {
 	ZemEt   string `gorm:"column:zemet"`   // Zone d'emploi
 
 	// Informations
-	Siege      string `gorm:"column:siege"`       // Qualité de siège ou non de l'établissement
-	Enseigne   string `gorm:"column:enseigne"`    // Enseigne ou nom de l'exploitation
-	IndPublipo string `gorm:"column:ind_publipo"` // Indicateur du champ du publipostage
-	DiffCom    string `gorm:"column:diffcom"`     // Statut de diffusion de l'établissement
-	AmintrEt   string `gorm:"column:amintret"`    // Année et mois d'introduction de l'établissement dans la base de diffusion
+	Siege      string     `gorm:"column:siege"`       // Qualité de siège ou non de l'établissement
+	Enseigne   string     `gorm:"column:enseigne"`    // Enseigne ou nom de l'exploitation
+	IndPublipo string     `gorm:"column:ind_publipo"` // Indicateur du champ du publipostage
+	DiffCom    string     `gorm:"column:diffcom"`     // Statut de diffusion de l'établissement
+	AmintrEt   *time.Time `gorm:"column:amintret"`    // Année et mois d'introduction de l'établissement dans la base de diffusion
 
 	// Caractéristiques Économiques
-	NatEtab    string    `gorm:"column:natetab"`    // Nature de l'établissement d'un entrepreneur individuel
-	LibNatEtab string    `gorm:"column:libnatetab"` // Libellé de la nature de l'établissement
-	APET700    string    `gorm:"column:apet700"`    // Activité principale de l'établissement
-	LibAPET    string    `gorm:"column:libapet"`    // Libellé de l'activité principale de l'établissement
-	DAPET      time.Time `gorm:"column:dapet"`      // Année de validité de l'activité principale de l'établissement
-	TEfet      string    `gorm:"column:tefet"`      // Tranche d'effectif salarié de l'établissement
-	LibTEfet   string    `gorm:"column:libtefet"`   // Libellé de la tranche d'effectif de l'établissement
-	EfetCent   string    `gorm:"column:efetcent"`   // Effectif salarié de l'établissement à la centaine près
-	DEfet      time.Time `gorm:"column:defet"`      // Année de validité de l'effectif salarié de l'établissement
-	Origine    string    `gorm:"column:origine"`    // Origine de la création de l'établissement
-	DCret      string    `gorm:"column:dcret"`      // Année et mois de création de l'établissement
-	DDebAct    time.Time `gorm:"column:ddebact"`    // Date de début d’activité
-	ActivNat   string    `gorm:"column:activnat"`   // Nature de l'activité de l'établissement
-	LieuAct    string    `gorm:"column:lieuact"`    // Lieu de l'activité de l'établissement
-	ActiSurf   string    `gorm:"column:actisurf"`   // Type de magasin
-	SaisonAt   string    `gorm:"column:saisonat"`   // Caractère saisonnier ou non de l'activité de l'établissement
-	ModEt      string    `gorm:"column:modet"`      // Modalité de l'activité principale de l'établissement
-	ProdEt     string    `gorm:"column:prodet"`     // Caractère productif de l'établissement
-	ProdPart   string    `gorm:"column:prodpart"`   // Participation particulière à la production de l'établissement
-	AuxiLt     string    `gorm:"column:auxilt"`     // Caractère auxiliaire de l'activité de l'établissement
+	NatEtab    string     `gorm:"column:natetab"`    // Nature de l'établissement d'un entrepreneur individuel
+	LibNatEtab string     `gorm:"column:libnatetab"` // Libellé de la nature de l'établissement
+	APET700    string     `gorm:"column:apet700"`    // Activité principale de l'établissement
+	LibAPET    string     `gorm:"column:libapet"`    // Libellé de l'activité principale de l'établissement
+	DAPET      *time.Time `gorm:"column:dapet"`      // Année de validité de l'activité principale de l'établissement
+	TEfet      string     `gorm:"column:tefet"`      // Tranche d'effectif salarié de l'établissement
+	LibTEfet   string     `gorm:"column:libtefet"`   // Libellé de la tranche d'effectif de l'établissement
+	EfetCent   string     `gorm:"column:efetcent"`   // Effectif salarié de l'établissement à la centaine près
+	DEfet      *time.Time `gorm:"column:defet"`      // Année de validité de l'effectif salarié de l'établissement
+	Origine    string     `gorm:"column:origine"`    // Origine de la création de l'établissement
+	DCret      *time.Time `gorm:"column:dcret"`      // Année et mois de création de l'établissement
+	DDebAct    *time.Time `gorm:"column:ddebact"`    // Date de début d’activité
+	ActivNat   string     `gorm:"column:activnat"`   // Nature de l'activité de l'établissement
+	LieuAct    string     `gorm:"column:lieuact"`    // Lieu de l'activité de l'établissement
+	ActiSurf   string     `gorm:"column:actisurf"`   // Type de magasin
+	SaisonAt   string     `gorm:"column:saisonat"`   // Caractère saisonnier ou non de l'activité de l'établissement
+	ModEt      string     `gorm:"column:modet"`      // Modalité de l'activité principale de l'établissement
+	ProdEt     string     `gorm:"column:prodet"`     // Caractère productif de l'établissement
+	ProdPart   string     `gorm:"column:prodpart"`   // Participation particulière à la production de l'établissement
+	AuxiLt     string     `gorm:"column:auxilt"`     // Caractère auxiliaire de l'activité de l'établissement
 
 	// Identification de l'entreprise
 	NomenLong string `gorm:"column:nomen_long"` // Nom ou raison sociale de l'entreprise
@@ -96,38 +96,38 @@ type Establishment struct {
 	AdrMail  string `gorm:"column:adr_mail"` // Adresse mail
 
 	// Caractéristiques économiques de l'entreprise
-	NJ        string    `gorm:"column:nj"`      // Nature juridique de l'entreprise
-	LibNJ     string    `gorm:"column:libnj"`   // Libellé de la nature juridique
-	APEN700   string    `gorm:"column:apen700"` // Activité principale de l'entreprise
-	LibAPEN   string    `gorm:"column:libapen"` // Libellé de l'activité principale de l'entreprise
-	DAPEN     time.Time `gorm:"column:dapen"`   // Année de validité de l'activité principale de l'entreprise
-	APRM      string    `gorm:"column:aprm"`    // Activité principale au registre des métiers
-	ESS       string    `gorm:"column:ess"`     // Appartenance au champ de l’économie sociale et solidaire
-	DateESS   time.Time
-	TefEn     string    `gorm:"column:tefen"`     // Tranche d'effectif salarié de l'entreprise
-	LibTefEn  string    `gorm:"column:libtefen"`  // Libellé de la tranche d'effectif de l'entreprise
-	EfEnCent  string    `gorm:"column:efencent"`  // Effectif salarié de l'entreprise à la centaine près
-	DEfEn     time.Time `gorm:"column:defen"`     // Année de validité de l'effectif salarié de l'entreprise
-	Categorie string    `gorm:"column:categorie"` // Catégorie d'entreprise
-	DCrEn     string    `gorm:"column:dcren"`     // Année et mois de création de l'entreprise
-	AmintrEn  string    `gorm:"column:amintren"`  // Année et mois d'introduction de l'entreprise dans la base de diffusion
-	MonoAct   string    `gorm:"column:monoact"`   // Indice de monoactivité de l'entreprise
-	ModEn     string    `gorm:"column:moden"`     // Modalité de l'activité principale de l'entreprise
-	ProdEn    string    `gorm:"column:proden"`    // Caractère productif de l'entreprise
-	ESAANN    time.Time `gorm:"column:esaann"`    // Année de validité des rubriques de niveau entreprise en provenance de l'ESA*
-	TCA       string    `gorm:"column:tca"`       // Tranche de chiffre d'affaires pour les entreprises enquêtées par l'ESA*
-	ESAAPEN   string    `gorm:"column:esaapen"`   // Activité principale de l'entreprise issue de l'ESA*
-	ESASEC1N  string    `gorm:"column:esasec1n"`  // Première activité secondaire déclarée dans l'ESA*
-	ESASEC2N  string    `gorm:"column:esasec2n"`  // Deuxième activité secondaire déclarée dans l'ESA*
-	ESASEC3N  string    `gorm:"column:esasec3n"`  // Troisième activité secondaire déclarée dans l'ESA*
-	ESASEC4N  string    `gorm:"column:esasec4n"`  // Quatrième activité secondaire déclarée dans l'ESA*
+	NJ        string     `gorm:"column:nj"`      // Nature juridique de l'entreprise
+	LibNJ     string     `gorm:"column:libnj"`   // Libellé de la nature juridique
+	APEN700   string     `gorm:"column:apen700"` // Activité principale de l'entreprise
+	LibAPEN   string     `gorm:"column:libapen"` // Libellé de l'activité principale de l'entreprise
+	DAPEN     *time.Time `gorm:"column:dapen"`   // Année de validité de l'activité principale de l'entreprise
+	APRM      string     `gorm:"column:aprm"`    // Activité principale au registre des métiers
+	ESS       string     `gorm:"column:ess"`     // Appartenance au champ de l’économie sociale et solidaire
+	DateESS   *time.Time
+	TefEn     string     `gorm:"column:tefen"`     // Tranche d'effectif salarié de l'entreprise
+	LibTefEn  string     `gorm:"column:libtefen"`  // Libellé de la tranche d'effectif de l'entreprise
+	EfEnCent  string     `gorm:"column:efencent"`  // Effectif salarié de l'entreprise à la centaine près
+	DEfEn     *time.Time `gorm:"column:defen"`     // Année de validité de l'effectif salarié de l'entreprise
+	Categorie string     `gorm:"column:categorie"` // Catégorie d'entreprise
+	DCrEn     *time.Time `gorm:"column:dcren"`     // Année et mois de création de l'entreprise
+	AmintrEn  *time.Time `gorm:"column:amintren"`  // Année et mois d'introduction de l'entreprise dans la base de diffusion
+	MonoAct   string     `gorm:"column:monoact"`   // Indice de monoactivité de l'entreprise
+	ModEn     string     `gorm:"column:moden"`     // Modalité de l'activité principale de l'entreprise
+	ProdEn    string     `gorm:"column:proden"`    // Caractère productif de l'entreprise
+	ESAANN    *time.Time `gorm:"column:esaann"`    // Année de validité des rubriques de niveau entreprise en provenance de l'ESA*
+	TCA       string     `gorm:"column:tca"`       // Tranche de chiffre d'affaires pour les entreprises enquêtées par l'ESA*
+	ESAAPEN   string     `gorm:"column:esaapen"`   // Activité principale de l'entreprise issue de l'ESA*
+	ESASEC1N  string     `gorm:"column:esasec1n"`  // Première activité secondaire déclarée dans l'ESA*
+	ESASEC2N  string     `gorm:"column:esasec2n"`  // Deuxième activité secondaire déclarée dans l'ESA*
+	ESASEC3N  string     `gorm:"column:esasec3n"`  // Troisième activité secondaire déclarée dans l'ESA*
+	ESASEC4N  string     `gorm:"column:esasec4n"`  // Quatrième activité secondaire déclarée dans l'ESA*
 
 	// Données specifiques aux mises à jour
-	VMaj    string    `gorm:"column:vmaj"`    // Nature de la mise à jour (création, suppression, modification)
-	VMaj1   string    `gorm:"column:vmaj1"`   // Indicateur de mise à jour n°1
-	VMaj2   string    `gorm:"column:vmaj2"`   // Indicateur de mise à jour n°2
-	VMaj3   string    `gorm:"column:vmaj3"`   // Indicateur de mise à jour n°3
-	DateMaj time.Time `gorm:"column:datemaj"` // Date de traitement de la mise à jour
+	VMaj    string     `gorm:"column:vmaj"`    // Nature de la mise à jour (création, suppression, modification)
+	VMaj1   string     `gorm:"column:vmaj1"`   // Indicateur de mise à jour n°1
+	VMaj2   string     `gorm:"column:vmaj2"`   // Indicateur de mise à jour n°2
+	VMaj3   string     `gorm:"column:vmaj3"`   // Indicateur de mise à jour n°3
+	DateMaj *time.Time `gorm:"column:datemaj"` // Date de traitement de la mise à jour
 }
 
 func (e *Establishment) ToUC() *domain.Establishment {
@@ -238,10 +238,10 @@ func (e *Establishment) ToUC() *domain.Establishment {
 // Enterprises is a slice of Enterprise
 type Establishments []Establishment
 
-func (es *Establishments) ToUC() []domain.Establishment {
+func (es *Establishments) ToUC() *[]domain.Establishment {
 	var result []domain.Establishment
 	for _, e := range *es {
 		result = append(result, *e.ToUC())
 	}
-	return result
+	return &result
 }

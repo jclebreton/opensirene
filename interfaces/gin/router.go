@@ -40,7 +40,10 @@ func (s *Server) SetupRouter() {
 }
 
 func (s Server) SetupRoutes(httpG HttpGateway, prefix conf.Prefix) {
+	s.GinEngine.GET(prefix.Admin+"/ping", httpG.Ping)
+	s.GinEngine.GET(prefix.Admin+"/health", httpG.Health)
 	s.GinEngine.GET(prefix.Admin+"/history", httpG.GetDBStatus)
+
 	s.GinEngine.GET(prefix.Api+"/siret/:id", httpG.GetEnterpriseFromSiret)
 	s.GinEngine.GET(prefix.Api+"/siren/:id", httpG.GetEstablishmentsFromSiren)
 }

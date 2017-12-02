@@ -1,4 +1,4 @@
-package usecases
+package monitoring
 
 import (
 	"github.com/jclebreton/opensirene/domain"
@@ -9,11 +9,11 @@ type GetDBStatusRequest struct{}
 
 // GetDBStatus returns the list of updates applied in the database
 func (i *Interactor) GetDBStatus(r GetDBStatusRequest) ([]domain.UpdateFileStatus, error) {
-	return r.findDBSatus(i)
+	return r.getDBStatus(i)
 }
 
-func (r *GetDBStatusRequest) findDBSatus(i *Interactor) ([]domain.UpdateFileStatus, error) {
-	hh, err := i.DBStatusRW.FindDatabaseStatus()
+func (r *GetDBStatusRequest) getDBStatus(i *Interactor) ([]domain.UpdateFileStatus, error) {
+	hh, err := i.MonitoringRW.GetDBStatus()
 	if err != nil {
 		return nil, err
 	}

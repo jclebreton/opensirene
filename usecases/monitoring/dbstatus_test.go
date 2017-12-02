@@ -1,4 +1,4 @@
-package usecases
+package monitoring
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ func TestFindHistories(t *testing.T) {
 	}
 	for k, tt := range tests {
 		r := GetDBStatusRequest{}
-		i := &Interactor{DBStatusRW: mocked.RW{FindDatabaseStatusRet: mocked.FindDatabaseStatusRet{tt.retH, tt.retErr}}}
+		i := &Interactor{MonitoringRW: mocked.RW{FindDatabaseStatusRet: mocked.FindDatabaseStatusRet{tt.retH, tt.retErr}}}
 
 		returned, err := r.findDBSatus(i)
 

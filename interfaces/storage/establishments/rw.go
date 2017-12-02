@@ -38,17 +38,17 @@ func (rw *RW) FindEnterpriseBySiret(siret string) (*domain.Establishment, error)
 
 	sql := fmt.Sprintf("SELECT %s FROM enterprises WHERE siren=$1 AND nic=$2", strings.Join(cols, ", "))
 	err := rw.PgxClient.QueryRow(sql, e.Siren, e.Nic).Scan(&e.Siren, &e.Nic, &e.L1Normalisee, &e.L2Normalisee,
-		&e.L3Normalisee, &e.L4Normalisee, &e.L5Normalisee, &e.L6Normalisee, &e.L7Normalisee, &e.L1Declaree, &e.L2Declaree,
-		&e.L3Declaree, &e.L4Declaree, &e.L5Declaree, &e.L6Declaree, &e.L7Declaree, &e.NumVoie, &e.IndRep, &e.TypVoie,
-		&e.LibVoie, &e.CodePos, &e.Cedex, &e.RPEt, &e.LibReg, &e.DepEt, &e.ArronEt, &e.CtonEt, &e.ComEt, &e.LibCom,
-		&e.DU, &e.TU, &e.UU, &e.EPCI, &e.TCD, &e.ZemEt, &e.Siege, &e.Enseigne, &e.IndPublipo, &e.DiffCom, &e.AmintrEt,
-		&e.NatEtab, &e.LibNatEtab, &e.APET700, &e.LibAPET, &e.DAPET, &e.TEfet, &e.LibTEfet, &e.EfetCent, &e.DEfet,
-		&e.Origine, &e.DCret, &e.DDebAct, &e.ActivNat, &e.LieuAct, &e.ActiSurf, &e.SaisonAt, &e.ModEt, &e.ProdEt,
-		&e.ProdPart, &e.AuxiLt, &e.NomenLong, &e.Sigle, &e.Nom, &e.Prenom, &e.Civilite, &e.RNA, &e.NicSiege, &e.RPEn,
-		&e.DepComEn, &e.AdrMail, &e.NJ, &e.LibNJ, &e.APEN700, &e.LibAPEN, &e.DAPEN, &e.APRM, &e.ESS, &e.DateESS, &e.TefEn,
-		&e.LibTefEn, &e.EfEnCent, &e.DEfEn, &e.Categorie, &e.DCrEn, &e.AmintrEn, &e.MonoAct, &e.ModEn, &e.ProdEn,
-		&e.ESAANN, &e.TCA, &e.ESAAPEN, &e.ESASEC1N, &e.ESASEC2N, &e.ESASEC3N, &e.ESASEC4N, &e.VMaj, &e.VMaj1,
-		&e.VMaj2, &e.VMaj3, &e.DateMaj)
+		&e.L3Normalisee, &e.L4Normalisee, &e.L5Normalisee, &e.L6Normalisee, &e.L7Normalisee, &e.L1Declaree,
+		&e.L2Declaree, &e.L3Declaree, &e.L4Declaree, &e.L5Declaree, &e.L6Declaree, &e.L7Declaree, &e.NumVoie, &e.IndRep,
+		&e.TypVoie, &e.LibVoie, &e.CodePos, &e.Cedex, &e.RPEt, &e.LibReg, &e.DepEt, &e.ArronEt, &e.CtonEt, &e.ComEt,
+		&e.LibCom, &e.DU, &e.TU, &e.UU, &e.EPCI, &e.TCD, &e.ZemEt, &e.Siege, &e.Enseigne, &e.IndPublipo, &e.DiffCom,
+		&e.AmintrEt, &e.NatEtab, &e.LibNatEtab, &e.APET700, &e.LibAPET, &e.DAPET, &e.TEfet, &e.LibTEfet, &e.EfetCent,
+		&e.DEfet, &e.Origine, &e.DCret, &e.DDebAct, &e.ActivNat, &e.LieuAct, &e.ActiSurf, &e.SaisonAt, &e.ModEt,
+		&e.ProdEt, &e.ProdPart, &e.AuxiLt, &e.NomenLong, &e.Sigle, &e.Nom, &e.Prenom, &e.Civilite, &e.RNA, &e.NicSiege,
+		&e.RPEn, &e.DepComEn, &e.AdrMail, &e.NJ, &e.LibNJ, &e.APEN700, &e.LibAPEN, &e.DAPEN, &e.APRM, &e.ESS,
+		&e.DateESS, &e.TefEn, &e.LibTefEn, &e.EfEnCent, &e.DEfEn, &e.Categorie, &e.DCrEn, &e.AmintrEn, &e.MonoAct,
+		&e.ModEn, &e.ProdEn, &e.ESAANN, &e.TCA, &e.ESAAPEN, &e.ESASEC1N, &e.ESASEC2N, &e.ESASEC3N, &e.ESASEC4N, &e.VMaj,
+		&e.VMaj1, &e.VMaj2, &e.VMaj3, &e.DateMaj)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (rw *RW) FindEnterpriseBySiret(siret string) (*domain.Establishment, error)
 	return &e, nil
 }
 
-func (rw *RW) FindEstablishmentsFromSiren(siren, limit, offset string) ([]domain.Establishment, error) {
+func (rw *RW) FindEstablishmentsFromSiren(siren, limit, offset string) (*[]domain.Establishment, error) {
 	var err error
 	var es Establishments
 	lim := -1

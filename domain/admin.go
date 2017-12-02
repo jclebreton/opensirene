@@ -13,6 +13,9 @@ type UpdateFileStatus struct {
 
 // Health is a struct mapping service data for monitoring
 type Health struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
+	Name    string
+	Version string
 }
+
+// Pong is used for ping request
+type Pong string
