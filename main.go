@@ -7,9 +7,9 @@ import (
 	"github.com/jackc/pgx"
 	"github.com/jclebreton/opensirene/conf"
 	"github.com/jclebreton/opensirene/database"
-	http "github.com/jclebreton/opensirene/interfaces/http"
-	cors "github.com/jclebreton/opensirene/interfaces/http/cors"
-	"github.com/jclebreton/opensirene/interfaces/http/monitoring"
+	"github.com/jclebreton/opensirene/interfaces/gin"
+	"github.com/jclebreton/opensirene/interfaces/gin/cors"
+	"github.com/jclebreton/opensirene/interfaces/gin/monitoring"
 	"github.com/jclebreton/opensirene/interfaces/json"
 	"github.com/jclebreton/opensirene/interfaces/storage/db_status"
 	"github.com/jclebreton/opensirene/interfaces/storage/establishments"
@@ -54,11 +54,11 @@ func loadConf() {
 	}
 }
 
-func setupServer(gormClient *gorm.DB, pgxClient *pgx.ConnPool) http.Server {
-	server := http.NewServer(conf.C.Server)
+func setupServer(gormClient *gorm.DB, pgxClient *pgx.ConnPool) gin.Server {
+	server := gin.NewServer(conf.C.Server)
 	server.SetupRouter()
 	server.StartMonitoring(monitoring.NewPrometheus(conf.C.Prometheus.Prefix, server.GinEngine))
-	server.SetupRoutes(http.NewHttpGateway(setInteractor(gormClient, pgxClient)), conf.C.Server.Prefix)
+	server.SetupRoutes(gin.NewHttpGateway(setInteractor(gormClient, pgxClient)), conf.C.Server.Prefix)
 	if conf.C.Server.Cors.Enabled {
 		server.SetupCors(cors.NewStandardCors(conf.C.Server.Cors.PermissiveMode, conf.C.Server.Cors.AllowOrigins))
 	}

@@ -1,4 +1,4 @@
-package http
+package gin
 
 import "github.com/jclebreton/opensirene/usecases"
 
