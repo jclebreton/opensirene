@@ -25,7 +25,7 @@ func TestFindHistories(t *testing.T) {
 	}
 	for k, tt := range tests {
 		r := GetDBStatusRequest{}
-		i := &Interactor{DBStatusRW: mocked.RW{mocked.FindDatabaseStatusRet{tt.retH, tt.retErr}}}
+		i := &Interactor{DBStatusRW: mocked.RW{FindDatabaseStatusRet: mocked.FindDatabaseStatusRet{tt.retH, tt.retErr}}}
 
 		returned, err := r.findDBSatus(i)
 

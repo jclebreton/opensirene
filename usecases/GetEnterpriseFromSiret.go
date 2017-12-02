@@ -1,6 +1,10 @@
 package usecases
 
-import "github.com/jclebreton/opensirene/domain"
+import (
+	"errors"
+
+	"github.com/jclebreton/opensirene/domain"
+)
 
 type GetEnterpriseFromSiretRequest struct {
 	Siret string
@@ -15,6 +19,10 @@ func (r *GetEnterpriseFromSiretRequest) findEnterpriseFromSiret(i *Interactor) (
 	e, err := i.EnterprisesRW.FindEnterpriseBySiret(r.Siret)
 	if err != nil {
 		return nil, err
+	}
+
+	if e == nil {
+		return nil, errors.New("nothing found")
 	}
 
 	return e, nil

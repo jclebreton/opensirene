@@ -15,5 +15,5 @@ type DBStatusRW interface {
 
 type EnterprisesRW interface {
 	FindEnterpriseBySiret(siret string) (*domain.Establishment, error)
-	FindEstablishmentsFromSiren(siren, limit, offset string) ([]domain.Establishment, error)
+	FindEstablishmentsFromSiren(siren, limit, offset string) (*[]domain.Establishment, error)
 }
