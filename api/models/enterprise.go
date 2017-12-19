@@ -33,7 +33,7 @@ type Enterprise struct {
 	IndRep  string `json:"indrep" gorm:"column:indrep"`   // Indice de répétition
 	TypVoie string `json:"typvoie" gorm:"column:typvoie"` // Type de la voie
 	LibVoie string `json:"libvoie" gorm:"column:libvoie"` // Libellé de la voie
-	CodePos string `json:"codepos" gorm:"column:codepos"` // Code postal
+	CodPos  string `json:"codpos" gorm:"column:codpos"`   // Code postal
 	Cedex   string `json:"cedex" gorm:"column:cedex"`     // Code Cedex
 
 	// Localisation Géographique
