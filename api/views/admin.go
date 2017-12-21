@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jclebreton/opensirene/api/models"
+	"github.schibsted.io/opensirene/conf"
 )
 
 // GetHistory is in charge of querying the database to get database history
@@ -26,6 +27,21 @@ func (v *ViewsContext) GetPing(c *gin.Context) {
 
 // GetHealth is a monitoring endpoint
 func (v *ViewsContext) GetHealth(c *gin.Context) {
-	h := models.Health{Name: "opensirene", Version: v.Version}
+	h := models.Health{
+		Name:    "opensirene",
+		Version: v.Version,
+		Dependencies: map[string]models.Dependency{
+			conf.C.Database.Host: models.Dependency{
+				Name:   conf.C.Database.Name,
+				Status: "Unknown",
+				Error:  "",
+			},
+			"www.data.gouv.fr": models.Dependency{
+				Name:   "www.data.gouv.fr",
+				Status: "Unknown",
+				Error:  "",
+			},
+		},
+	}
 	c.JSON(http.StatusOK, h)
 }
