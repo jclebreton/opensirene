@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jclebreton/opensirene/api/models"
-	"github.schibsted.io/opensirene/conf"
+	"github.com/jclebreton/opensirene/conf"
 )
 
 // GetHistory is in charge of querying the database to get database history
