@@ -14,7 +14,7 @@ import (
 )
 
 // SetupAndRun creates the router and runs it
-func SetupAndRun(gormClient *gorm.DB, version string) error {
+func SetupAndRun(gormClient *gorm.DB, version, buildDate string) error {
 	// Setup debug mode or not in Gin
 	if !conf.C.Server.Debug {
 		gin.SetMode(gin.ReleaseMode)
@@ -40,7 +40,7 @@ func SetupAndRun(gormClient *gorm.DB, version string) error {
 	p := ginprom.New(ginprom.Subsystem(conf.C.Prometheus.Prefix), ginprom.Engine(r))
 	r.Use(p.Instrument())
 	// Route setup
-	views := &views.ViewsContext{GormClient: gormClient, Version: version}
+	views := &views.ViewsContext{GormClient: gormClient, Version: version, BuildDate: buildDate}
 	r.GET(conf.C.Server.Prefix.Api+"/siret/:id", views.GetSiret)
 	r.GET(conf.C.Server.Prefix.Api+"/siren/:id", views.GetSiren)
 	r.GET(conf.C.Server.Prefix.Admin+"/history", views.GetHistory)

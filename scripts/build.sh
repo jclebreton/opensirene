@@ -2,4 +2,5 @@
 
 source ./scripts/version.sh
 deb_version=$(getVersionFromGitTag)
-go build -ldflags "-X main.version=${deb_version}"
+build_date=$(date --rfc-3339=seconds)
+go build -ldflags "-X 'main.version=${deb_version}' -X 'main.buildDate=${build_date}'"

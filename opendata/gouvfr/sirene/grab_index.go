@@ -13,7 +13,7 @@ var location *time.Location
 
 // Grab can be used to grab the full dataset object
 func Grab() (*api.Dataset, error) {
-	r, err := http.Get(datasetEndpoint + sirenID)
+	r, err := http.Get(DatasetEndpoint + SirenID)
 	if err != nil {
 		return nil, err
 	}

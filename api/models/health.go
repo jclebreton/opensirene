@@ -4,6 +4,7 @@ package models
 type Health struct {
 	Name         string                `json:"name"`
 	Version      string                `json:"version"`
+	BuildDate    string                `json:build_date`
 	Dependencies map[string]Dependency `json:"dependencies"`
 }
 

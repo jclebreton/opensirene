@@ -20,8 +20,8 @@ import (
 )
 
 const (
-	sirenID         = "5862206588ee38254d3f4e5e"
-	datasetEndpoint = "https://www.data.gouv.fr/api/1/datasets/"
+	SirenID         = "5862206588ee38254d3f4e5e"
+	DatasetEndpoint = "https://www.data.gouv.fr/api/1/datasets/"
 )
 
 // FileType is the main representation for the filetype
