@@ -14,6 +14,7 @@ import (
 
 // This variable is overridden at compile time when using script/build.sh
 var version = "dev"
+var buildDate = "no build date"
 
 func main() {
 	var err error
@@ -56,7 +57,7 @@ func main() {
 		err = gormClient.Close()
 		logrus.WithError(err).Fatal("Couldn't close GORM")
 	}()
-	if err = router.SetupAndRun(gormClient, version); err != nil {
+	if err = router.SetupAndRun(gormClient, version, buildDate); err != nil {
 		logrus.WithError(err).Fatal("Could not setup and run API")
 	}
 }
