@@ -51,6 +51,11 @@ func GrabLatestFull(dPath string) (RemoteFiles, error) {
 			logrus.Warn("Ignored daily that is before the first day of month")
 			continue
 		}
+
+		if rf.Type != StockType && rf.Type != DailyType {
+			continue
+		}
+
 		rfs = append(rfs, rf)
 		if rf.Type == StockType {
 			break
