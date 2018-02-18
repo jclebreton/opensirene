@@ -1,4 +1,4 @@
-# OpenSirene [![Build Status](https://travis-ci.org/jclebreton/opensirene.svg?branch=v2)](https://travis-ci.org/jclebreton/opensirene) [![codecov](https://codecov.io/gh/jclebreton/opensirene/branch/master/graph/badge.svg)](https://codecov.io/gh/jclebreton/opensirene)
+# OpenSirene [![Build Status](https://travis-ci.org/jclebreton/opensirene.svg?branch=v2)](https://travis-ci.org/jclebreton/opensirene)
 
 OpenSirene  is a REST micro-service to build and access a database of French companies
 provided by the [French government's open data](https://www.data.gouv.fr/fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/).
